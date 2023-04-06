@@ -44,9 +44,6 @@ public class UserController {
     private static final long duration = 1*1000*60*5;
     private static final String MAIL_POSTFIX_REGISTER = "register";
     private static final String MAIL_POSTFIX_RESET = "reset";
-
-
-
     @GetMapping("/register")
     public String register(){
         return "register";
@@ -55,9 +52,7 @@ public class UserController {
 
     @GetMapping("/login")
     public String login(){
-
         return "login";
-
     }
 
 
@@ -132,7 +127,6 @@ public class UserController {
         codeMap.put(mail+MAIL_POSTFIX_REGISTER,code+","+System.currentTimeMillis());
         return new Result(ResultConstant.CODE_SUCCESS,ResultConstant.MESSAGE_SUCCESS,null);
     }
-
 
     @GetMapping("/resetPwd/ValidateMail")
     public Object createResetCode(Integer uid){

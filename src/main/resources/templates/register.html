@@ -12,6 +12,7 @@
   <script src="../static/js/bootstrap.bundle.min.js" th:src="@{/js/bootstrap.bundle.min.js}"></script>
   <script src="../static/js/SourcePath.js" th:src="@{/js/SourcePath.js}"></script>
   <script src="../static/js/register.js" th:src="@{/js/register.js}"></script>
+  <script src="../static/js/mailUtil.js" th:src="@{/js/mailUtil.js}"></script>
 </head>
 <body class="my-login-page" th:style="'background-size: 100% 90%;background-image: url('+@{img/backImg.jpg}+');background-repeat: no-repeat;background-position: center;background-attachment: fixed'" style="background-size: 100% 90%;background-image: url('../static/img/backImg.jpg');background-repeat: no-repeat;background-position: center;background-attachment: fixed">
 <section class="h-100">
@@ -24,10 +25,10 @@
         <div class="card fat" >
           <div class="card-body" style="overflow-y: scroll;height: 600px">
             <h4 class="card-title">Register</h4>
-            <form method="POST" class="my-login-validation" novalidate="">
+            <form id="registerForm" class="my-login-validation" novalidate="">
               <div class="form-group">
-                <label for="username">username</label>
-                <input id="username" type="text" class="form-control" name="username" placeholder="Only letters and numbers are allowed and length is between 5 and 30" required autofocus>
+                <label for="username">Username</label>
+                <input id="username" type="text" class="form-control" name="username" placeholder="Only letters and numbers are allowed" required autofocus>
                 <div class="invalid-feedback">
                   What's your name?
                 </div>
@@ -36,7 +37,7 @@
 
               <div class="form-group">
                 <label for="pwd">Password</label>
-                <input id="pwd" type="password" class="form-control" name="pwd" placeholder="Only letters and numbers are allowed and length is between 5 and 15" required data-eye>
+                <input id="pwd" type="password" class="form-control" name="pwd" placeholder="Only letters and numbers are allowed" required data-eye>
                 <div class="invalid-feedback">
                   Password is required
                 </div>
@@ -44,8 +45,8 @@
 
 
               <div class="form-group">
-                <label for="rpwd">repeat Password</label>
-                <input id="rpwd" type="password" class="form-control" name="pwd" placeholder="consistent with password" required data-eye/>
+                <label for="rpwd">Repeat Password</label>
+                <input id="rpwd" type="password" class="form-control" placeholder="consistent with password" required data-eye/>
 <!--                <div class="invalid-feedback">-->
 <!--                  password is required-->
 <!--                </div>-->
@@ -67,8 +68,8 @@
 
 
               <div class="form-group">
-                <label for="verification code">verification code</label>
-                <input class="form-control" id="verification code" type="text" name="code"/>
+                <label for="verificationCode">verification code</label>
+                <input class="form-control" id="verificationCode" type="text" name="code"/>
               </div>
 
 <!--              <div class="form-group">-->
@@ -82,7 +83,7 @@
 <!--              </div>-->
 
               <div class="form-group m-0">
-                <button type="button" class="btn btn-primary btn-block" style="background-color: #FFCB62">
+                <button type="button" onclick="register()" class="btn btn-primary btn-block" style="background-color: #FFCB62">
                   Register
                 </button>
               </div>
