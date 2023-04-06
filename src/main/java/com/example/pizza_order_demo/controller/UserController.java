@@ -25,7 +25,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
 
-
+import javax.servlet.http.HttpServletRequest;
 import java.util.concurrent.ConcurrentHashMap;
 
 @Controller
@@ -44,6 +44,24 @@ public class UserController {
     private static final long duration = 1*1000*60*5;
     private static final String MAIL_POSTFIX_REGISTER = "register";
     private static final String MAIL_POSTFIX_RESET = "reset";
+
+
+
+
+    @GetMapping("/hello")
+    @ResponseBody
+    public String hello(HttpServletRequest httpServletRequest){
+        httpServletRequest.getSession();
+        return "1233333";
+    }
+
+    @GetMapping("/hello2")
+    @ResponseBody
+    public String hello2(HttpServletRequest httpServletRequest){
+
+        return "222222222";
+    }
+
 
 
 
