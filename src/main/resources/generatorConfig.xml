@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE generatorConfiguration PUBLIC "-//mybatis.org//DTD MyBatis Generator Configuration 1.0//EN" "http://mybatis.org/dtd/mybatis-generator-config_1_0.dtd" >
+<generatorConfiguration>
+    <!-- 引入配置文件 -->
+    <properties resource="generator.properties" />
+
+    <context id="context1" targetRuntime="MyBatis3">
+
+        <!-- 数据库连接信息 -->
+        <jdbcConnection driverClass="${jdbc.driverClassName}"
+                        connectionURL="${jdbc.url}" userId="${jdbc.username}" password="${jdbc.password}" >
+
+            <property name="nullCatalogMeansCurrent" value="true"/>
+        </jdbcConnection>
+
+        <!-- 生成Model对象路径配置 -->
+        <javaModelGenerator targetPackage="com.example.pizza_order_demo.model"
+                            targetProject="src\main\java">
+            <property name="enableSubPackages" value="true" />
+            <property name="trimStrings" value="true" />
+        </javaModelGenerator>
+
+        <!-- 生成sqlXML文件路径配置 -->
+        <sqlMapGenerator targetPackage="com.example.pizza_order_demo.mapper"
+                         targetProject="src\main\java">
+            <property name="enableSubPackages" value="true" />
+        </sqlMapGenerator>
+
+        <!-- 生成DAO的类文件路径配置 -->
+        <javaClientGenerator targetPackage="com.example.pizza_order_demo.mapper"
+                             targetProject="src\main\java" type="XMLMAPPER">
+            <property name="enableSubPackages" value="true" />
+        </javaClientGenerator>
+
+        <!--要生成哪些表 -->
+        <table tableName="t_user" domainObjectName="User" ><generatedKey column="id" sqlStatement="Mysql" identity="true"/></table>
+        <table tableName="t_category" domainObjectName="Category" ><generatedKey column="id" sqlStatement="Mysql" identity="true"/></table>
+        <table tableName="t_comment" domainObjectName="Comment" ><generatedKey column="id" sqlStatement="Mysql" identity="true"/></table>
+        <table tableName="t_coupon" domainObjectName="Coupon" ><generatedKey column="id" sqlStatement="Mysql" identity="true"/></table>
+        <table tableName="t_deliveryman" domainObjectName="Deliveryman" ><generatedKey column="id" sqlStatement="Mysql" identity="true"/></table>
+        <table tableName="t_dish" domainObjectName="Dish" ><generatedKey column="id" sqlStatement="Mysql" identity="true"/></table>
+        <table tableName="t_flavour" domainObjectName="Flavour" ><generatedKey column="id" sqlStatement="Mysql" identity="true"/></table>
+        <table tableName="t_inventory" domainObjectName="Inventory" ><generatedKey column="id" sqlStatement="Mysql" identity="true"/></table>
+        <table tableName="t_log" domainObjectName="Log" ><generatedKey column="id" sqlStatement="Mysql" identity="true"/></table>
+        <table tableName="t_order" domainObjectName="Order" ><generatedKey column="id" sqlStatement="Mysql" identity="true"/></table>
+        <table tableName="t_order_detail" domainObjectName="OrderDetail" ><generatedKey column="id" sqlStatement="Mysql" identity="true"/></table>
+        <table tableName="t_plan" domainObjectName="Plan" ><generatedKey column="id" sqlStatement="Mysql" identity="true"/></table>
+        <table tableName="t_role" domainObjectName="Role" ><generatedKey column="id" sqlStatement="Mysql" identity="true"/></table>
+        <table tableName="t_turnover" domainObjectName="Turnover" ><generatedKey column="id" sqlStatement="Mysql" identity="true"/></table>
+        <table tableName="t_user_address" domainObjectName="UserAddress" ><generatedKey column="id" sqlStatement="Mysql" identity="true"/></table>
+        <table tableName="t_user_role" domainObjectName="UserRole" ><generatedKey column="id" sqlStatement="Mysql" identity="true"/></table>
+        <table tableName="t_wallet" domainObjectName="Wallet" ><generatedKey column="id" sqlStatement="Mysql" identity="true"/></table>
+    </context>
+</generatorConfiguration>
