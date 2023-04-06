@@ -47,19 +47,17 @@ public class UserController {
 
 
 
-
-    @GetMapping("/hello")
-    @ResponseBody
-    public String hello(HttpServletRequest httpServletRequest){
-        httpServletRequest.getSession();
-        return "1233333";
+    @GetMapping("/register")
+    public String register(){
+        return "register";
     }
 
-    @GetMapping("/hello2")
-    @ResponseBody
-    public String hello2(HttpServletRequest httpServletRequest){
 
-        return "222222222";
+    @GetMapping("/login")
+    public String login(){
+
+        return "login";
+
     }
 
 
