@@ -5,22 +5,20 @@
     <meta name="author" content="Kodinger">
     <meta name="viewport" content="width=device-width,initial-scale=1">
     <title>My Login Page</title>
-    <link rel="stylesheet" href="../static/css/bootstrap.min.css">
-    <link rel="stylesheet" type="text/css" href="../static/css/my-login.css">
-
+    <link rel="stylesheet" href="../static/css/bootstrap.min.css" th:href="@{/css/bootstrap.min.css}">
+    <link rel="stylesheet" type="text/css" href="../static/css/my-login.css" th:href="@{/css/my-login.css}">
 <!--    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>-->
-    <script src="../static/js/bootstrap.bundle.min.js" th:src="${}"></script>
-    <script src="js/my-login.js"></script>
-
+    <script src="../static/js/bootstrap.bundle.min.js" th:src="@{/js/bootstrap.bundle.min.js}"></script>
+    <script th:src="@{/js/login.js}"></script>
 </head>
 
-<body class="my-login-page">
+<body class="my-login-page" th:style="'background-size: 100% 90%;background-image: url('+@{img/backImg.jpg}+');background-repeat: no-repeat;background-position: center;background-attachment: fixed'" style="background-size: 100% 90%;background-image: url('../static/img/backImg.jpg');background-repeat: no-repeat;background-position: center;background-attachment: fixed">
 <section class="h-100">
     <div class="container h-100">
-        <div class="row justify-content-md-center h-100">
+        <div class="row h-100 justify-content-md-end" >
             <div class="card-wrapper">
                 <div class="brand">
-                    <img src="img/logo.jpg" alt="logo">
+<!--                    <img src="img/logo.jpg" alt="logo">-->
                 </div>
                 <div class="card fat">
                     <div class="card-body">
@@ -54,7 +52,7 @@
                             </div>
 
                             <div class="form-group m-0">
-                                <button type="submit" class="btn btn-primary btn-block">
+                                <button type="submit" class="btn btn-primary btn-block" style="background-color: #FFCB62">
                                     Login
                                 </button>
                             </div>
@@ -64,9 +62,9 @@
                         </form>
                     </div>
                 </div>
-                <div class="footer">
-                    Copyright &copy; 2023 &mdash; GROUP 28
-                </div>
+<!--                <div class="footer">-->
+<!--                    Copyright &copy; 2023 &mdash; GROUP 28-->
+<!--                </div>-->
             </div>
         </div>
     </div>
