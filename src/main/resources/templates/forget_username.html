@@ -9,7 +9,7 @@
     <script src="js/footer.js"></script>
     <style type="text/css">
         .account-step-icon-doing {
-            background: #0069d9;
+            background: #FFBF3D;
         }
         .account-step-icon {
             font-size: 14px;
@@ -33,7 +33,7 @@
             display: flex;
             align-items: center;
             justify-content: space-between;
-            margin-bottom: 40px;
+            margin-bottom: 10%;
             /*width: 100%;*/
         }
 
@@ -60,8 +60,12 @@
 
 <body class="my-login-page">
 <section class="h-100">
-
-    <div style="margin-top: 10%">
+    <div>
+        <a href="../templates/login.html" th:href="@{/login}">
+        <img src="../static/img/logo.png" alt="logo" style="height: 120px;width: 40%; margin-left:30%;margin-top: 2%;">
+        </a>
+    </div>
+    <div style="margin-top: 5%; margin-left:20%;width: 60%;">
         <div class="account-step-wp">
             <div class="account-step-item">
                 <div class="account-step-icon account-step-icon-doing">1</div>
@@ -103,7 +107,7 @@
                             </div>
 
                             <div class="form-group m-0">
-                                <button id="btn" class="btn btn-primary btn-block">
+                                <button id="btn" class="btn btn-primary btn-block" style="background-color: #FFCB62">
                                     Reset password
                                 </button>
                             </div>
