@@ -7,23 +7,105 @@
     <script src="js/header.js"></script>
     <link href="css/my-login.css" rel="stylesheet"/>
     <script src="js/footer.js"></script>
+    <style type="text/css">
+        .account-step-icon-doing {
+            background: #0069d9;
+        }
+        .account-step-icon {
+            font-size: 14px;
+            box-sizing: border-box;
+            width: 24px;
+            height: 24px;
+            text-align: center;
+            line-height: 22px;
+            border-radius: 50%;
+            color: #fff;
+        }
+
+        .account-step-txt {
+            margin-top: 4px;
+            font-size: 16px;
+            line-height: 20px;
+            font-weight: 400;
+        }
+
+        .account-step-wp {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 40px;
+            /*width: 100%;*/
+        }
+
+        .account-step-item {
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            flex: 1;
+            /*margin: 1%;*/
+            width: auto;
+            /*margin: 0 10px;*/
+        }
+
+        .account-step-icon-todo {
+            border: 1px solid #9499a0;
+            color: #9499a0;
+            opacity: .4;
+        }
+
+    </style>
 </head>
 
 <body class="my-login-page">
 <section class="h-100">
+
+    <div style="margin-top: 10%">
+        <div class="account-step-wp">
+            <div class="account-step-item">
+                <div class="account-step-icon account-step-icon-doing">1</div>
+                <div class="account-step-txt" style="font-weight: 700">Input user name</div>
+            </div>
+            <div class="account-step-item">
+                <div class="account-step-icon account-step-icon-todo">2</div>
+                <div class="account-step-txt">Validate email</div>
+            </div>
+            <div class="account-step-item">
+                <div class="account-step-icon account-step-icon-todo">3</div>
+                <div class="account-step-txt">Reset password</div>
+            </div>
+        </div>
+    </div>
+
     <div class="container h-100">
+
+
         <div class="row h-100 justify-content-md-center" >
             <div class="card-wrapper">
-                <div style="margin-top: 60%">
-                    <!--                    <img src="img/logo.jpg" alt="logo">-->
-                </div>
+<!--                <div style="margin-top: 55%;">-->
+<!--                    &lt;!&ndash;                    <img src="img/logo.jpg" alt="logo">&ndash;&gt;-->
+<!--                </div>-->
                 <div class="card fat" >
                     <div class="card-body">
-                        <h4 class="card-title">Input user name</h4>
+                        <h4 class="card-title">Forget password</h4>
 
-                        <form id="form">
+                        <form id="form" class="my-login-validation" novalidate="">
                             <div class="form-group">
-                                <input id="username" name="username" class="form-control" type="text">
+                                <label for="username">User name</label>
+                                <input id="username" name="username" class="form-control" type="text" value="" required autofocus/>
+                                <div class="invalid-feedback">
+
+                                </div>
+                                <div class="form-text text-muted">
+                                    By clicking "Reset Password" we will send a password reset link
+                                </div>
+                            </div>
+
+                            <div class="form-group m-0">
+                                <button id="btn" class="btn btn-primary btn-block">
+                                    Reset password
+                                </button>
                             </div>
                         </form>
 
@@ -55,11 +137,6 @@
                         <!--                </div>-->
                         <!--              </div>-->
 
-                        <div class="form-group m-0">
-                            <button id="btn" class="btn-primary btn btn-block">
-                                Confirm user name
-                            </button>
-                        </div>
                     </div>
                 </div>
                 <!--                <div class="footer">-->
