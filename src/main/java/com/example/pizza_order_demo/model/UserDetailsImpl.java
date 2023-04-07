@@ -1,6 +1,7 @@
 package com.example.pizza_order_demo.model;
 
 import com.example.pizza_order_demo.service.impl.UserDetailServiceImpl;
+import org.apache.commons.lang3.ObjectUtils;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
@@ -13,6 +14,11 @@ public class UserDetailsImpl implements UserDetails{
     private Collection<? extends GrantedAuthority> auths;
 
     public UserDetailsImpl(User user,Collection<? extends GrantedAuthority> auths){
+        if (ObjectUtils.isEmpty(user)){
+            username = "";
+            pwd = "";
+            return;
+        }
         pwd = user.getPwd();
         username = user.getUsername();
         this.auths = auths;

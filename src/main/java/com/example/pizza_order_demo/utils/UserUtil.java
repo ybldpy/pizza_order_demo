@@ -29,9 +29,7 @@ public class UserUtil {
         else if (!MailUtil.isValidateMail(user.getMail())){
             return new Result(ResultConstant.CODE_FAILED,ErrorConstant.MAIL_ILLEGAL,null);
         }
-
         return null;
-
     }
 
     private static boolean isLegalUsernameOrPwd(String str){

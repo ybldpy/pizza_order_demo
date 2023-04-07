@@ -30,12 +30,12 @@ public class UserDetailServiceImpl implements UserDetailsService {
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        if (StringUtils.isBlank(username)){return new UserDetailsImpl();}
+        if (StringUtils.isBlank(username)){throw new UsernameNotFoundException("user name doesn't exist");}
         UserExample userExample = new UserExample();
         userExample.or().andUsernameEqualTo(username);
         User user = userService.selectFirstByExample(userExample);
         if (ObjectUtils.isEmpty(user)){
-            return new UserDetailsImpl();
+            throw new UsernameNotFoundException("user name doesn't exist");
         }
         int id = user.getId();
         UserRoleExample userRoleExample = new UserRoleExample();

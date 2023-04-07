@@ -14,6 +14,8 @@ public class ErrorConstant {
     public static final String MAIL_EXIST = "this mail has been used";
     public static final String CODE_WRONG = "validation code is wrong";
 
+    public static final String USER_LOGIN_USERNAME_PASSWORD_WRONG = "user name or password is incorrect";
+
 
 
 

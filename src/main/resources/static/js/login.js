@@ -18,7 +18,13 @@ function login(){
                 return true;
             },
             success:function (result){
-
+                if (result == undefined||result==null){alert("server error");}
+                else if (result.code!=1){
+                    alert(result.message);
+                }
+                else {
+                    window.location.href = basePath+"/"+result.data;
+                }
             }
         }
     )

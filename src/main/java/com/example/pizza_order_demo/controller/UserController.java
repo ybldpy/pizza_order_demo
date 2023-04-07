@@ -19,6 +19,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.JavaMailSenderImpl;
+import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.transaction.annotation.Transactional;
@@ -47,6 +48,19 @@ public class UserController {
     @GetMapping("/register")
     public String register(){
         return "register";
+    }
+
+
+    @RequestMapping("/login/success")
+    @ResponseBody
+    public Result loginSuccess(){
+        return new Result(1,ResultConstant.MESSAGE_SUCCESS,"/index");
+    }
+
+    @RequestMapping("/login/failure")
+    @ResponseBody
+    public Result loginFail(String username,String password){
+        return new Result(0,ErrorConstant.USER_LOGIN_USERNAME_PASSWORD_WRONG,null);
     }
 
 
