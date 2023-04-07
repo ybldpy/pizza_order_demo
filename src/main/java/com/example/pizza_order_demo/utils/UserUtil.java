@@ -11,6 +11,20 @@ import org.apache.commons.lang3.StringUtils;
 public class UserUtil {
 
 
+    /**
+     *
+     * @param str 用户名或密码
+     * @param minLen 最小长度
+     * @param maxLen 最大长度
+     * @return
+     */
+    public static boolean isValidateField(String str,int minLen,int maxLen){
+        if (StringUtils.isBlank(str)){return false;}
+        int len = str.length();
+        return len>=minLen&&len<=maxLen;
+    }
+
+
     public static Result checkRegisterField(User user){
         if (StringUtils.isAllBlank(user.getUsername())){
             return new Result(ResultConstant.CODE_FAILED, ErrorConstant.USER_REGISTER_MISSING_PARAM,null);

@@ -50,7 +50,6 @@ public class UserController {
         return "register";
     }
 
-
     @RequestMapping("/login/success")
     @ResponseBody
     public Result loginSuccess(){
@@ -61,6 +60,32 @@ public class UserController {
     @ResponseBody
     public Result loginFail(String username,String password){
         return new Result(0,ErrorConstant.USER_LOGIN_USERNAME_PASSWORD_WRONG,null);
+    }
+
+    @GetMapping("/forget/username")
+    public String forgetPasswordUsername(){
+        return "/forget_username";
+    }
+    @PostMapping("/forget/username")
+    @ResponseBody
+    public Result forgetPasswordUsername(String username){
+        if(!UserUtil.isValidateField(username,5,30)){
+            return new Result(ResultConstant.CODE_FAILED,ErrorConstant.USER_REGISTER_USERNAME_LENGTH,null);
+        }
+        UserExample userExample = new UserExample();
+        userExample.or().andUsernameEqualTo(username);
+        User user = userService.selectFirstByExample(userExample);
+        if (ObjectUtils.isEmpty(user)){return new Result(ResultConstant.CODE_FAILED,ErrorConstant.USER_NOT_FOUND,ErrorConstant.USER_NOT_FOUND);}
+        String mail = user.getMail();
+        String code = MailUtil.createValidationCode(6);
+        // send code
+        boolean res = true;
+        //res = MailUtil.sendCode(code,mail);
+        if (!res){
+            return new Result(ResultConstant.CODE_FAILED,ErrorConstant.CODE_SEND_ERROR,null);
+        }
+        System.out.println(code);
+        return new Result(ResultConstant.CODE_SUCCESS,ResultConstant.MESSAGE_SUCCESS,"forget/validateMail");
     }
 
 
