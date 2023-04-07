@@ -23,7 +23,7 @@
 
                         <form id="form">
                             <div class="form-group">
-                                <input name="username" class="form-control" type="text">
+                                <input id="username" name="username" class="form-control" type="text">
                             </div>
                         </form>
 
@@ -71,7 +71,14 @@
     <script>
         $(function (){
             $("#btn").on("click",function (){
+                $.ajax({
+                    type:"post",
+                    data:$("#loginForm").serialize(),
+                    beforeSend:function (){return checkUsername($("#username").val(),/^[A-Za-z0-9]+$/)},
+                    success:function (result){
 
+                    }
+                })
             })
         })
     </script>
