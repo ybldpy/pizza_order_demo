@@ -9,7 +9,9 @@
     <link rel="stylesheet" type="text/css" href="../static/css/my-login.css" th:href="@{/css/my-login.css}">
 <!--    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>-->
     <script src="../static/js/bootstrap.bundle.min.js" th:src="@{/js/bootstrap.bundle.min.js}"></script>
-    <script th:src="@{/js/login.js}"></script>
+    <script src="../static/js/SourcePath.js" th:src="@{/js/SourcePath.js}"></script>
+    <script src="../static/js/login.js" th:src="@{/js/login.js}"></script>
+<!--    <script th:src="@{/js/login.js}"></script>-->
 </head>
 
 <body class="my-login-page" th:style="'background-size: 100% 90%;background-image: url('+@{img/backgroundImage1.jpg}+');background-repeat: no-repeat;background-position: center;background-attachment: fixed'" style="background-size: 100% 90%;background-image: url('../static/img/backgroundImage1.jpg');background-repeat: no-repeat;background-position: center;background-attachment: fixed">
@@ -23,7 +25,7 @@
                 <div class="card fat">
                     <div class="card-body">
                         <h4 class="card-title">Login</h4>
-                        <form method="POST" class="my-login-validation" novalidate="">
+                        <form id="loginForm" class="my-login-validation" novalidate="">
                             <div class="form-group">
                                 <label for="username">User name</label>
                                 <input id="username" type="email" class="form-control" name="email" value="" required autofocus>
@@ -52,7 +54,7 @@
                             </div>
 
                             <div class="form-group m-0">
-                                <button type="submit" class="btn btn-primary btn-block" style="background-color: #FFCB62">
+                                <button type="button" class="btn btn-primary btn-block" style="background-color: #FFCB62">
                                     Login
                                 </button>
                             </div>

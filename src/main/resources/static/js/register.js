@@ -37,27 +37,15 @@ function checkField(){
     let mail = $("#mail").val();
     let code = $("#verificationCode").val();
 
-    if (username==undefined||username==null||username.length<5||username.length>30){
-        alert("length of user name is between 5 and 30");
+    if (!checkUserNameAndPwd(username,password)){
         return false;
     }
-    let rep = /^[A-Za-z0-9]+$/;
-    if (!rep.test(username)){
-        alert("Only letters and digital are allowed in user name");
-        return false;
-    }
-    if (password==null||password==undefined||password.length<5||password.length>20){
-        alert("length of password is between 5 and 20");
-        return false;
-    }
-    if (!rep.test(password)){
-        alert("Only letters and digital are allowed in password");
-        return false;
-    }
+
     if (repeatPasswowrd!==password){
         alert("password must be equal to repeat password");
         return false;
     }
+
     if (!isValidateMail(mail)){
         alert("illegal mail");
         return false;

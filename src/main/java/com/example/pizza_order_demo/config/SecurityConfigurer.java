@@ -15,10 +15,17 @@ public class SecurityConfigurer extends WebSecurityConfigurerAdapter {
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
-        http.authorizeRequests().antMatchers("/**").authenticated();
+        http.csrf().disable();
+        http.authorizeRequests().antMatchers("/login","/register**","/forget**").permitAll().anyRequest().authenticated();
         http.formLogin().loginPage("/login");
+//        http.authorizeRequests().antMatchers("/**").authenticated();
+//        http.formLogin().loginPage("/login");
+    }
 
 
+    @Override
+    public void configure(WebSecurity web) throws Exception {
+        web.ignoring().antMatchers("/css/**","/js/**","/img/**","/registerSuccess.html");
     }
 
     @Bean
