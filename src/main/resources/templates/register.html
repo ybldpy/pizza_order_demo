@@ -14,7 +14,7 @@
   <script src="../static/js/register.js" th:src="@{/js/register.js}"></script>
   <script src="../static/js/mailUtil.js" th:src="@{/js/mailUtil.js}"></script>
 </head>
-<body class="my-login-page" th:style="'background-size: 100% 90%;background-image: url('+@{img/backImg.jpg}+');background-repeat: no-repeat;background-position: center;background-attachment: fixed'" style="background-size: 100% 90%;background-image: url('../static/img/backImg1.jpg');background-repeat: no-repeat;background-position: center;background-attachment: fixed">
+<body class="my-login-page" th:style="'background-size: 100% 90%;background-image: url('+@{img/backgroundImage1.jpg}+');background-repeat: no-repeat;background-position: center;background-attachment: fixed'" style="background-size: 100% 90%;background-image: url('../static/img/backgroundImage1.jpg');background-repeat: no-repeat;background-position: center;background-attachment: fixed">
 <section class="h-100">
   <div class="container h-100">
     <div class="row justify-content-md-end h-100">
@@ -59,7 +59,7 @@
 <!--                  <button class="btn btn-outline-secondary">send verification code</button>-->
 <!--                </div>-->
                 <div style="margin-top: 2%">
-                  <button id="sendVerificationCodeBtn" type="button" class="btn btn-primary btn-block" style="height: auto;width: auto;background-color: #FFCB62;" onclick="sendVerificationCode(this)">send verification code</button>
+                  <button id="sendVerificationCodeBtn" type="button" class="btn btn-primary btn-block" style="height: auto;width: auto;background-color: #FFCB62;" onclick="sendVerificationCode(this)">Send Verification Code</button>
                 </div>
                 <div class="invalid-feedback">
                   Your email is invalid
@@ -68,7 +68,7 @@
 
 
               <div class="form-group">
-                <label for="verificationCode">verification code</label>
+                <label for="verificationCode">Verification Code</label>
                 <input class="form-control" id="verificationCode" type="text" name="code"/>
               </div>
 

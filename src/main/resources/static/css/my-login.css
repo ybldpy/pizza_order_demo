@@ -1,11 +1,15 @@
 html,body {
 	height: 100%;
+
 }
 
 body.my-login-page {
-	background-color: #f7f9fb;
+	filter: Alpha(opacity=20);
+	background: url("Image/backgroundImage3.jpg") no-repeat fixed center center;
+	background-size: 100% 90%;
 	font-size: 14px;
 }
+
 
 .my-login-page .brand {
 	width: 90px;
