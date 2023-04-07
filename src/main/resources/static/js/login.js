@@ -23,7 +23,7 @@ function login(){
                     alert(result.message);
                 }
                 else {
-                    window.location.href = basePath+"/"+result.data;
+                    window.location.href = result.data;
                 }
             }
         }

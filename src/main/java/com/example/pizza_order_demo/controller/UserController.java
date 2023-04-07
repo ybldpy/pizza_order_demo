@@ -54,7 +54,7 @@ public class UserController {
     @RequestMapping("/login/success")
     @ResponseBody
     public Result loginSuccess(){
-        return new Result(1,ResultConstant.MESSAGE_SUCCESS,"/index");
+        return new Result(1,ResultConstant.MESSAGE_SUCCESS,"index");
     }
 
     @RequestMapping("/login/failure")
