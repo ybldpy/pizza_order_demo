@@ -7,6 +7,7 @@ import com.example.pizza_order_demo.commons.constant.ResultConstant;
 import com.example.pizza_order_demo.model.User;
 import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.security.core.Authentication;
 
 public class UserUtil {
 
@@ -51,6 +52,11 @@ public class UserUtil {
 
         return str.matches("^[A-Za-z0-9]+$");
 
+    }
+
+    public static boolean hasRole(Authentication authentication,String role){
+        if (ObjectUtils.isEmpty(authentication)){return false;}
+        return authentication.getAuthorities().contains(role);
     }
 
 

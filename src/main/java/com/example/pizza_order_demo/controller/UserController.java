@@ -16,6 +16,7 @@ import com.example.pizza_order_demo.utils.UserUtil;
 import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.transaction.annotation.Transactional;
@@ -51,8 +52,9 @@ public class UserController {
 
     @RequestMapping("/login/success")
     @ResponseBody
-    public Result loginSuccess(){
-        return new Result(1,ResultConstant.MESSAGE_SUCCESS,"index");
+    public Result loginSuccess(Authentication authentication){
+
+        return new Result(1,ResultConstant.MESSAGE_SUCCESS,UserUtil.hasRole(authentication,UserConstant.ROLE_ADMIN)?UserConstant.PAGE_INDEX_ADMIN:UserConstant.PAGE_INDEX_CUSTOMER);
     }
 
     @RequestMapping("/login/failure")
@@ -95,6 +97,10 @@ public class UserController {
         model.addAttribute("username",username);
         return "forget/forget_reset";
     }
+    @GetMapping("/forget/resetSuccess")
+    public String resetSuccess(){
+        return "forget/resetSuccess";
+    }
 
     @PostMapping("/forget/validateMail")
     @ResponseBody
@@ -125,14 +131,22 @@ public class UserController {
         int res = userService.updateByPrimaryKey(user);
         if (res>0){
             codeMap.remove(username);
-            return new Result(ResultConstant.CODE_SUCCESS,ResultConstant.MESSAGE_SUCCESS,"resetSuccess.html");
+            return new Result(ResultConstant.CODE_SUCCESS,ResultConstant.MESSAGE_SUCCESS,"forget/resetSuccess");
         }
         throw new CURDException();
     }
 
 
     @GetMapping("/login")
-    public String login(){
+    public String login(Authentication authentication){
+        if (authentication!=null){
+            if (authentication.getAuthorities().contains(UserConstant.ROLE_ADMIN)){
+                return "admin";
+            }
+            else {
+                return "index";
+            }
+        }
         return "login";
     }
 
