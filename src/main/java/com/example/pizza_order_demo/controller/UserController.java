@@ -16,6 +16,7 @@ import com.example.pizza_order_demo.utils.UserUtil;
 import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.transaction.annotation.Transactional;
@@ -132,7 +133,9 @@ public class UserController {
 
 
     @GetMapping("/login")
-    public String login(){
+    public String login(Authentication authentication){
+        
+
         return "login";
     }
 
