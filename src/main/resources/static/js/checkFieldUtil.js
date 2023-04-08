@@ -3,7 +3,7 @@
 function checkUserNameAndPwd(username,password){
 
     let rep = /^[A-Za-z0-9]+$/;
-    return checkUsername(username,rep)&&checkPassword(password);
+    return checkUsername(username,rep)&&checkPassword(password,rep);
 }
 
 function checkUsername(username,rep){
@@ -24,15 +24,12 @@ function checkUsername(username,rep){
 
 function checkPassword(password,rep){
     if (typeof password!="string"){
-        alert("illegal password");
         return false;
     }
     if (password==null||password==undefined||password.length<5||password.length>20){
-        alert("length of password is between 5 and 20");
         return false;
     }
     if (!rep.test(password)){
-        alert("Only letters and digital are allowed in password");
         return false;
     }
 

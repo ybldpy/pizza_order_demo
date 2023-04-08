@@ -1,13 +1,14 @@
 <!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
-    <base href="../static/" th:href="@{/}">
+    <base href="../../static/" th:href="@{/}">
     <meta charset="UTF-8">
     <title>check username</title>
     <script src="js/header.js"></script>
     <link href="css/my-login.css" rel="stylesheet"/>
+    <link href="img/icon.png" rel="icon"/>
     <script src="js/footer.js"></script>
-    <script src="js/checkFieldUtil.js"></script>
+    <script src="js/myUtils.js"></script>
     <style type="text/css">
         .account-step-icon-doing {
             background: #FFBF3D;
@@ -34,7 +35,7 @@
             display: flex;
             align-items: center;
             justify-content: space-between;
-            margin-bottom: 10%;
+            margin-bottom: 5%;
             /*width: 100%;*/
         }
 
@@ -61,11 +62,35 @@
 
 <body class="my-login-page">
 <section class="h-100">
+<!--    <div id="messageContainer" style="z-index: 5;width: 30%;margin-top: 1%;position: absolute;margin-left: 35%">-->
+<!--        <div class="alert alert-danger fade show" role="alert">-->
+<!--            Server error-->
+<!--            <button type="button" class="close" data-dismiss="alert" aria-label="Close">-->
+<!--                <span aria-hidden="true">&times;</span>-->
+<!--            </button>-->
+<!--        </div>-->
+<!--    </div>-->
+    <div id="messageContainer" style="width: 20%;z-index: 5;margin-top: 0.5%;position: absolute;margin-left: 40%">
+<!--        <div class="alert alert-danger fade" role="alert" style="font-size: 15px">-->
+<!--            Server error-->
+<!--            <button type="button" class="close" data-dismiss="alert" aria-label="Close">-->
+<!--                <span aria-hidden="true">&times;</span>-->
+<!--            </button>-->
+<!--        </div>-->
+    </div>
     <div>
         <a href="../templates/login.html" th:href="@{/login}">
         <img src="img/logo.png" alt="logo" style="height: 17%;width: 25%; margin-left: 37.5%;margin-top: 2%">
         </a>
     </div>
+
+<!--    <div class="alert alert-danger alert-dismissible fade show" role="alert" style="z-index: 10;">-->
+<!--        A simple primary alert—check it out!-->
+<!--        <button type="button" class="close" data-dismiss="alert" aria-label="Close">-->
+<!--            <span aria-hidden="true">&times;</span>-->
+<!--        </button>-->
+<!--    </div>-->
+
     <div style="margin-top: 3%; margin-left:20%;width: 60%;">
         <div class="account-step-wp">
             <div class="account-step-item">
@@ -91,13 +116,14 @@
 <!--                    &lt;!&ndash;                    <img src="img/logo.jpg" alt="logo">&ndash;&gt;-->
 <!--                </div>-->
                 <div class="card fat" >
+
                     <div class="card-body">
                         <h4 class="card-title">Forget password</h4>
 
                         <form id="form" class="my-login-validation" novalidate="">
                             <div class="form-group">
                                 <label for="username">User name</label>
-                                <input id="username" name="username" class="form-control" type="text" value="" required autofocus/>
+                                <input id="username" oninput="$(this).siblings('.invalid-feedback').hide();" name="username" class="form-control" type="text" value="" required autofocus/>
                                 <div id="invalidUserName" class="invalid-feedback">
                                 </div>
                                 <div class="form-text text-muted">
@@ -107,7 +133,7 @@
 
                             <div class="form-group m-0">
                                 <button id="btn" type="button" class="btn btn-primary btn-block" style="background-color: #FFCB62">
-                                    Reset password
+                                    Next
                                 </button>
                             </div>
                         </form>
@@ -149,24 +175,36 @@
         </div>
     </div>
     <script>
+
+
+
         $(function (){
             $("#btn").on("click",function (){
                 $.ajax({
                     type:"post",
                     url:basePath+"/forget/username",
                     data:$("#form").serialize(),
-                    beforeSend:function (){return checkUsername($("#username").val(),/^[A-Za-z0-9]+$/)},
+                    beforeSend:function (){
+                         let canSend = checkUsername($("#username").val(),/^[A-Za-z0-9]+$/);
+                         if (!canSend){
+                             $(".invalid-feedback")[0].innerText = illegalUsername;
+                             $(".invalid-feedback").show();
+                         }
+                         return canSend;
+                        },
                     success:function (result){
                         if (result==undefined||result==null){
-                            alert("server error");
+                            alertUtil.message("server error","danger",$("#messageContainer"));
                         }
                         if (result.code!=1){
                             if (result.data==null||result==undefined){
-                                alert(result.message);
+                                // alert(result.message);
+                                alertUtil.message(result.message,"warning",$("#messageContainer"));
                             }
                             else {
-                                $("#invalidUserName")[0].innerText = result.message;
-                                $("#invalidUserName").show();
+                                // $("#invalidUserName")[0].innerText = result.message;
+                                // $("#invalidUserName").show();
+                                alertUtil.message(result.message,"danger",$("#messageContainer"));
                                 // $("#form")[0].innerHTML = ('<div class="alert alert-primary" role="alert">server error</div>');
                             }
                         }
@@ -176,7 +214,8 @@
                     },
                     error:function (){
                         // alert("server error");
-
+                        // alertUtil.alert("server error");
+                        alertUtil.message("server error","danger",$("#messageContainer"));
                     }
                 })
             })

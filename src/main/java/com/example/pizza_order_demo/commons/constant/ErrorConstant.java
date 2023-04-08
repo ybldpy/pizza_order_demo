@@ -6,7 +6,7 @@ public class ErrorConstant {
     public static final String USER_REGISTER_PASSWORD_LENGTH = "the length of password is 5-16";
     public static final String USER_REGISTER_USERNAME_EXIST = "username have existed";
     public static final String USER_REGISTER_USERNAME_ILLEGAL_CHARACTER = "only letters and numbers are allowed to appear in username";
-    public static final String USER_REGISTER_PASSWORD_ILLEGAL_CHARACTER = "only letters and numbers are allowed to appear in username";
+    public static final String USER_REGISTER_PASSWORD_ILLEGAL_CHARACTER = "only letters and numbers are allowed to appear in password";
     public static final String USER_NOT_FOUND = "such user name doesn't exist";
     public static final String MAIL_ILLEGAL = "mail seems not a right format";
     public static final String MAIL_EMPTY = "empty mail";

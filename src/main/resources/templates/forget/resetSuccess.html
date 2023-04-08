@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <base href="../../static/" th:href="@{/}">
+    <meta charset="UTF-8">
+    <title>check username</title>
+    <script src="js/header.js"></script>
+    <link href="css/my-login.css" rel="stylesheet"/>
+    <link href="img/icon.png" rel="icon"/>
+    <script src="js/footer.js"></script>
+    <script src="js/myUtils.js"></script>
+    <style type="text/css">
+        .account-step-icon-doing {
+            background: #FFBF3D;
+        }
+
+        .account-step-icon {
+            font-size: 14px;
+            box-sizing: border-box;
+            width: 24px;
+            height: 24px;
+            text-align: center;
+            line-height: 22px;
+            border-radius: 50%;
+            color: #fff;
+        }
+
+        .account-step-txt {
+            margin-top: 4px;
+            font-size: 16px;
+            line-height: 20px;
+            font-weight: 400;
+        }
+
+        .account-step-wp {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 5%;
+            /*width: 100%;*/
+        }
+
+        .account-step-item {
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            flex: 1;
+            /*margin: 1%;*/
+            width: auto;
+            /*margin: 0 10px;*/
+        }
+
+        .account-step-icon-todo {
+            border: 1px solid #9499a0;
+            color: #9499a0;
+            opacity: .4;
+        }
+
+    </style>
+</head>
+
+<body class="my-login-page">
+<section class="h-100">
+    <!--    <div id="messageContainer" style="z-index: 5;width: 30%;margin-top: 1%;position: absolute;margin-left: 35%">-->
+    <!--        <div class="alert alert-danger fade show" role="alert">-->
+    <!--            Server error-->
+    <!--            <button type="button" class="close" data-dismiss="alert" aria-label="Close">-->
+    <!--                <span aria-hidden="true">&times;</span>-->
+    <!--            </button>-->
+    <!--        </div>-->
+    <!--    </div>-->
+    <div id="messageContainer" style="width: 20%;z-index: 5;margin-top: 0.5%;position: absolute;margin-left: 40%">
+        <!--        <div class="alert alert-danger fade" role="alert" style="font-size: 15px">-->
+        <!--            Server error-->
+        <!--            <button type="button" class="close" data-dismiss="alert" aria-label="Close">-->
+        <!--                <span aria-hidden="true">&times;</span>-->
+        <!--            </button>-->
+        <!--        </div>-->
+    </div>
+    <div>
+        <a href="../templates/login.html" th:href="@{/login}">
+            <img src="img/logo.png" alt="logo" style="height: 17%;width: 25%; margin-left: 37.5%;margin-top: 2%">
+        </a>
+    </div>
+
+    <!--    <div class="alert alert-danger alert-dismissible fade show" role="alert" style="z-index: 10;">-->
+    <!--        A simple primary alert—check it out!-->
+    <!--        <button type="button" class="close" data-dismiss="alert" aria-label="Close">-->
+    <!--            <span aria-hidden="true">&times;</span>-->
+    <!--        </button>-->
+    <!--    </div>-->
+
+    <div style="margin-top: 3%; margin-left:20%;width: 60%;">
+        <div class="account-step-wp">
+            <div class="account-step-item">
+                <div class="account-step-icon account-step-icon-doing">1</div>
+                <div class="account-step-txt">Input user name</div>
+            </div>
+            <div class="account-step-item">
+                <div class="account-step-icon account-step-icon-doing">2</div>
+                <div class="account-step-txt" >Reset Password</div>
+            </div>
+            <div class="account-step-item">
+                <div class="account-step-icon account-step-icon-doing">3</div>
+                <div class="account-step-txt" style="font-weight: 700">Reset Success</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="container">
+
+        <div class="row h-100 justify-content-md-center" >
+            <div class="card-wrapper">
+                <!--                <div style="margin-top: 55%;">-->
+                <!--                    &lt;!&ndash;                    <img src="img/logo.jpg" alt="logo">&ndash;&gt;-->
+                <!--                </div>-->
+                <div class="card fat" >
+
+                    <div class="card-body">
+                        <h4 class="card-title">Reset success</h4>
+                            <div class="form-group m-0">
+                                <a href="../templates/login.html" th:href="@{/login}" id="btn" type="button" class="btn btn-primary btn-block" style="background-color: #FFCB62">
+                                    Go to Log in
+                                </a>
+                            </div>
+                        </form>
+
+
+                        <!--              <div class="form-group">-->
+                        <!--                <label for="username">User name</label>-->
+                        <!--                <input id="username" type="email" class="form-control" name="email" value="" required autofocus>-->
+                        <!--                <div class="invalid-feedback">-->
+                        <!--                  username is invalid-->
+                        <!--                </div>-->
+                        <!--              </div>-->
+
+                        <!--              <div class="form-group">-->
+                        <!--                <label for="password">Password-->
+                        <!--                  <a href="forgot.html" class="float-right">-->
+                        <!--                    Forgot Password?-->
+                        <!--                  </a>-->
+                        <!--                </label>-->
+                        <!--                <input id="password" type="password" class="form-control" name="password" required data-eye>-->
+                        <!--                <div class="invalid-feedback">-->
+                        <!--                  Password is required-->
+                        <!--                </div>-->
+                        <!--              </div>-->
+
+                        <!--              <div class="form-group">-->
+                        <!--                <div class="custom-checkbox custom-control">-->
+                        <!--                  <input type="checkbox" name="remember" id="remember" class="custom-control-input">-->
+                        <!--                  <label for="remember" class="custom-control-label">Remember Me</label>-->
+                        <!--                </div>-->
+                        <!--              </div>-->
+
+                    </div>
+                </div>
+                <!--                <div class="footer">-->
+                <!--                    Copyright &copy; 2023 &mdash; GROUP 28-->
+                <!--                </div>-->
+            </div>
+        </div>
+    </div>
+</section>
+
+</body>
+</html>

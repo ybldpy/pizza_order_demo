@@ -7,24 +7,39 @@ function login(){
     $.ajax(
         {
             type:"post",
-            url:basePath+"/login",
+            url:"login",
             data:form.serialize(),
             beforeSend:function (){
-                let username = $("#username").val();
-                let pwd = $("#password").val();
-                if (!checkUserNameAndPwd(username,pwd)){
-                    return false;
+                let username = $("#username");
+                let pwd = $("#password");
+                let canSend = true;
+                if (!checkPassword(pwd.val())){
+                    let feedbackDiv = pwd.siblings(".invalid-feedback");
+                    feedbackDiv[0].innerText = illegalPassword;
+                    feedbackDiv.show();
+                    canSend = false;
                 }
-                return true;
+                if (!checkPassword(username.val())){
+                    let feedBackDiv = username.siblings(".invalid-feedback");
+                    feedBackDiv[0].innerText = illegalUsername;
+                    feedBackDiv.show();
+                    canSend = false;
+                }
+                return canSend;
+
+
             },
             success:function (result){
-                if (result == undefined||result==null){alert("server error");}
+                if (result == undefined||result==null){alertUtil.message("server error","danger",$("#messageContainer"));}
                 else if (result.code!=1){
-                    alert(result.message);
+                    alertUtil.message(result.message,"warning",$("#messageContainer"));
                 }
                 else {
                     window.location.href = result.data;
                 }
+            },
+            error:function (){
+                alertUtil.message("server error","danger",$("#messageContainer"));
             }
         }
     )

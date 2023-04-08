@@ -25,11 +25,12 @@ public class UserUtil {
     }
 
 
+
     public static Result checkRegisterField(User user){
         if (StringUtils.isAllBlank(user.getUsername())){
             return new Result(ResultConstant.CODE_FAILED, ErrorConstant.USER_REGISTER_MISSING_PARAM,null);
         }
-        else if (false&&StringUtils.isAnyBlank(user.getSafeQuestion(),user.getAnswer())){return new Result(ResultConstant.CODE_FAILED,ErrorConstant.USER_REGISTER_MISSING_PARAM,null);}
+        else if (StringUtils.isAnyBlank(user.getSafeQuestion(),user.getAnswer())){return new Result(ResultConstant.CODE_FAILED,ErrorConstant.USER_REGISTER_MISSING_PARAM,null);}
         else if (user.getUsername().length()>30||user.getUsername().length()<5){return new Result(ResultConstant.CODE_FAILED,ErrorConstant.USER_REGISTER_USERNAME_LENGTH,null);}
         else if(!isLegalUsernameOrPwd(user.getPwd())){return new Result(ResultConstant.CODE_FAILED,ErrorConstant.USER_REGISTER_USERNAME_ILLEGAL_CHARACTER,null);}
         else if (ObjectUtils.isEmpty(user.getPwd())){return new Result(ResultConstant.CODE_FAILED,ErrorConstant.USER_REGISTER_MISSING_PARAM,null);}
@@ -46,13 +47,9 @@ public class UserUtil {
         return null;
     }
 
-    private static boolean isLegalUsernameOrPwd(String str){
-        char c=str.charAt(0);
-        for(int i=0;i<str.length();i++){
-            c = str.charAt(i);
-            if (!Character.isLetter(c)&&!Character.isDigit(c)){return false;}
-        }
-        return true;
+    public static boolean isLegalUsernameOrPwd(String str){
+
+        return str.matches("^[A-Za-z0-9]+$");
 
     }
 

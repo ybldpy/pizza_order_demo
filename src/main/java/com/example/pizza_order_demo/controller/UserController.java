@@ -7,7 +7,6 @@ import com.example.pizza_order_demo.commons.constant.ResultConstant;
 import com.example.pizza_order_demo.commons.constant.UserConstant;
 import com.example.pizza_order_demo.exception.CURDException;
 import com.example.pizza_order_demo.exception.InternalException;
-import com.example.pizza_order_demo.mapper.UserMapper;
 import com.example.pizza_order_demo.model.*;
 import com.example.pizza_order_demo.service.RoleService;
 import com.example.pizza_order_demo.service.UserRoleService;
@@ -17,16 +16,16 @@ import com.example.pizza_order_demo.utils.UserUtil;
 import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.mail.javamail.JavaMailSender;
-import org.springframework.mail.javamail.JavaMailSenderImpl;
-import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.ui.Model;
+import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.*;
 
 
 import javax.servlet.http.HttpServletRequest;
+import java.security.Security;
 import java.util.concurrent.ConcurrentHashMap;
 
 @Controller
@@ -64,7 +63,7 @@ public class UserController {
 
     @GetMapping("/forget/username")
     public String forgetPasswordUsername(){
-        return "/forget_username";
+        return "forget/forget_username";
     }
     @PostMapping("/forget/username")
     @ResponseBody
@@ -85,7 +84,50 @@ public class UserController {
             return new Result(ResultConstant.CODE_FAILED,ErrorConstant.CODE_SEND_ERROR,null);
         }
         System.out.println(code);
-        return new Result(ResultConstant.CODE_SUCCESS,ResultConstant.MESSAGE_SUCCESS,"forget/validateMail");
+        // 将验证码放入map中
+        codeMap.put(username,code+","+System.currentTimeMillis());
+        return new Result(ResultConstant.CODE_SUCCESS,ResultConstant.MESSAGE_SUCCESS,"forget/validateMail?username="+username);
+    }
+
+
+    @GetMapping("/forget/validateMail")
+    public String forgetValidateMail(String username, Model model){
+        model.addAttribute("username",username);
+        return "forget/forget_reset";
+    }
+
+    @PostMapping("/forget/validateMail")
+    @ResponseBody
+    public Result forgetValidateMail(String username, String password,String code){
+        // check username
+        if (!UserUtil.isValidateField(username,5,30)){return new Result(ResultConstant.CODE_FAILED,ErrorConstant.USER_REGISTER_USERNAME_LENGTH,null);}
+        if (!UserUtil.isLegalUsernameOrPwd(username)){return new Result(ResultConstant.CODE_FAILED,ErrorConstant.USER_REGISTER_USERNAME_ILLEGAL_CHARACTER,null);}
+        if (!UserUtil.isValidateField(password,5,16)){return new Result(ResultConstant.CODE_FAILED,ErrorConstant.USER_REGISTER_PASSWORD_LENGTH,null);}
+        if (!UserUtil.isLegalUsernameOrPwd(password)){return new Result(ResultConstant.CODE_FAILED,ErrorConstant.USER_REGISTER_PASSWORD_ILLEGAL_CHARACTER,null);}
+        if (!UserUtil.isLegalUsernameOrPwd(username)){return new Result(ResultConstant.CODE_FAILED,ErrorConstant.USER_REGISTER_USERNAME_ILLEGAL_CHARACTER,null);}
+        String target = codeMap.get(username);
+        if (StringUtils.isBlank(target)){
+            return new Result(ResultConstant.CODE_FAILED,ErrorConstant.CODE_WRONG,ErrorConstant.CODE_WRONG);
+        }
+        String[] codeAndTime = target.split(",");
+        long begin = Long.parseLong(codeAndTime[1]);
+        if (System.currentTimeMillis()-begin>duration){
+            codeMap.remove(username);
+            return new Result(ResultConstant.CODE_FAILED,ErrorConstant.CODE_EXPIRE,ErrorConstant.CODE_EXPIRE);
+        }
+        if (!StringUtils.equals(codeAndTime[0],code)){
+            return new Result(ResultConstant.CODE_FAILED,ErrorConstant.CODE_WRONG,ErrorConstant.CODE_WRONG);
+        }
+        UserExample userExample = new UserExample();
+        userExample.or().andUsernameEqualTo(username);
+        User user = userService.selectFirstByExample(userExample);
+        user.setPwd(passwordEncoder.encode(password));
+        int res = userService.updateByPrimaryKey(user);
+        if (res>0){
+            codeMap.remove(username);
+            return new Result(ResultConstant.CODE_SUCCESS,ResultConstant.MESSAGE_SUCCESS,"resetSuccess.html");
+        }
+        throw new CURDException();
     }
 
 
