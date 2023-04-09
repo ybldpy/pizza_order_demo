@@ -132,7 +132,7 @@
                             </div>
 
                             <div class="form-group m-0">
-                                <button id="btn" type="button" class="btn btn-primary btn-block" style="background-color: #FFCB62">
+                                <button id="btn" type="button" class="submitBtn btn btn-primary btn-block" style="background-color: #FFCB62">
                                     Next
                                 </button>
                             </div>
@@ -190,9 +190,13 @@
                              $(".invalid-feedback")[0].innerText = illegalUsername;
                              $(".invalid-feedback").show();
                          }
+                         if (canSend){
+                             enableLoadingVideo($(this))
+                         }
                          return canSend;
                         },
                     success:function (result){
+                        disableLoadingVideo($(this),"Next");
                         if (result==undefined||result==null){
                             alertUtil.message("server error","danger",$("#messageContainer"));
                         }
@@ -215,6 +219,7 @@
                     error:function (){
                         // alert("server error");
                         // alertUtil.alert("server error");
+                        disableLoadingVideo($(this))
                         alertUtil.message("server error","danger",$("#messageContainer"));
                     }
                 })

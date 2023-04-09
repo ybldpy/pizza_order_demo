@@ -97,6 +97,12 @@ function checkUserNameAndPwd(username,password){
     return checkUsername(username,rep)&&checkPassword(password);
 }
 
+function showFeedback(e,eId,msg){
+    let target = e.siblings("#"+eId+"Feedback");
+    target[0].innerText = msg;
+    target.show();
+}
+
 function checkUsername(username,rep){
     if (typeof username!="string"){
         return false;
@@ -129,5 +135,19 @@ function checkPassword(password,rep){
     }
 
     return true;
+}
+
+
+function enableLoadingVideo(btn){
+    if (btn==undefined||btn==null){return;}
+    if (btn[0]==undefined||btn[0]==null){return;}
+    btn[0].disabled = true;
+    btn[0].innerHTML = '<div class="spinner-border" role="status"><span class="sr-only">Loading...</span></div>'
+}
+function disableLoadingVideo(btn,msg){
+    if (btn==undefined||btn==null){return;}
+    if (btn[0]==undefined||btn[0]==null){return;}
+    btn[0].disabled = false;
+    btn[0].innerHTML = msg;
 }
 
