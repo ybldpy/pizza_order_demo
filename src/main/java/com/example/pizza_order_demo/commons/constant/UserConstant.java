@@ -10,7 +10,7 @@ public class UserConstant {
     public static final int GENDER_FEMALE = 2;
     public static final int GENDER_HIDE = 0;
     public static final String PAGE_INDEX_CUSTOMER = "index";
-    public static final String PAGE_INDEX_ADMIN = "admin";
+    public static final String PAGE_INDEX_ADMIN = "admin/index";
 
 
 

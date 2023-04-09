@@ -26,6 +26,7 @@ public class SecurityConfigurer extends WebSecurityConfigurerAdapter {
         http.csrf().disable();
         http.authorizeRequests().antMatchers("/login/**","/register/**","/forget/**").permitAll().anyRequest().authenticated().and().logout().permitAll();
         http.formLogin().loginPage("/login").successForwardUrl("/login/success").failureForwardUrl("/login/failure").and().rememberMe();
+        http.headers().frameOptions().sameOrigin();
 //        http.authorizeRequests().antMatchers("/**").authenticated();
 //        http.formLogin().loginPage("/login");
     }
@@ -38,7 +39,7 @@ public class SecurityConfigurer extends WebSecurityConfigurerAdapter {
 
     @Override
     public void configure(WebSecurity web) throws Exception {
-        web.ignoring().antMatchers("/*.html","/css/**","/js/**","/img/**");
+        web.ignoring().antMatchers("/*.html","/css/**","/js/**","/img/**","/plugins/**");
     }
 
     @Bean

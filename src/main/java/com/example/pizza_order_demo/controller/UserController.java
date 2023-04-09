@@ -16,7 +16,9 @@ import com.example.pizza_order_demo.utils.UserUtil;
 import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.transaction.annotation.Transactional;
@@ -53,14 +55,28 @@ public class UserController {
     @RequestMapping("/login/success")
     @ResponseBody
     public Result loginSuccess(Authentication authentication){
-
-        return new Result(1,ResultConstant.MESSAGE_SUCCESS,UserUtil.hasRole(authentication,UserConstant.ROLE_ADMIN)?UserConstant.PAGE_INDEX_ADMIN:UserConstant.PAGE_INDEX_CUSTOMER);
+        return new Result(ResultConstant.CODE_SUCCESS,ResultConstant.MESSAGE_SUCCESS,UserUtil.hasRole(SecurityContextHolder.getContext().getAuthentication(),UserConstant.ROLE_ADMIN)?UserConstant.PAGE_INDEX_ADMIN:UserConstant.PAGE_INDEX_CUSTOMER);
     }
+    @RequestMapping("/one")
+    public String a(){
+        return "admin/one";
+    }
+
+    @GetMapping("/index")
+    public String getIndexPage(){
+        return "index";
+    }
+    @GetMapping("admin/index")
+    @PreAuthorize("hasRole('admin')")
+    public String getAdminIndexPage(Authentication authentication){
+        return "forward:/admin/index.html";
+    }
+
 
     @RequestMapping("/login/failure")
     @ResponseBody
     public Result loginFail(String username,String password){
-        return new Result(0,ErrorConstant.USER_LOGIN_USERNAME_PASSWORD_WRONG,null);
+        return new Result(ResultConstant.CODE_FAILED,ErrorConstant.USER_LOGIN_USERNAME_PASSWORD_WRONG,null);
     }
 
     @GetMapping("/forget/username")
@@ -140,12 +156,7 @@ public class UserController {
     @GetMapping("/login")
     public String login(Authentication authentication){
         if (authentication!=null){
-            if (authentication.getAuthorities().contains(UserConstant.ROLE_ADMIN)){
-                return "admin";
-            }
-            else {
-                return "index";
-            }
+            return "redirect:/index";
         }
         return "login";
     }
