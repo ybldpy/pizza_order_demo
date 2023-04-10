@@ -10,7 +10,7 @@
     <script src="plugins/bootstrap-table/bootstrap-table.min.js"></script>
 </head>
 <body>
-<div class="container">
+<div class="container" style="margin-top: 5%">
 <!--    <div id="toolbar">-->
 <!--        <div class="row">-->
 <!--            <div class="col-8">123</div>-->
@@ -20,13 +20,13 @@
 
     <div id="toolbar">
         <div class="btns">
-            <a class="btn-primary btn">add dish</a>
+            <a class="btn-primary btn">Add Category</a>
         </div>
 <!--        <div class="col-3">-->
 <!--            <input class="form-control" type="text" id="searchText" placeholder="search here"/>-->
 <!--        </div>-->
     </div>
-    <table id="table">
+    <table id="table" data-cache="false">
 
     </table>
 </div>
@@ -37,22 +37,17 @@
             toolbar:"#toolbar",
             columns: [{
                 field: 'id',
-                title: 'Dish ID'
+                title: 'Category ID'
             }, {
                 field: 'name',
                 title: 'name'
-            }, {
-                field: 'price',
-                title: 'Price'
             }],
             data: [{
                 id: 1,
-                name: 'Item 1',
-                price: '$1'
+                name: 'Item 1'
             }, {
                 id: 2,
-                name: 'Item 2',
-                price: '$2'
+                name: 'Item 2'
             }]
         })
     })

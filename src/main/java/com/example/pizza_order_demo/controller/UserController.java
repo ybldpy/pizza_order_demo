@@ -179,19 +179,18 @@ public class UserController {
             return new Result(ResultConstant.CODE_FAILED,ErrorConstant.USER_REGISTER_USERNAME_EXIST,null);
         }
 
-//        String mailCode = codeMap.get(user.getMail()+MAIL_POSTFIX_REGISTER);
-//        if (StringUtils.isBlank(mailCode)){
-//            return new Result(ResultConstant.CODE_FAILED,ErrorConstant.CODE_WRONG,null);
-//        }
-//        String[] mailCodeAndTime = mailCode.split(",");
-//        long start = Long.parseLong(mailCodeAndTime[1]);
-//        if (System.currentTimeMillis()-start>duration){
-//            return new Result(ResultConstant.CODE_FAILED,ErrorConstant.CODE_EXPIRE,null);
-//        }
-//        if (!code.equals(mailCodeAndTime[0])){
-//            return new Result(ResultConstant.CODE_FAILED,ErrorConstant.CODE_WRONG,null);
-//        }
-//        codeMap.remove(user.getMail()+MAIL_POSTFIX_REGISTER);
+        String mailCode = codeMap.get(user.getMail()+MAIL_POSTFIX_REGISTER);
+        if (StringUtils.isBlank(mailCode)){
+            return new Result(ResultConstant.CODE_FAILED,ErrorConstant.CODE_WRONG,null);
+        }
+        String[] mailCodeAndTime = mailCode.split(",");
+        long start = Long.parseLong(mailCodeAndTime[1]);
+        if (System.currentTimeMillis()-start>duration){
+            return new Result(ResultConstant.CODE_FAILED,ErrorConstant.CODE_EXPIRE,null);
+        }
+        if (!code.equals(mailCodeAndTime[0])){
+            return new Result(ResultConstant.CODE_FAILED,ErrorConstant.CODE_WRONG,null);
+        }
         user.setPwd(passwordEncoder.encode(user.getPwd()));
         user.setGender(user.getGender()==null?0:user.getGender());
         user.setStatus(1);
@@ -210,6 +209,7 @@ public class UserController {
         if(res<1){
             throw new CURDException();
         }
+        codeMap.remove(user.getMail()+MAIL_POSTFIX_REGISTER);
         return new Result(ResultConstant.CODE_SUCCESS,ResultConstant.MESSAGE_SUCCESS,null);
     }
 
