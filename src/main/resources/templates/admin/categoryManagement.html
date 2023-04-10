@@ -35,22 +35,30 @@
         $('#table').bootstrapTable({
             search:true,
             toolbar:"#toolbar",
+            url:"category/query",
             columns: [{
                 field: 'id',
                 title: 'Category ID'
             }, {
-                field: 'name',
+                field: 'categoryName',
                 title: 'name'
-            }],
-            data: [{
-                id: 1,
-                name: 'Item 1'
-            }, {
-                id: 2,
-                name: 'Item 2'
-            }]
+            },
+                {
+                    field: "operate",
+                    title:"operation",
+                    clickToSelect: false,
+                    align:'center',
+                    events: window.operateEvents,
+                    formatter: operateFormatter
+                }
+            ]
         })
     })
+
+
+    function operateFormatter(){
+        return ["<a href='javascript:void(0)' title='delete'><i>remove</i></a>","<a href='javascript:void(0)' title='delete'><i>edit</i></a>"].join("<div></div>");
+    }
 </script>
 </body>
 </html>
