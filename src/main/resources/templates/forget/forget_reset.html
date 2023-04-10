@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <base href="../../static/" th:href="@{/}">
+    <link rel="icon" href="img/">
+    <meta charset="UTF-8">
+    <title>check username</title>
+    <script src="js/header.js"></script>
+    <link href="css/my-login.css" rel="stylesheet"/>
+    <link href="img/icon.png" rel="icon"/>
+    <script src="js/footer.js"></script>
+    <script src="js/myUtils.js"></script>
+    <style type="text/css">
+        .account-step-icon-doing {
+            background: #FFBF3D;
+        }
+
+        .account-step-icon {
+            font-size: 14px;
+            box-sizing: border-box;
+            width: 24px;
+            height: 24px;
+            text-align: center;
+            line-height: 22px;
+            border-radius: 50%;
+            color: #fff;
+        }
+
+        .account-step-txt {
+            margin-top: 4px;
+            font-size: 16px;
+            line-height: 20px;
+            font-weight: 400;
+        }
+
+        .account-step-wp {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 5%;
+            /*width: 100%;*/
+        }
+
+        .account-step-item {
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            flex: 1;
+            /*margin: 1%;*/
+            width: auto;
+            /*margin: 0 10px;*/
+        }
+
+        .account-step-icon-todo {
+            border: 1px solid #9499a0;
+            color: #9499a0;
+            opacity: .4;
+        }
+
+    </style>
+</head>
+
+<body class="my-login-page">
+<section class="h-100">
+<!--    <div id="messageContainer" style="z-index: 5;width: 30%;margin-top: 1%;position: absolute;margin-left: 35%">-->
+<!--        <div class="alert alert-danger fade show" role="alert">-->
+<!--            Server error-->
+<!--            <button type="button" class="close" data-dismiss="alert" aria-label="Close">-->
+<!--                <span aria-hidden="true">&times;</span>-->
+<!--            </button>-->
+<!--        </div>-->
+<!--    </div>-->
+    <div id="messageContainer" style="width: 20%;z-index: 5;margin-top: 0.5%;position: absolute;margin-left: 40%">
+<!--        <div class="alert alert-danger fade" role="alert" style="font-size: 15px">-->
+<!--            Server error-->
+<!--            <button type="button" class="close" data-dismiss="alert" aria-label="Close">-->
+<!--                <span aria-hidden="true">&times;</span>-->
+<!--            </button>-->
+<!--        </div>-->
+    </div>
+    <div>
+        <a href="../templates/login.html" th:href="@{/login}">
+        <img src="img/logo.png" alt="logo" style="height: 17%;width: 25%; margin-left: 37.5%;margin-top: 2%">
+        </a>
+    </div>
+
+<!--    <div class="alert alert-danger alert-dismissible fade show" role="alert" style="z-index: 10;">-->
+<!--        A simple primary alert—check it out!-->
+<!--        <button type="button" class="close" data-dismiss="alert" aria-label="Close">-->
+<!--            <span aria-hidden="true">&times;</span>-->
+<!--        </button>-->
+<!--    </div>-->
+
+    <div style="margin-top: 3%; margin-left:20%;width: 60%;">
+        <div class="account-step-wp">
+            <div class="account-step-item">
+                <div class="account-step-icon account-step-icon-doing">1</div>
+                <div class="account-step-txt">Input user name</div>
+            </div>
+            <div class="account-step-item">
+                <div class="account-step-icon account-step-icon-doing">2</div>
+                <div class="account-step-txt" style="font-weight: 700">Reset Password</div>
+            </div>
+            <div class="account-step-item">
+                <div class="account-step-icon account-step-icon-todo">3</div>
+                <div class="account-step-txt">Reset Success</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="container">
+
+        <div class="row h-100 justify-content-md-center" >
+            <div class="card-wrapper">
+<!--                <div style="margin-top: 55%;">-->
+<!--                    &lt;!&ndash;                    <img src="img/logo.jpg" alt="logo">&ndash;&gt;-->
+<!--                </div>-->
+                <div class="card fat" >
+
+                    <div class="card-body">
+                        <h4 class="card-title">Forget password</h4>
+
+                        <form id="form" class="my-login-validation" novalidate="">
+                            <input name="username" value="" th:value="${username}" hidden/>
+                            <div class="form-group">
+                                <label for="password">New password</label>
+                                <input id="password" name="password" class="form-control checks" type="password" value="" data-eye autofocus/>
+                                <div id="passwordFeedback" class="invalid-feedback">
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label for="repeatPassword">Repeat password</label>
+                                <input id="repeatPassword" class="form-control checks" type="password" value="" autofocus data-eye/>
+                                <div id="repeatPasswordFeedback" class="invalid-feedback">
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label for="verificationCode">Verification Code</label>
+                                <input id="verificationCode" name="code" class="form-control checks" type="text" value="" required autofocus/>
+                                <div id="verificationCodeFeedback" class="invalid-feedback">
+                                    You must input verification code
+                                </div>
+                                <div class="form-text text-muted">
+                                    Input verification code we send to your mail
+                                </div>
+                            </div>
+
+                            <div class="form-group m-0">
+                                <button id="btn" type="button" class="btn btn-primary btn-block" style="background-color: #FFCB62">
+                                    Next
+                                </button>
+                            </div>
+                        </form>
+
+
+                        <!--              <div class="form-group">-->
+                        <!--                <label for="username">User name</label>-->
+                        <!--                <input id="username" type="email" class="form-control" name="email" value="" required autofocus>-->
+                        <!--                <div class="invalid-feedback">-->
+                        <!--                  username is invalid-->
+                        <!--                </div>-->
+                        <!--              </div>-->
+
+                        <!--              <div class="form-group">-->
+                        <!--                <label for="password">Password-->
+                        <!--                  <a href="forgot.html" class="float-right">-->
+                        <!--                    Forgot Password?-->
+                        <!--                  </a>-->
+                        <!--                </label>-->
+                        <!--                <input id="password" type="password" class="form-control" name="password" required data-eye>-->
+                        <!--                <div class="invalid-feedback">-->
+                        <!--                  Password is required-->
+                        <!--                </div>-->
+                        <!--              </div>-->
+
+                        <!--              <div class="form-group">-->
+                        <!--                <div class="custom-checkbox custom-control">-->
+                        <!--                  <input type="checkbox" name="remember" id="remember" class="custom-control-input">-->
+                        <!--                  <label for="remember" class="custom-control-label">Remember Me</label>-->
+                        <!--                </div>-->
+                        <!--              </div>-->
+
+                    </div>
+                </div>
+                <!--                <div class="footer">-->
+                <!--                    Copyright &copy; 2023 &mdash; GROUP 28-->
+                <!--                </div>-->
+            </div>
+        </div>
+    </div>
+    <script>
+
+
+        $(function (){
+
+            $("#form").find("input.checks").on("input",function (){
+
+                $(this).siblings(".invalid-feedback").hide();
+
+            });
+            $("#btn").on("click",function (){
+                $.ajax({
+                    type:"post",
+                    url:basePath+"/forget/validateMail",
+                    data:$("#form").serialize(),
+                    beforeSend:function (){
+                        let canSend = true;
+                        let code = $("#verificationCode").val();
+                        alert(code)
+                        if (code==undefined||code==null||code==""){
+                            $("#verificationCodeFeedback").show();
+                            canSend = false;
+                        }
+                        let pwd = $("#password").val();
+                        if(!checkPassword(pwd)){
+                            let div = $("#passwordFeedback");
+                            div[0].innerText = illegalPassword;
+                            div.show();
+                            canSend = false;
+                        }
+                        let repeatPwd = $("#repeatPassword").val();
+                        if (repeatPwd!==pwd){
+                            let div = $("#repeatPasswordFeedback");
+                            div[0].innerText = repeatPasswordNotEqual;
+                            div.show();
+                            canSend = false;
+                        }
+                        if (canSend){
+                            enableLoadingVideo($(this));
+                        }
+                        return canSend;
+                    },
+                    success:function (result){
+                        disableLoadingVideo($(this),"Reset");
+                        if (result==undefined||result==null){
+                            alertUtil.message("server error","danger",$("#messageContainer"));
+                        }
+                        if (result.code!=1){
+                            // if (result.data==null||result==undefined){
+                            //     // alert(result.message);
+                            //     alertUtil.message(result.message,"warning",$("#messageContainer"));
+                            // }
+                            // else {
+                            //     // $(".invalid-feedback")[0].innerText = result.message;
+                            //     // $(".invalid-feedback").show();
+                            //     alertUtil.message(result.message,"danger",$("#messageContainer"));
+                            //     // $("#form")[0].innerHTML = ('<div class="alert alert-primary" role="alert">server error</div>');
+                            // }
+                            alertUtil.message(result.message,"danger",$("#messageContainer"));
+                        }
+                        else {
+                            window.location.href = result.data
+                        }
+                    },
+                    error:function (){
+                        disableLoadingVideo($(this),"Reset");
+                        // alert("server error");
+                        // alertUtil.alert("server error");
+                        alertUtil.message("server error","danger",$("#messageContainer"));
+                    }
+                })
+            })
+        })
+    </script>
+</section>
+
+</body>
+</html>

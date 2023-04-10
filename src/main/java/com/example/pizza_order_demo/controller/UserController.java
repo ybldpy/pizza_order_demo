@@ -7,7 +7,6 @@ import com.example.pizza_order_demo.commons.constant.ResultConstant;
 import com.example.pizza_order_demo.commons.constant.UserConstant;
 import com.example.pizza_order_demo.exception.CURDException;
 import com.example.pizza_order_demo.exception.InternalException;
-import com.example.pizza_order_demo.mapper.UserMapper;
 import com.example.pizza_order_demo.model.*;
 import com.example.pizza_order_demo.service.RoleService;
 import com.example.pizza_order_demo.service.UserRoleService;
@@ -17,16 +16,19 @@ import com.example.pizza_order_demo.utils.UserUtil;
 import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.mail.javamail.JavaMailSender;
-import org.springframework.mail.javamail.JavaMailSenderImpl;
-import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.ui.Model;
+import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.*;
 
 
 import javax.servlet.http.HttpServletRequest;
+import java.security.Security;
 import java.util.concurrent.ConcurrentHashMap;
 
 @Controller
@@ -50,22 +52,112 @@ public class UserController {
         return "register";
     }
 
-
     @RequestMapping("/login/success")
     @ResponseBody
-    public Result loginSuccess(){
-        return new Result(1,ResultConstant.MESSAGE_SUCCESS,"index");
+    public Result loginSuccess(Authentication authentication){
+        return new Result(ResultConstant.CODE_SUCCESS,ResultConstant.MESSAGE_SUCCESS,UserUtil.hasRole(SecurityContextHolder.getContext().getAuthentication(),UserConstant.ROLE_ADMIN)?UserConstant.PAGE_INDEX_ADMIN:UserConstant.PAGE_INDEX_CUSTOMER);
     }
+    @RequestMapping("/one")
+    public String a(){
+        return "admin/one";
+    }
+
+    @GetMapping("/index")
+    public String getIndexPage(){
+        return "index";
+    }
+    @GetMapping("admin/index")
+    @PreAuthorize("hasRole('admin')")
+    public String getAdminIndexPage(Authentication authentication){
+        return "forward:/admin/index.html";
+    }
+
 
     @RequestMapping("/login/failure")
     @ResponseBody
     public Result loginFail(String username,String password){
-        return new Result(0,ErrorConstant.USER_LOGIN_USERNAME_PASSWORD_WRONG,null);
+        return new Result(ResultConstant.CODE_FAILED,ErrorConstant.USER_LOGIN_USERNAME_PASSWORD_WRONG,null);
+    }
+
+    @GetMapping("/forget/username")
+    public String forgetPasswordUsername(){
+        return "forget/forget_username";
+    }
+    @PostMapping("/forget/username")
+    @ResponseBody
+    public Result forgetPasswordUsername(String username){
+        if(!UserUtil.isValidateField(username,5,30)){
+            return new Result(ResultConstant.CODE_FAILED,ErrorConstant.USER_REGISTER_USERNAME_LENGTH,null);
+        }
+        UserExample userExample = new UserExample();
+        userExample.or().andUsernameEqualTo(username);
+        User user = userService.selectFirstByExample(userExample);
+        if (ObjectUtils.isEmpty(user)){return new Result(ResultConstant.CODE_FAILED,ErrorConstant.USER_NOT_FOUND,ErrorConstant.USER_NOT_FOUND);}
+        String mail = user.getMail();
+        String code = MailUtil.createValidationCode(6);
+        // send code
+        boolean res = true;
+        //res = MailUtil.sendCode(code,mail);
+        if (!res){
+            return new Result(ResultConstant.CODE_FAILED,ErrorConstant.CODE_SEND_ERROR,null);
+        }
+        System.out.println(code);
+        // 将验证码放入map中
+        codeMap.put(username,code+","+System.currentTimeMillis());
+        return new Result(ResultConstant.CODE_SUCCESS,ResultConstant.MESSAGE_SUCCESS,"forget/validateMail?username="+username);
+    }
+
+
+    @GetMapping("/forget/validateMail")
+    public String forgetValidateMail(String username, Model model){
+        model.addAttribute("username",username);
+        return "forget/forget_reset";
+    }
+    @GetMapping("/forget/resetSuccess")
+    public String resetSuccess(){
+        return "forget/resetSuccess";
+    }
+
+    @PostMapping("/forget/validateMail")
+    @ResponseBody
+    public Result forgetValidateMail(String username, String password,String code){
+        // check username
+        if (!UserUtil.isValidateField(username,5,30)){return new Result(ResultConstant.CODE_FAILED,ErrorConstant.USER_REGISTER_USERNAME_LENGTH,null);}
+        if (!UserUtil.isLegalUsernameOrPwd(username)){return new Result(ResultConstant.CODE_FAILED,ErrorConstant.USER_REGISTER_USERNAME_ILLEGAL_CHARACTER,null);}
+        if (!UserUtil.isValidateField(password,5,16)){return new Result(ResultConstant.CODE_FAILED,ErrorConstant.USER_REGISTER_PASSWORD_LENGTH,null);}
+        if (!UserUtil.isLegalUsernameOrPwd(password)){return new Result(ResultConstant.CODE_FAILED,ErrorConstant.USER_REGISTER_PASSWORD_ILLEGAL_CHARACTER,null);}
+        if (!UserUtil.isLegalUsernameOrPwd(username)){return new Result(ResultConstant.CODE_FAILED,ErrorConstant.USER_REGISTER_USERNAME_ILLEGAL_CHARACTER,null);}
+        String target = codeMap.get(username);
+        if (StringUtils.isBlank(target)){
+            return new Result(ResultConstant.CODE_FAILED,ErrorConstant.CODE_WRONG,ErrorConstant.CODE_WRONG);
+        }
+        String[] codeAndTime = target.split(",");
+        long begin = Long.parseLong(codeAndTime[1]);
+        if (System.currentTimeMillis()-begin>duration){
+            codeMap.remove(username);
+            return new Result(ResultConstant.CODE_FAILED,ErrorConstant.CODE_EXPIRE,ErrorConstant.CODE_EXPIRE);
+        }
+        if (!StringUtils.equals(codeAndTime[0],code)){
+            return new Result(ResultConstant.CODE_FAILED,ErrorConstant.CODE_WRONG,ErrorConstant.CODE_WRONG);
+        }
+        UserExample userExample = new UserExample();
+        userExample.or().andUsernameEqualTo(username);
+        User user = userService.selectFirstByExample(userExample);
+        user.setPwd(passwordEncoder.encode(password));
+        int res = userService.updateByPrimaryKey(user);
+        if (res>0){
+            codeMap.remove(username);
+            return new Result(ResultConstant.CODE_SUCCESS,ResultConstant.MESSAGE_SUCCESS,"forget/resetSuccess");
+        }
+        throw new CURDException();
     }
 
 
     @GetMapping("/login")
-    public String login(){
+    public String login(Authentication authentication){
+        if (authentication!=null){
+            return "redirect:/index";
+        }
         return "login";
     }
 

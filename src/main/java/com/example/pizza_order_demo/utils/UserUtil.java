@@ -7,8 +7,24 @@ import com.example.pizza_order_demo.commons.constant.ResultConstant;
 import com.example.pizza_order_demo.model.User;
 import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.security.core.Authentication;
 
 public class UserUtil {
+
+
+    /**
+     *
+     * @param str 用户名或密码
+     * @param minLen 最小长度
+     * @param maxLen 最大长度
+     * @return
+     */
+    public static boolean isValidateField(String str,int minLen,int maxLen){
+        if (StringUtils.isBlank(str)){return false;}
+        int len = str.length();
+        return len>=minLen&&len<=maxLen;
+    }
+
 
 
     public static Result checkRegisterField(User user){
@@ -32,14 +48,15 @@ public class UserUtil {
         return null;
     }
 
-    private static boolean isLegalUsernameOrPwd(String str){
-        char c=str.charAt(0);
-        for(int i=0;i<str.length();i++){
-            c = str.charAt(i);
-            if (!Character.isLetter(c)&&!Character.isDigit(c)){return false;}
-        }
-        return true;
+    public static boolean isLegalUsernameOrPwd(String str){
 
+        return str.matches("^[A-Za-z0-9]+$");
+
+    }
+
+    public static boolean hasRole(Authentication authentication,String role){
+        if (ObjectUtils.isEmpty(authentication)){return false;}
+        return authentication.getAuthorities().contains(role);
     }
 
 

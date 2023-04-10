@@ -3,3 +3,4 @@ function isValidateMail(mail){
     let reg = /^[\w-_\.+]*[\w-_\.]\@([\w]+\.)+[\w]+[\w]$/;
     return reg.test(mail);
 }
+
