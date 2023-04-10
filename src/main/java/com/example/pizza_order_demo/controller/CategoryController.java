@@ -22,14 +22,14 @@ public class CategoryController {
 
 
     @GetMapping("/category/management")
-    @PreAuthorize("hasRole('admin')")
+//    @PreAuthorize("hasRole('admin')")
     public String categoryManagement(){
         return "admin/categoryManagement";
     }
 
 
     @GetMapping("/category/query")
-    @PreAuthorize("hasRole('admin')")
+//    @PreAuthorize("hasRole('admin')")
     @ResponseBody
     public Object getCategories(){
         CategoryExample categoryExample = new CategoryExample();
