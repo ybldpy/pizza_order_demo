@@ -138,7 +138,7 @@
                             </div>
                             <div class="form-group">
                                 <label for="verificationCode">Verification Code</label>
-                                <input id="verificationCode" name="verificationCode" class="form-control checks" type="text" value="" required autofocus/>
+                                <input id="verificationCode" name="code" class="form-control checks" type="text" value="" required autofocus/>
                                 <div id="verificationCodeFeedback" class="invalid-feedback">
                                     You must input verification code
                                 </div>
@@ -227,29 +227,35 @@
                             div.show();
                             canSend = false;
                         }
+                        if (canSend){
+                            enableLoadingVideo($(this));
+                        }
                         return canSend;
                     },
                     success:function (result){
+                        disableLoadingVideo($(this),"Reset");
                         if (result==undefined||result==null){
                             alertUtil.message("server error","danger",$("#messageContainer"));
                         }
                         if (result.code!=1){
-                            if (result.data==null||result==undefined){
-                                // alert(result.message);
-                                alertUtil.message(result.message,"warning",$("#messageContainer"));
-                            }
-                            else {
-                                // $(".invalid-feedback")[0].innerText = result.message;
-                                // $(".invalid-feedback").show();
-                                alertUtil.message(result.message,"danger",$("#messageContainer"));
-                                // $("#form")[0].innerHTML = ('<div class="alert alert-primary" role="alert">server error</div>');
-                            }
+                            // if (result.data==null||result==undefined){
+                            //     // alert(result.message);
+                            //     alertUtil.message(result.message,"warning",$("#messageContainer"));
+                            // }
+                            // else {
+                            //     // $(".invalid-feedback")[0].innerText = result.message;
+                            //     // $(".invalid-feedback").show();
+                            //     alertUtil.message(result.message,"danger",$("#messageContainer"));
+                            //     // $("#form")[0].innerHTML = ('<div class="alert alert-primary" role="alert">server error</div>');
+                            // }
+                            alertUtil.message(result.message,"danger",$("#messageContainer"));
                         }
                         else {
                             window.location.href = result.data
                         }
                     },
                     error:function (){
+                        disableLoadingVideo($(this),"Reset");
                         // alert("server error");
                         // alertUtil.alert("server error");
                         alertUtil.message("server error","danger",$("#messageContainer"));

@@ -25,11 +25,13 @@ function login(){
                     feedBackDiv.show();
                     canSend = false;
                 }
+                if (canSend){
+                    enableLoadingVideo($(".submitBtn"));
+                }
                 return canSend;
-
-
             },
             success:function (result){
+                disableLoadingVideo($(".submitBtn"),"Log in");
                 if (result == undefined||result==null){alertUtil.message("server error","danger",$("#messageContainer"));}
                 else if (result.code!=1){
                     alertUtil.message(result.message,"warning",$("#messageContainer"));
@@ -39,6 +41,7 @@ function login(){
                 }
             },
             error:function (){
+                disableLoadingVideo($(".submitBtn"),"Log in");
                 alertUtil.message("server error","danger",$("#messageContainer"));
             }
         }
