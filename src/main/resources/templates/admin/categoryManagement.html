@@ -11,7 +11,16 @@
 </head>
 <body>
 
-<div id="addMessageContainer" style="width: 20%;margin-top: 1%;position: fixed;z-index: 1055;margin-left: 40%">
+<!--<div id="addMessageContainer" style="width: 20%;margin-top: 1%;position: relative;z-index: 1055;margin-left: 40%;">-->
+<!--    &lt;!&ndash;        <div class="alert alert-danger fade" role="alert" style="font-size: 15px">&ndash;&gt;-->
+<!--    &lt;!&ndash;            Server error&ndash;&gt;-->
+<!--    &lt;!&ndash;            <button type="button" class="close" data-dismiss="alert" aria-label="Close">&ndash;&gt;-->
+<!--    &lt;!&ndash;                <span aria-hidden="true">&times;</span>&ndash;&gt;-->
+<!--    &lt;!&ndash;            </button>&ndash;&gt;-->
+<!--    &lt;!&ndash;        </div>&ndash;&gt;-->
+<!--</div>-->
+
+<div id="messageContainer" style="width: 20%;margin-top: 1%;position: absolute;z-index: 1055;margin-left: 40%;top: 0">
     <!--        <div class="alert alert-danger fade" role="alert" style="font-size: 15px">-->
     <!--            Server error-->
     <!--            <button type="button" class="close" data-dismiss="alert" aria-label="Close">-->
@@ -69,7 +78,9 @@
         $('#table').bootstrapTable({
             search:true,
             toolbar:"#toolbar",
-            url:"category/query",
+            // url:"category/query",
+            checkbox:true,
+            clickToSelect: true,
             columns: [{
                 field: 'id',
                 title: 'Category ID'
@@ -85,13 +96,19 @@
                     events: window.operateEvents,
                     formatter: operateFormatter
                 }
+            ],
+            data:[
+                {
+                    "id":"1",
+                    "categoryName":"123"
+                }
             ]
         })
     })
 
 
     function operateFormatter(){
-        return ["<a href='javascript:void(0)' title='delete'><i>remove</i></a>","<a href='javascript:void(0)' title='delete'><i>edit</i></a>"].join("<div></div>");
+        return ["<a href='javascript:void(0)' title='delete'><i>remove</i></a>","<a href='javascript:void(0)' title='edit'><i>edit</i></a>"].join("<span class='col-1'></span>");
     }
 
     function addNewCategory(btn){
@@ -126,22 +143,21 @@
                     btns[1].disabled = false;
                     disableLoadingVideo($("#addBtn"),"Add");
                     if (result==null||result==undefined){
-                        alertUtil.message("Add failed","danger",$("#addMessageContainer"))
+                        alertUtil.message("Add failed","danger",$("#messageContainer"))
                         return;
                     }
                     if (result.code!=1){
-                        alertUtil.message(result.message,"warning",$("#addMessageContainer"));
+                        alertUtil.message(result.message,"warning",$("#messageContainer"));
                         return;
                     }
-                    alertUtil.message(result.message,"info",$("#addMessageContainer"));
-                    $("#addCategoryInput")[0].value = "";
+                    alertUtil.message(result.message,"success",$("#messageContainer"));
                 },
                 error:function (){
                     let btns = $(".addBtn");
                     btns[0].disabled = false;
                     btns[1].disabled = false;
                     disableLoadingVideo($("#addBtn"),"Add");
-                    alertUtil.message("Add failed","danger",$("#addMessageContainer"))
+                    alertUtil.message("Add failed","danger",$("#messageContainer"))
                 }
             }
         )
