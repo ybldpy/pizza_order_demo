@@ -50,6 +50,7 @@ const alertUtil = {
             var IntervalMS = 20; // 每次上浮的间隔毫秒
             var floatSpace = 60; // 上浮的空间(px)
             var nowTop = divElement.offset().top; // 获取元素当前的top值
+            alert(nowTop)
             var stopTop = nowTop - floatSpace;    // 上浮停止时的top值
             divElement.fadeOut(IntervalMS * floatSpace); // 设置元素淡出
 
