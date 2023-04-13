@@ -9,6 +9,7 @@ import com.example.pizza_order_demo.service.CategoryService;
 import com.example.pizza_order_demo.service.DishService;
 import com.example.pizza_order_demo.service.FlavourService;
 import com.example.pizza_order_demo.utils.FatherToChildUtil;
+import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -71,6 +72,11 @@ public class DishController {
     public Result addDish(Dish dish, String[] flavour){
         if (StringUtils.isAnyBlank(dish.getName(),dish.getCategoryName())||dish.getPrice()==null){
             return new Result(ResultConstant.CODE_FAILED, ErrorConstant.PARAM_MISSING,null);
+        }
+        DishExample dishExample = new DishExample();
+        Dish dishInDb = dishService.selectFirstByExample(dishExample);
+        if (!ObjectUtils.isEmpty(dishInDb)){
+            return new Result(ResultConstant.CODE_FAILED,ErrorConstant.EXIST,null);
         }
         CategoryExample categoryExample = new CategoryExample();
         categoryExample.or().andCategoryNameEqualTo(dish.getCategoryName());

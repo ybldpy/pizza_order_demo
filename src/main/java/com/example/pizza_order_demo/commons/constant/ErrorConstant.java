@@ -1,6 +1,7 @@
 package com.example.pizza_order_demo.commons.constant;
 
 public class ErrorConstant {
+    public static final String EXIST = "Existed!";
     public static final String USER_REGISTER_MISSING_PARAM = "Missing param";
     public static final String PARAM_MISSING = USER_REGISTER_MISSING_PARAM;
     public static final String USER_REGISTER_USERNAME_LENGTH = "The length of username is 5-30";
