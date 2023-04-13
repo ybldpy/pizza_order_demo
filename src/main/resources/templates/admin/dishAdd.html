@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <base href="../../static/">
+    <meta charset="UTF-8">
+    <title>Dish Management</title>
+    <script src="js/header.js"></script>
+    <script src="js/footer.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+    <style>
+        button{
+            background-color: #FFCB62;
+        }
+    </style>
+</head>
+<body>
+
+
+<div id="messageContainer" style="width: 30%;margin-top: 1%;position: fixed;z-index: 1055;margin-left: 35%;top: 0">
+    <!--        <div class="alert alert-danger fade" role="alert" style="font-size: 15px">-->
+    <!--            Server error-->
+    <!--            <button type="button" class="close" data-dismiss="alert" aria-label="Close">-->
+    <!--                <span aria-hidden="true">&times;</span>-->
+    <!--            </button>-->
+    <!--        </div>-->
+</div>
+<div id="addContainer" class="modal" tabindex="-1">
+
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Flavour Set</h5>
+            </div>
+            <div class="modal-body">
+                <div>
+                        <input id="addFlavourInput" class="form-control" type="text" name="categoryName" placeholder="Input new category" oninput="$(this).siblings('div').hide();"/>
+                        <div id="flavourFeedback" class="invalid-feedback">Flavour cannot be empty</div>
+                </div>
+            </div>
+            <div class="modal-footer" style="width: 100%">
+                <button type="button" class="btn btn-secondary addBtn" onclick="$('#addContainer').modal('hide')">Close</button>
+                <button type="button" class="btn btn-warning addBtn" onclick="addFlavour()">Add</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="container" style="margin-top: 5%">
+    <form id="form">
+        <div class="form-row">
+            <div class="form-group col-md-4">
+                <label for="dishName">Dish name</label>
+                <input class="form-control" type="text" name="name" id="dishName"/>
+            </div>
+            <div class="form-group col-md-4">
+                <label for="categoryName">Choose category</label>
+                <select name="categoryName" class="form-control" id="categoryName">
+                </select>
+            </div>
+            <div class="form-group col-md-4">
+                <label for="price">Price</label>
+                <input type="number" name="price" class="form-control" id="price"/>
+            </div>
+        </div>
+        <div class="form-row">
+            <div class="input-group mb-3">
+                <div class="input-group-prepend" id="button-addon3">
+                    <div class="input-group-text">Without</div>
+                </div>
+                <div id="flavourList" class="form-control"></div>
+                <div class="input-group-append">
+                    <button class="btn btn-warning" type="button" id="addFlavourBtn" onclick="$('#addContainer').modal('hide')">Add Flavour</button>
+                </div>
+            </div>
+        </div>
+        <div class="form-row" style="height: 5%">
+            <input name="img" type="text" hidden/>
+            <input id="img-upload" type="file" onchange="chooseFile(this)" accept="image/*" hidden/>
+            <div class="form-group col-3">
+                <div style="height: 80%;cursor: pointer;width: 100%" onclick="document.getElementById('img-upload').click();">
+                    <label for="image-container">Choose image to upload</label>
+                    <img id="image-container" src="img/icon.png" class="img-fluid img-thumbnail"/>
+                </div>
+            </div>
+            <div class="form-group col-4" style="margin-top: 5%">
+                <button id="upload-image-btn" type="button" class="btn btn-warning">Upload</button>
+            </div>
+        </div>
+        <div class="form-row">
+            <div class="form-group col-4">
+                <label for="size">Select Pizza size</label>
+                <select name="size" id="size" class="form-control">
+                    <option value="0">Choose size</option>
+                    <option value="6">6</option>
+                    <option value="9">9</option>
+                    <option value="12">12</option>
+                </select>
+            </div>
+            <div class="form-group col-4">
+                <label for="status">Choose status of dish</label>
+                <select name="status" id="status" class="form-control">
+                    <option value="1">Sell</option>
+                    <option value="0">Hide</option>
+                </select>
+            </div>
+        </div>
+        <div class="form-row">
+            <div class="form-group col-8">
+                <label for="description">description</label>
+                <textarea name="description" class="form-control" id="description"></textarea>
+            </div>
+        </div>
+    </form>
+    <div class="form-row" style="margin-top: 5px">
+        <div class="form-group col-12">
+            <button type="button" class="btn btn-warning btn-block submitBtn" id="addDishBtn">
+                Save
+            </button>
+        </div>
+    </div>
+</div>
+
+
+<script>
+
+    function addDish(){
+        let data = $("#form");
+    }
+
+
+    function addFlavour(){
+        let val = $("#addFlavourInput").val();
+        if (val == undefined || val == null || val.length==0){
+            $("#flavourFeedback").show();
+            return;
+        }
+        let spanElement = $("<span class=\"flavour-item\" style=\"background-color: #e2e6ea;cursor: pointer;margin-right: 10px\">"+val+"<span aria-hidden=\"true\" style='background-color: #e2e6ea' onclick='deleteFlavour(this)' \">&times;</span></span>");
+        // "<span class=\"btn-light flavour-item\" style=\"cursor: pointer\"><span aria-hidden=\"true\" class=\"btn-light\">&times;</span></span>"
+        $("#flavourList").append(spanElement);
+
+    }
+
+    function deleteFlavour(item){
+        $(item).parent().remove();
+    }
+
+    function chooseFile(inputElement){
+        let files = inputElement.files;
+        let fileReader = new FileReader();
+
+        fileReader.onload = function (e){
+            $("#image-container").attr("src",this.result);
+        }
+        fileReader.onerror = function (e){
+            alertUtil.message("Error happen during reading image","danger",$("#messageContainer"));
+        }
+        fileReader.readAsDataURL(files[0]);
+
+    }
+
+    $(function (){
+        $.ajax(
+            {
+                type:"get",
+                url:"category/query",
+                success:function (result){
+                    if (result==null||result==undefined){
+                        alertUtil.message("Get category failed, try to refresh",dangerType,document.getElementById("messageContainer"));
+                    }
+                    else if (result.code!=1){
+                        alertUtil.message(result.message,dangerType,document.getElementById("messageContainer"));
+                    }
+                    else {
+                        let select = $("select[name='category']");
+                        let rows = result.rows;
+                        for(let i=0;i<rows.length;i++){
+                            select.append("<option value='"+rows[i].categoryName+"'>"+rows[i].categoryName+"</option>");
+                        }
+                    }
+                },
+                error:function (){
+                    alertUtil.message("Get category failed, try to refresh",dangerType,document.getElementById("messageContainer"));
+                }
+            }
+        );
+        $("#addDishBtn").on("click",addDish);
+
+        $("#addFlavourBtn").on("click",function (){
+            $('#addContainer').modal({keyboard:true,focus:true,show:true})
+        });
+        $("#addContainer").on("hide.bs.modal",function (){
+            document.getElementById("addFlavourInput").value = '';
+        });
+        $("#upload-image-btn").on("click",function (){
+            let files = document.getElementById("img-upload").files;
+            if (files==null||files==undefined||files.length==0){alertUtil.message("You should choose a img file to upload","warning",document.getElementById("messageContainer"));return;}
+            let formData = new FormData();
+            formData.append("file",files[0]);
+            $.ajax({
+                type:"post",
+                url:"file/img/upload",
+                data:formData,
+                processData:false,
+                contentType:false,
+                beforeSend:function (){
+                 enableLoadingVideo($("#upload-image-btn"))
+                },
+                success:function (result){
+                    disableLoadingVideo($("#upload-image-btn"),"Upload");
+                    if (result==null||result==undefined){
+                        alertUtil.message("Upload failed","danger",document.getElementById("messageContainer"));
+                    }
+                    else if (result.code!=1){
+                        alertUtil.message(result.message,"warning",document.getElementById("messageContainer"));
+                    }
+                    else {
+                        alertUtil.message("Upload success","success",document.getElementById("messageContainer"));
+                        $("input[name='img']")[0].value = result.data
+                    }
+                },
+                error:function (){
+                    disableLoadingVideo($("#upload-image-btn"),"Upload");
+                    alertUtil.message("Upload failed","danger",document.getElementById("messageContainer"));
+                }
+            })
+
+        });
+    })
+</script>
+</body>
+</html>
