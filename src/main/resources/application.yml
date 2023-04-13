@@ -1,4 +1,5 @@
-
+file:
+  upload-path: D:\pizza_order_demo\upload
 spring:
   thymeleaf:
     cache: false

@@ -2,6 +2,9 @@
 const illegalUsername = "The length of user name is 5-30 and only letters and numbers are allowed to appear in username";
 const illegalPassword = "The length of user name is 5-16 and only letters and numbers are allowed to appear in password";
 const repeatPasswordNotEqual = "Repeat password must equals to password";
+const successType = "success";
+const dangerType = "danger";
+const warningType = "warning";
 
 function redirect(url){
     window.location.href = url;
