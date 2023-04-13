@@ -9,6 +9,7 @@ public class Dish {
      * @mbg.generated Tue Apr 11 14:41:11 CST 2023
      */
     private Integer id;
+    public static final Integer STATUS_SELL = 1;
 
     /**
      *

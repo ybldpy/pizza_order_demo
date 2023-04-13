@@ -1,7 +1,7 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
-    <base href="../../static/">
+    <base href="../../static/" th:href="@{/}">
     <meta charset="UTF-8">
     <title>Dish Management</title>
     <script src="js/header.js"></script>
@@ -50,16 +50,20 @@
         <div class="form-row">
             <div class="form-group col-md-4">
                 <label for="dishName">Dish name</label>
-                <input class="form-control" type="text" name="name" id="dishName"/>
+                <input class="form-control" type="text" name="name" id="dishName" oninput="$(this).siblings('.invalid-feedback').hide();"/>
+                <div class="invalid-feedback" id="dishNameFeedback">You must input dish name</div>
             </div>
             <div class="form-group col-md-4">
                 <label for="categoryName">Choose category</label>
-                <select name="categoryName" class="form-control" id="categoryName">
+                <select name="categoryName" class="form-control" id="categoryName" onclick="$(this).siblings('.invalid-feedback').hide();">
+                    <option value="123" selected>123</option>
                 </select>
+                <div class="invalid-feedback" id="categoryNameFeedback">You must select a category</div>
             </div>
             <div class="form-group col-md-4">
                 <label for="price">Price</label>
-                <input type="number" name="price" class="form-control" id="price"/>
+                <input type="number" name="price" class="form-control" id="price" value="" oninput="$(this).siblings('.invalid-feedback').hide();" />
+                <div class="invalid-feedback" id="priceFeedback">You must set price</div>
             </div>
         </div>
         <div class="form-row">
@@ -79,7 +83,7 @@
             <div class="form-group col-3">
                 <div style="height: 80%;cursor: pointer;width: 100%" onclick="document.getElementById('img-upload').click();">
                     <label for="image-container">Choose image to upload</label>
-                    <img id="image-container" src="img/icon.png" class="img-fluid img-thumbnail"/>
+                    <img id="image-container" src="img/default.jpg" class="img-fluid img-thumbnail"/>
                 </div>
             </div>
             <div class="form-group col-4" style="margin-top: 5%">
@@ -99,7 +103,7 @@
             <div class="form-group col-4">
                 <label for="status">Choose status of dish</label>
                 <select name="status" id="status" class="form-control">
-                    <option value="1">Sell</option>
+                    <option value="1" selected>Sell</option>
                     <option value="0">Hide</option>
                 </select>
             </div>
@@ -124,19 +128,70 @@
 <script>
 
     function addDish(){
-        let data = $("#form");
+
+        let flavourList = [];
+
+
+        $.ajax(
+            {
+                type:"post",
+                url:"dish/add",
+                data:$("#form").serialize(),
+                beforeSend:function (){
+                    let canSend = true;
+                    let dishName = $("#dishName");
+                    let price = $("#price");
+                    let categoryName = $("#categoryName");
+                    if (isBlank(dishName.val())){
+                        dishName.siblings(".invalid-feedback").show();
+                        canSend = false;
+                    }
+                    if (isBlank(price.val())){
+                        price.siblings(".invalid-feedback").show();
+                        canSend = false;
+                    }
+                    if (isBlank(categoryName.val())){
+                        categoryName.siblings(".invalid-feedback").show();
+                        canSend = false;
+                    }
+                    if (canSend){
+                        enableLoadingVideo($(this));
+                    }
+                    return canSend;
+                },
+                success:function (result){
+                    disableLoadingVideo($(this),"Save");
+                    if (result==null||result==undefined){
+                        alertUtil.message("Save failed",dangerType,document.getElementById("messageContainer"));
+                        return;
+                    }
+                    if (result.code!=1){
+                        alertUtil.message(result.message,warningType,document.getElementById("messageContainer"));
+                        return;
+                    }
+                    alertUtil.message("Save success",successType,document.getElementById("messageContainer"));
+                },
+                error:function (){
+                    disableLoadingVideo($(this),"Save");
+                }
+            }
+        )
+
+
     }
 
 
     function addFlavour(){
         let val = $("#addFlavourInput").val();
-        if (val == undefined || val == null || val.length==0){
+        if (isBlank(val)){
             $("#flavourFeedback").show();
             return;
         }
-        let spanElement = $("<span class=\"flavour-item\" style=\"background-color: #e2e6ea;cursor: pointer;margin-right: 10px\">"+val+"<span aria-hidden=\"true\" style='background-color: #e2e6ea' onclick='deleteFlavour(this)' \">&times;</span></span>");
+        let spanElement = $("<span class=\"flavour-item\" style=\"background-color: #e2e6ea;cursor: pointer;margin-right: 10px\"><input type='text' name='flavour' value='"+val+"' hidden/>"+val+"<span aria-hidden=\"true\" style='background-color: #e2e6ea' onclick='deleteFlavour(this)' \">&times;</span></span>");
         // "<span class=\"btn-light flavour-item\" style=\"cursor: pointer\"><span aria-hidden=\"true\" class=\"btn-light\">&times;</span></span>"
         $("#flavourList").append(spanElement);
+        $("#addFlavourInput")[0].value = '';
+        alertUtil.message("success",successType,document.getElementById("messageContainer"))
 
     }
 
@@ -167,11 +222,8 @@
                     if (result==null||result==undefined){
                         alertUtil.message("Get category failed, try to refresh",dangerType,document.getElementById("messageContainer"));
                     }
-                    else if (result.code!=1){
-                        alertUtil.message(result.message,dangerType,document.getElementById("messageContainer"));
-                    }
                     else {
-                        let select = $("select[name='category']");
+                        let select = $("select[name='categoryName']");
                         let rows = result.rows;
                         for(let i=0;i<rows.length;i++){
                             select.append("<option value='"+rows[i].categoryName+"'>"+rows[i].categoryName+"</option>");
@@ -195,7 +247,7 @@
             let files = document.getElementById("img-upload").files;
             if (files==null||files==undefined||files.length==0){alertUtil.message("You should choose a img file to upload","warning",document.getElementById("messageContainer"));return;}
             let formData = new FormData();
-            formData.append("file",files[0]);
+            formData.append("img",files[0]);
             $.ajax({
                 type:"post",
                 url:"file/img/upload",
