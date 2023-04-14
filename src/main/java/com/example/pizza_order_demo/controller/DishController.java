@@ -8,7 +8,6 @@ import com.example.pizza_order_demo.model.*;
 import com.example.pizza_order_demo.service.CategoryService;
 import com.example.pizza_order_demo.service.DishService;
 import com.example.pizza_order_demo.service.FlavourService;
-import com.example.pizza_order_demo.utils.FatherToChildUtil;
 import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,7 +17,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import java.lang.reflect.InvocationTargetException;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -70,40 +69,7 @@ public class DishController {
     @Transactional(rollbackFor = Exception.class)
     @ResponseBody
     public Result addDish(Dish dish, String[] flavour){
-        if (StringUtils.isAnyBlank(dish.getName(),dish.getCategoryName())||dish.getPrice()==null){
-            return new Result(ResultConstant.CODE_FAILED, ErrorConstant.PARAM_MISSING,null);
-        }
-        DishExample dishExample = new DishExample();
-        Dish dishInDb = dishService.selectFirstByExample(dishExample);
-        if (!ObjectUtils.isEmpty(dishInDb)){
-            return new Result(ResultConstant.CODE_FAILED,ErrorConstant.EXIST,null);
-        }
-        CategoryExample categoryExample = new CategoryExample();
-        categoryExample.or().andCategoryNameEqualTo(dish.getCategoryName());
-        int count = categoryService.countByExample(categoryExample);
-        if (count<=0){return new Result(ResultConstant.CODE_FAILED,ErrorConstant.NOT_FOUND_CATEGORY,null);}
-        if (StringUtils.isBlank(dish.getImg())){
-            dish.setImg(DEFAULT_IMG);
-        }
-        if (dish.getStatus() == null){
-            dish.setStatus(Dish.STATUS_SELL);
-        }
-        int res = dishService.insert(dish);
-        if (res<=0){
-            throw new CURDException();
-        }
-        if (flavour.length==0){return new Result(ResultConstant.CODE_SUCCESS,ResultConstant.MESSAGE_SUCCESS,null);}
-        Flavour flavour1 = null;
-        for(String s:flavour){
-            flavour1 = new Flavour();
-            flavour1.setName("Without "+s);
-            flavour1.setDishId(dish.getId());
-            res = flavourService.insert(flavour1);
-            if (res<=0){
-                throw new CURDException();
-            }
-        }
-        return new Result(ResultConstant.CODE_SUCCESS,ResultConstant.MESSAGE_SUCCESS,null);
+        return null;
     }
 
 }
