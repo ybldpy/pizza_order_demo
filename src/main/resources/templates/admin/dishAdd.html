@@ -81,7 +81,7 @@
                     <input type="number" name="price" class="form-control" placeholder="Input price"/>
                 </div>
                 <div class="form-group col-md-4">
-                    <button type="button" class="btn btn-warning">Delete</button>
+                    <button type="button" class="btn btn-warning delete-size" onclick="deleteGroupItem($(this).parents('div.group-item'),document.getElementById('sizeAndPrice'))">Delete</button>
                 </div>
             </div>
         </div>
@@ -221,8 +221,17 @@
 
     }
 
-    function deleteGroupItem(item,container){
+    function addGroupItem(container){
+        $(container)
+    }
 
+    function deleteGroupItem(item,container){
+        let items = $(container).find(".group-item");
+        if (items.length==1){
+            alertUtil.message("At least one size is required",warningType,document.getElementById("messageContainer"));
+            return;
+        }
+        $(item).remove();
     }
 
     $(function (){
