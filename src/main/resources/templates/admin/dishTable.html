@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <base href="../../static/" th:href="@{/}">
+    <meta charset="UTF-8">
+    <title>dish table</title>
+    <script src="js/header.js"></script>
+    <link href="plugins/bootstrap-table/bootstrap-table.min.css" rel="stylesheet"/>
+    <script src="js/footer.js"></script>
+    <script src="plugins/bootstrap-table/bootstrap-table.min.js"></script>
+</head>
+<body>
+<div class="container">
+    <table id="dishTable"></table>
+</div>
+
+<script>
+    $(function (){
+        $("#dishTable").bootstrapTable(
+            {
+                search:true,
+                checkbox:true,
+                columns:[
+                    {
+                        field:"id",
+                        title:"id"
+                    },
+                    {
+                        field:"img",
+                        title:"image",
+                        formatter:imgFormatter
+                    },
+                    {
+                        field:"price",
+                        title:"price",
+                        searchable:true
+                    },
+                    {
+                        field: "categoryName",
+                        title: "category",
+                        searchable: true
+                    },
+                    {
+                        field: "sellStatus",
+                        title: "sellStatus",
+                        searchable: true
+                    }
+                ]
+            }
+        )
+    })
+
+    function imgFormatter(){
+
+    }
+</script>
+</body>
+</html>
