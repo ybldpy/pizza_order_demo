@@ -68,7 +68,7 @@
         </div>
         <div class="form-row">
             <div class="form-group col-md-4">
-                <button class="btn btn-warning" type="button" onclick="">Add Size</button>
+                <button class="btn btn-warning" type="button" onclick="addGroupItem(document.getElementById('sizeAndPrice'))">Add Size</button>
             </div>
         </div>
 
@@ -222,7 +222,18 @@
     }
 
     function addGroupItem(container){
-        $(container)
+        let item = $("<div class=\"form-row group-item\">\n" +
+            "                <div class=\"form-group col-md-4\">\n" +
+            "                    <input type=\"number\" name=\"size\" class=\"form-control\" placeholder=\"Input size\"/>\n" +
+            "                </div>\n" +
+            "                <div class=\"form-group col-md-4\">\n" +
+            "                    <input type=\"number\" name=\"price\" class=\"form-control\" placeholder=\"Input price\"/>\n" +
+            "                </div>\n" +
+            "                <div class=\"form-group col-md-4\">\n" +
+            "                    <button type=\"button\" class=\"btn btn-warning delete-size\" onclick=\"deleteGroupItem($(this).parents('div.group-item'),document.getElementById('sizeAndPrice'))\">Delete</button>\n" +
+            "                </div>\n" +
+            "            </div>");
+        $(container).append(item);
     }
 
     function deleteGroupItem(item,container){
