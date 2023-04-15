@@ -2,11 +2,13 @@ package com.example.pizza_order_demo.controller;
 
 
 import com.example.pizza_order_demo.commons.Result;
+import com.example.pizza_order_demo.commons.constant.ErrorConstant;
 import com.example.pizza_order_demo.commons.constant.ResultConstant;
 import com.example.pizza_order_demo.exception.CURDException;
 import com.example.pizza_order_demo.model.Category;
 import com.example.pizza_order_demo.model.CategoryExample;
 import com.example.pizza_order_demo.service.CategoryService;
+import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -63,6 +65,8 @@ public class CategoryController {
     }
 
 
+
+
     @GetMapping("/category/query")
 //    @PreAuthorize("hasRole('admin')")
     @ResponseBody
@@ -82,5 +86,21 @@ public class CategoryController {
         resultMap.put("rows",categoryList);
         return resultMap;
 
+    }
+    @PostMapping("/category/delete")
+    @Transactional(rollbackFor = Exception.class)
+    @ResponseBody
+    public Result deleteCategory(String[] categoryName){
+        if (ObjectUtils.isEmpty(categoryName)){
+            return new Result(ResultConstant.CODE_FAILED, ErrorConstant.PARAM_MISSING,null);
+        }
+
+        CategoryExample categoryExample = new CategoryExample();
+        for(String s:categoryName){
+            categoryExample.or().andCategoryNameEqualTo(s);
+            categoryService.deleteByExample(categoryExample);
+            categoryExample.clear();
+        }
+        return new Result(ResultConstant.CODE_SUCCESS,ResultConstant.MESSAGE_SUCCESS,null);
     }
 }

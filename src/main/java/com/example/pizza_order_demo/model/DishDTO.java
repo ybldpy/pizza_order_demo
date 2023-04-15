@@ -27,16 +27,7 @@ public class DishDTO extends Dish{
         this(null);
     }
     public DishDTO(Dish father){
-        if (father==null){return;}
-        setImg(father.getImg());
-        setId(father.getId());
-        setDescription(father.getDescription());
-        setName(father.getName());
-        setPrice(father.getPrice());
-        setSize(father.getSize());
-        setRank(father.getRank());
-        setStatus(father.getStatus());
-        setCategoryName(father.getCategoryName());
+
     }
 
     public String getSellStatus() {
