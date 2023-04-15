@@ -29,17 +29,16 @@
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title">Flavour Set</h5>
+                <h5 class="modal-title">Add Topping</h5>
             </div>
             <div class="modal-body">
                 <div>
-                        <input id="addFlavourInput" class="form-control" type="text" name="categoryName" placeholder="Input new category" oninput="$(this).siblings('div').hide();"/>
-                        <div id="flavourFeedback" class="invalid-feedback">Flavour cannot be empty</div>
+
                 </div>
             </div>
             <div class="modal-footer" style="width: 100%">
                 <button type="button" class="btn btn-secondary addBtn" onclick="$('#addContainer').modal('hide')">Close</button>
-                <button type="button" class="btn btn-warning addBtn" onclick="addFlavour()">Add</button>
+                <button type="button" class="btn btn-warning addBtn">Add</button>
             </div>
         </div>
     </div>
@@ -99,22 +98,19 @@
             </div>
         </div>
         <div class="form-row">
-            <div class="form-group col-4">
-                <label for="size">Select Pizza size</label>
-                <select name="size" id="size" class="form-control">
-                    <option value="0">Choose size</option>
-                    <option value="6">6</option>
-                    <option value="9">9</option>
-                    <option value="12">12</option>
-                </select>
+            <div class="form-group col-5 input-group">
+                <div id="topping-item-container" class="form-control"></div>
             </div>
             <div class="form-group col-4">
-                <label for="status">Choose status of dish</label>
-                <select name="status" id="status" class="form-control">
-                    <option value="1" selected>Sell</option>
-                    <option value="0">Hide</option>
-                </select>
+                <button class="btn btn-warning" type="button">Add topping</button>
             </div>
+<!--            <div class="form-group col-4">-->
+<!--                <label for="status">Choose status of dish</label>-->
+<!--                <select name="status" id="status" class="form-control">-->
+<!--                    <option value="1" selected>Sell</option>-->
+<!--                    <option value="0">Hide</option>-->
+<!--                </select>-->
+<!--            </div>-->
         </div>
         <div class="form-row">
             <div class="form-group col-8">
@@ -220,9 +216,8 @@
         fileReader.readAsDataURL(files[0]);
 
     }
-
     function addGroupItem(container){
-        let item = $("<div class=\"form-row group-item\">\n" +
+        let itemContent = "<div class=\"form-row group-item\">\n" +
             "                <div class=\"form-group col-md-4\">\n" +
             "                    <input type=\"number\" name=\"size\" class=\"form-control\" placeholder=\"Input size\"/>\n" +
             "                </div>\n" +
@@ -232,7 +227,8 @@
             "                <div class=\"form-group col-md-4\">\n" +
             "                    <button type=\"button\" class=\"btn btn-warning delete-size\" onclick=\"deleteGroupItem($(this).parents('div.group-item'),document.getElementById('sizeAndPrice'))\">Delete</button>\n" +
             "                </div>\n" +
-            "            </div>");
+            "            </div>"
+        let item = $(itemContent);
         $(container).append(item);
     }
 
