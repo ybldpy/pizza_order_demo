@@ -79,6 +79,13 @@ public class UserController {
         return new Result(ResultConstant.CODE_FAILED,ErrorConstant.USER_LOGIN_USERNAME_PASSWORD_WRONG,null);
     }
 
+    @RequestMapping("/login/test")
+    @ResponseBody
+    public Result test(String param1,String param2){
+        return new Result(ResultConstant.CODE_FAILED,ErrorConstant.MAIL_EMPTY,new String[]{param1,param2});
+
+    }
+
     @GetMapping("/forget/username")
     public String forgetPasswordUsername(){
         return "forget/forget_username";
