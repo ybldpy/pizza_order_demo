@@ -1,9 +1,11 @@
 package com.example.pizza_order_demo.service;
 
 
+import com.example.pizza_order_demo.mapper.UserAddressMapper;
 import com.example.pizza_order_demo.model.UserAddress;
+import com.example.pizza_order_demo.model.UserAddressExample;
 
-public interface UserAddressService  {
+public interface UserAddressService extends BaseService<UserAddress, UserAddressExample>{
 
 
 

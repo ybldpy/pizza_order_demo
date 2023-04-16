@@ -45,7 +45,7 @@ public class CategoryController {
             return result;
         }
         CategoryExample categoryExample=new CategoryExample();
-        categoryExample.or().andCategoryNameEqualTo(categoryName);
+        categoryExample.or().andCategoryNameEqualTo(categoryName).andDeletedEqualTo(0);
         List<Category> categoryList= categoryService.selectByExample(categoryExample);
         if(categoryList.size()==0){
             Category category = new Category();
@@ -72,6 +72,7 @@ public class CategoryController {
     @ResponseBody
     public Object getCategories(){
         CategoryExample categoryExample = new CategoryExample();
+        categoryExample.or().andDeletedEqualTo(0);
 //        if (!StringUtils.isBlank(search)){
 //            categoryExample.or().andCategoryNameLike("%"+search+"%");
 //            if (StringUtils.isNumeric(search)){
@@ -90,16 +91,22 @@ public class CategoryController {
     @PostMapping("/category/delete")
     @Transactional(rollbackFor = Exception.class)
     @ResponseBody
-    public Result deleteCategory(String[] categoryName){
+    public Result deleteCategory(List<String> categoryName){
         if (ObjectUtils.isEmpty(categoryName)){
             return new Result(ResultConstant.CODE_FAILED, ErrorConstant.PARAM_MISSING,null);
         }
-
         CategoryExample categoryExample = new CategoryExample();
-        for(String s:categoryName){
-            categoryExample.or().andCategoryNameEqualTo(s);
-            categoryService.deleteByExample(categoryExample);
-            categoryExample.clear();
+        categoryExample.or().andDeletedEqualTo(0).andCategoryNameIn(categoryName);
+        List<Category> categoryList = categoryService.selectByExample(categoryExample);
+        if (ObjectUtils.isEmpty(categoryList)||categoryList.size()!=categoryName.size()){
+            return new Result(ResultConstant.CODE_FAILED,"One or more than one categories don't find",null);
+        }
+
+        Category category = new Category();
+        category.setDeleted(1);
+        int res = categoryService.updateByExampleSelective(category,categoryExample);
+        if (res!=categoryList.size()){
+            throw new CURDException();
         }
         return new Result(ResultConstant.CODE_SUCCESS,ResultConstant.MESSAGE_SUCCESS,null);
     }

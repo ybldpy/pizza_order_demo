@@ -5,8 +5,10 @@
     <meta charset="UTF-8">
     <title>Dish Management</title>
     <script src="js/header.js"></script>
+    <link rel="stylesheet" href="plugins/bootstrap-select/bootstrap-select.min.css">
+    <link rel="stylesheet" href="font/fonts.css">
     <script src="js/footer.js"></script>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+    <script src="plugins/bootstrap-select/bootstrap-select.min.js"></script>
     <style>
         button{
             background-color: #FFCB62;
@@ -26,14 +28,15 @@
 </div>
 <div id="addContainer" class="modal" tabindex="-1">
 
-    <div class="modal-dialog">
+    <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title">Add Topping</h5>
             </div>
             <div class="modal-body">
-                <div>
-
+                <div class="input-group">
+                    <select id="topping-item" class="form-control">
+                    </select>
                 </div>
             </div>
             <div class="modal-footer" style="width: 100%">
@@ -55,7 +58,6 @@
             <div class="form-group col-md-7">
                 <label for="categoryName">Choose category</label>
                 <select name="categoryName" class="form-control" id="categoryName" onclick="$(this).siblings('.invalid-feedback').hide();">
-                    <option value="123" selected>123</option>
                 </select>
                 <div class="invalid-feedback" id="categoryNameFeedback">You must select a category</div>
             </div>
@@ -74,10 +76,10 @@
         <div id="sizeAndPrice">
             <div class="form-row group-item">
                 <div class="form-group col-md-4">
-                    <input type="number" name="size" class="form-control" placeholder="Input size"/>
+                    <input type="number" class="form-control" placeholder="Input size"/>
                 </div>
                 <div class="form-group col-md-4">
-                    <input type="number" name="price" class="form-control" placeholder="Input price"/>
+                    <input type="number" class="form-control" placeholder="Input price"/>
                 </div>
                 <div class="form-group col-md-4">
                     <button type="button" class="btn btn-warning delete-size" onclick="deleteGroupItem($(this).parents('div.group-item'),document.getElementById('sizeAndPrice'))">Delete</button>
@@ -98,12 +100,23 @@
             </div>
         </div>
         <div class="form-row">
-            <div class="form-group col-5 input-group">
-                <div id="topping-item-container" class="form-control"></div>
+            <div class="form-group col-5">
+<!--                <div id="topping-item-container" class="form-control"><span>&times;</span></div>-->
+                <label>Add topping</label>
+                <select class="form-control selectpicker" id="topping" multiple>
+                </select>
             </div>
-            <div class="form-group col-4">
-                <button class="btn btn-warning" type="button">Add topping</button>
+
+            <div class="form-group col-5">
+                <label>Set status</label>
+                <select class="form-control selectpicker" name="state">
+                    <option value="1">Selling</option>
+                    <option value="0">Hide</option>
+                </select>
             </div>
+<!--            <div class="form-group col-4">-->
+<!--                <button class="btn btn-warning" type="button">Add topping</button>-->
+<!--            </div>-->
 <!--            <div class="form-group col-4">-->
 <!--                <label for="status">Choose status of dish</label>-->
 <!--                <select name="status" id="status" class="form-control">-->
@@ -131,40 +144,73 @@
 
 <script>
 
+    $.ajax(
+        {
+            type:"get",
+            url:"dish/get",
+            success:function (result){
+                let sizePrice = result["rows"][0]["priceSize"]
+            }
+        }
+    )
+
     function addDish(){
 
-        let flavourList = [];
+
+        let dish = {};
+        dish["dishName"] = $("#dishName").val();
+        dish["categoryName"] = $("#categoryName").val();
+        let size_price = [];
+        let items = $("#sizeAndPrice").find(".group-item");
+        for(let i=0;i<items.length;i++){
+            let inputs = items.find("input[type='number']");
+            let jsonObj = {};
+            jsonObj["size"] = parseInt(inputs[0].value);
+            jsonObj["price"] = parseInt(inputs[0].value);
+            size_price.push(jsonObj);
+        }
+        dish["sizePrice"] = size_price;
+        dish["img"] = $("input[name='img']").val();
+        dish["topping"] = $("#topping").val();
+        dish["state"] = parseInt($("select[name='state']").val());
+        dish["remark"] = $("textarea[name='description']").val();
+        let btn = this;
 
 
         $.ajax(
             {
                 type:"post",
                 url:"dish/add",
-                data:$("#form").serialize(),
+                contentType: "application/json",
+                data:JSON.stringify(dish),
                 beforeSend:function (){
                     let canSend = true;
                     let dishName = $("#dishName");
-                    let price = $("#price");
                     let categoryName = $("#categoryName");
                     if (isBlank(dishName.val())){
                         dishName.siblings(".invalid-feedback").show();
                         canSend = false;
                     }
-                    if (isBlank(price.val())){
-                        price.siblings(".invalid-feedback").show();
-                        canSend = false;
+                    let sizeAndPrice = $("#sizeAndPrice");
+                    let inputs = sizeAndPrice.find("input");
+                    for(let i=0;i<inputs.length;i++){
+                        if (isBlank(inputs[i].value)){
+                            alertUtil.message("You have to fill in both size and price",warningType,document.getElementById("messageContainer"));
+                            canSend = false;
+                            break;
+                        }
                     }
                     if (isBlank(categoryName.val())){
                         categoryName.siblings(".invalid-feedback").show();
                         canSend = false;
                     }
                     if (canSend){
-                        enableLoadingVideo($(this));
+                        enableLoadingVideo($(btn));
                     }
                     return canSend;
                 },
                 success:function (result){
-                    disableLoadingVideo($(this),"Save");
+                    disableLoadingVideo($(btn),"Save");
                     if (result==null||result==undefined){
                         alertUtil.message("Save failed",dangerType,document.getElementById("messageContainer"));
                         return;
@@ -176,7 +222,7 @@
                     alertUtil.message("Save success",successType,document.getElementById("messageContainer"));
                 },
                 error:function (){
-                    disableLoadingVideo($(this),"Save");
+                    disableLoadingVideo($(btn),"Save");
                 }
             }
         )
@@ -241,13 +287,13 @@
         $(item).remove();
     }
 
-    $(function (){
+    function getCategory(){
         $.ajax(
             {
                 type:"get",
                 url:"category/query",
                 success:function (result){
-                    if (result==null||result==undefined){
+                    if (result==null||result==undefined||result.total==undefined||result.total==null){
                         alertUtil.message("Get category failed, try to refresh",dangerType,document.getElementById("messageContainer"));
                     }
                     else {
@@ -256,6 +302,7 @@
                         for(let i=0;i<rows.length;i++){
                             select.append("<option value='"+rows[i].categoryName+"'>"+rows[i].categoryName+"</option>");
                         }
+
                     }
                 },
                 error:function (){
@@ -263,14 +310,38 @@
                 }
             }
         );
+    }
+    function getTopping(){
+        $.ajax(
+            {
+                type:"get",
+                url:"topping/get",
+                success:function (result){
+                    if (result==null||result==undefined){
+                        alertUtil.message("Get topping failed, try to refresh",dangerType,document.getElementById("messageContainer"));
+                    }
+                    else {
+                        let select = $("#topping");
+                        let prefix = "<option value='";
+                        let postFix = "</option>"
+                        for(let i=0;i<result.total;i++){
+                            select.append(prefix+result.rows[i].toppingName+"'>"+result.rows[i].toppingName+postFix);
+                        }
+                        select.selectpicker("refresh");
+                    }
+                },
+                error:function (){
+                    alertUtil.message("Get topping failed, try to refresh",dangerType,document.getElementById("messageContainer"));
+                }
+            }
+        );
+    }
+
+    $(function (){
+        getCategory();
+        getTopping();
         $("#addDishBtn").on("click",addDish);
 
-        $("#addFlavourBtn").on("click",function (){
-            $('#addContainer').modal({keyboard:true,focus:true,show:true})
-        });
-        $("#addContainer").on("hide.bs.modal",function (){
-            document.getElementById("addFlavourInput").value = '';
-        });
         $("#upload-image-btn").on("click",function (){
             let files = document.getElementById("img-upload").files;
             if (files==null||files==undefined||files.length==0){alertUtil.message("You should choose a img file to upload","warning",document.getElementById("messageContainer"));return;}
@@ -295,6 +366,7 @@
                     }
                     else {
                         alertUtil.message("Upload success","success",document.getElementById("messageContainer"));
+                        alert(result.data)
                         $("input[name='img']")[0].value = result.data
                     }
                 },

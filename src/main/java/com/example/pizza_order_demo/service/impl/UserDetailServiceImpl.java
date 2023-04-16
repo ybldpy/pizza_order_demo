@@ -46,7 +46,7 @@ public class UserDetailServiceImpl implements UserDetailsService {
         for(UserRole userRole:userRoleList){
             role = roleService.selectByPrimaryKey(userRole.getRoleId());
             if (!ObjectUtils.isEmpty(role)){
-                authorities.add(new SimpleGrantedAuthority(role.getName()));
+                authorities.add(new SimpleGrantedAuthority(role.getRoleName()));
             }
         }
         return new UserDetailsImpl(user,authorities);

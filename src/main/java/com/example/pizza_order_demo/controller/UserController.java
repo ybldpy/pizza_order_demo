@@ -193,11 +193,11 @@ public class UserController {
         }
         user.setPwd(passwordEncoder.encode(user.getPwd()));
         user.setGender(user.getGender()==null?0:user.getGender());
-        user.setStatus(1);
+        user.setState(1);
         int res = userService.insert(user);
         if (res<1){throw new CURDException();}
         RoleExample roleExample = new RoleExample();
-        roleExample.or().andNameEqualTo(UserConstant.ROLE_CUSTOMER);
+        roleExample.or().andRoleNameEqualTo(UserConstant.ROLE_CUSTOMER);
         Role role = roleService.selectFirstByExample(roleExample);
         if (ObjectUtils.isEmpty(role)){
             throw new InternalException("role cannot find");

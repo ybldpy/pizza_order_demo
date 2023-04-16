@@ -38,6 +38,6 @@ public class DishDTO extends Dish{
         this.sellStatus = sellStatus;
     }
     public void setSellStatus(){
-        setSellStatus(this.getStatus()==STATUS_SELL?"Sell":"Hide");
+        setSellStatus(this.getState()==1?"Sell":"Hide");
     }
 }

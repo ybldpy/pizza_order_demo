@@ -6,33 +6,191 @@
     <title>dish table</title>
     <script src="js/header.js"></script>
     <link href="plugins/bootstrap-table/bootstrap-table.min.css" rel="stylesheet"/>
+    <link rel="stylesheet" href="font/fonts.css">
     <script src="js/footer.js"></script>
     <script src="plugins/bootstrap-table/bootstrap-table.min.js"></script>
 </head>
+<style type="text/css">
+    td{
+        word-break: break-all;
+        word-wrap: break-word;
+    }
+</style>
 <body>
-<div class="container">
+<div id="messageContainer" style="width: 30%;margin-top: 1%;position: fixed;z-index: 1055;margin-left: 35%;top: 0">
+
+</div>
+<div id="addContainer" class="modal" tabindex="-1">
+
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Change state</h5>
+            </div>
+            <div class="modal-body">
+                <div class="input-group">
+                    <select id="state" class="form-control">
+                        <option value="0">Hide</option>
+                        <option value="1">Selling</option>
+                    </select>
+                </div>
+            </div>
+            <div class="modal-footer" style="width: 100%">
+                <button type="button" class="btn btn-secondary" onclick="$('#addContainer').modal('hide')">Close</button>
+                <button id="changeBtn" type="button" class="btn btn-warning" >Change</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<div style="margin-top: 5%;width: 85%;margin-left: 7.5%">
+    <div id="toolbar">
+        <span>
+            <button class="btn btn-danger" id="deleteBtn"><i class="bi bi-trash"></i>Delete</button>
+        </span>
+        <span><button class="btn btn-warning" id="stateBtn"><i class="bi bi-pen"></i> Change state</button></span>
+    </div>
     <table id="dishTable"></table>
 </div>
 
 <script>
+
+    function getSelections(){
+        return $("#dishTable").bootstrapTable("getSelections");
+    }
+
+    const messageContainer = document.getElementById("messageContainer");
+
     $(function (){
+        $("#deleteBtn").click(function (){
+            let rows = getSelections();
+            let ids = [];
+            for(let i=0;i<rows.length;i++){
+                ids.push(parseInt(rows[i].id));
+            }
+            let data = JSON.stringify(ids);
+            let html = this.innerHTML;
+            let btn = $(this);
+            $.ajax(
+                {
+                    type:"post",
+                    url:"dish/delete",
+                    data:data,
+                    contentType:"application/json",
+                    beforeSend:function (){
+                        if (ids.length==0){return false;}
+                        enableLoadingVideo($("#deleteBtn"));
+                        document.getElementById("stateBtn").disabled = true;
+                        return true;
+                    },
+                    success:function (result){
+                        disableLoadingVideo(btn,html);
+                        document.getElementById("stateBtn").disabled = false;
+                        if (result==null||result==undefined){
+                            alertUtil.message("Delete failed",dangerType,messageContainer);
+                            return;
+                        }
+                        if (result.code!=1){
+                            alertUtil.message(result.message,dangerType,messageContainer);
+                            return;
+                        }
+                        alertUtil.message("Success",successType,messageContainer);
+                        $("#dishTable").bootstrapTable("refresh");
+
+                    },
+                    error:function (){
+                        disableLoadingVideo(btn,html);
+                        document.getElementById("stateBtn").disabled = false;
+                        alertUtil.message("Delete Failed",dangerType,messageContainer);
+                    }
+
+                }
+            )
+
+        })
+        $("#stateBtn").click(function (){
+            $("#addContainer").modal({backdrop:'static',keyboard:false});
+        })
+        $("#changeBtn").click(function (){
+            let rows = getSelections();
+            let ids = [];
+            for(let i=0;i<rows.length;i++){
+                ids.push(parseInt(rows[i].id));
+            }
+            let data = {
+                ids:ids,
+                state:parseInt($("#state").val())
+            }
+            let html = this.innerHTML;
+            let btn = $(this);
+            $.ajax(
+                {
+                    type:"post",
+                    url:"dish/changeState",
+                    data:JSON.stringify(data),
+                    contentType:"application/json",
+                    beforeSend:function (){
+                        if (ids.length==0){alertUtil.message("You should choose at least a item",warningType,messageContainer);return false;}
+                        enableLoadingVideo(btn);
+                        btn.siblings("button")[0].disabled = true;
+                        return true;
+                    },
+                    success:function (result){
+                        disableLoadingVideo(btn,html);
+                        btn.siblings("button")[0].disabled = false;
+                        document.getElementById("stateBtn").disabled = false;
+                        if (result==null||result==undefined){
+                            alertUtil.message("Delete failed",dangerType,messageContainer);
+                            return;
+                        }
+                        if (result.code!=1){
+                            alertUtil.message(result.message,dangerType,messageContainer);
+                            return;
+                        }
+                        alertUtil.message("Success",successType,messageContainer);
+                        $("#addContainer").modal("hide");
+                        $("#dishTable").bootstrapTable("refresh");
+
+                    },
+                    error:function (){
+                        disableLoadingVideo(btn,html);
+                        btn.siblings("button")[0].disabled = false
+                        alertUtil.message("Delete Failed",dangerType,messageContainer);
+                    }
+
+                }
+            )
+
+        })
+
+
         $("#dishTable").bootstrapTable(
             {
                 search:true,
-                checkbox:true,
+                url:"dish/get",
+                toolbar:"#toolbar",
                 columns:[
+                    {
+                        checkbox:true
+                    },
                     {
                         field:"id",
                         title:"id"
                     },
                     {
-                        field:"img",
-                        title:"image",
-                        formatter:imgFormatter
+                      field: "dishName",
+                      title: "Dish name",
                     },
                     {
-                        field:"price",
-                        title:"price",
+                        field:"img",
+                        title:"image",
+                        formatter:imgFormatter,
+                    },
+                    {
+                        field:"sizePrice",
+                        title:"Size and price",
+                        formatter:sizePriceFormatter,
                         searchable:true
                     },
                     {
@@ -41,18 +199,63 @@
                         searchable: true
                     },
                     {
-                        field: "sellStatus",
-                        title: "sellStatus",
+                        field: "state",
+                        title: "state",
+                        formatter:stateFormatter,
                         searchable: true
+                    },
+                    {
+                        field:"topping",
+                        title:"topping",
+                        formatter:toppingFormatter,
+                        searchable: true
+                    },
+                    {
+                        field: "remark",
+                        title:"description",
+                    },
+                    {
+                        title:"operation",
+                        formatter:operationFormatter,
+                        align:"center",
                     }
                 ]
             }
         )
     })
+    function operationFormatter(val,row,index,field){
+        return "<a href=\"dish/modify?dishId="+row["id"]+"\"><i class='bi bi-pencil-square'></i>"
+    }
 
-    function imgFormatter(){
+    function imgFormatter(value,row,index,field){
+        return "<a target='_blank' href='"+row["img"]+"'><img src='"+row["img"]+"' style='height: auto;width: 100px' alt='text'/></a>";
+    }
+    function stateFormatter(value,row,index,field){
+        if (parseInt(value)==0){return "Hide"}
+        return "Selling";
+    }
+    function toppingFormatter(value,row,index,field){
+        let toppingJson = JSON.parse(value);
+        let list = [];
+
+        for(let i=0;i<toppingJson.length;i++){
+            list.push(toppingJson[i]);
+        }
+        return list.join(",");
+    }
+
+    function sizePriceFormatter(value,row,index,field){
+
+        let obj = JSON.parse(value);
+        let list = [];
+        for(let i=0;i<obj.length;i++){
+            list.push("[size: "+obj[i]["size"]+", price: "+obj[i]["price"]+"]");
+        }
+        return list.join("| ")
 
     }
+
+
 </script>
 </body>
 </html>
