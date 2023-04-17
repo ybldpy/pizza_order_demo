@@ -31,7 +31,7 @@ public class CategoryController {
 
 
     @GetMapping("/category/management")
-    @PreAuthorize("hasRole('admin')")
+//    @PreAuthorize("hasRole('admin')")
     public String categoryManagement(){
         return "admin/categoryManagement";
     }
