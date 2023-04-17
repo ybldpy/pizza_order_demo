@@ -1,0 +1,406 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <base href="../../static/" th:href="@{/}">
+    <meta charset="UTF-8">
+    <title>address</title>
+    <script src="js/header.js"></script>
+    <link href="plugins/bootstrap-table/bootstrap-table.min.css" rel="stylesheet"/>
+    <script src="js/footer.js"></script>
+    <script src="plugins/bootstrap-table/bootstrap-table.min.js"></script>
+
+</head>
+<style>
+    .color{
+        background-color: #FFBF3D !important;
+    }
+
+    a.color:focus,a.color:hover,button.color:focus,button.color:hover{
+        background-color:#DFB300!important
+    }
+
+    /*.bigbox{*/
+    /*    margin-top: 5%;*/
+    /*}*/
+     h1{
+         font-style: italic;
+         font-family: "Monaco",serif;
+         color:#FF9D1B;
+         text-shadow: 2px 2px 5px orange;
+         margin: auto;
+         /*position: absolute; left: 50px; top: 5px;*/
+     }
+
+     .btnadd{
+         /*margin-top: ;*/
+         margin-left: 70%;
+         /*margin-top: 5%;*/
+     }
+
+     .btndel{
+         margin-left: 80%;
+     }
+
+     .box{
+         width: 100%;
+         height: 40%;
+     }
+
+     .white{
+         color: black;
+         background-color: rgba(255,255,255,0.7);
+     }
+
+     #addadresspage{
+         display: none;
+         background-color: white;
+         border-radius: 25px;
+         width: 80%;
+         height: 80%;
+         position:absolute;
+         top:15%;
+         left:10%;
+     }
+
+    #editadresspage{
+        display: none;
+        outline-style: solid;
+        background-color: white;
+        border-radius: 25px;
+        width: 80%;
+        height: 80%;
+        position:absolute;
+        top:15%;
+        left:10%;
+    }
+
+     #grey{
+         display: none;
+         background-color: rgba(0,0,0,0.5);
+         width: 100%;
+         height: 100%;
+         position:absolute;
+         top:0%;
+         left:0%;
+     }
+
+     #name{
+         width: 80%;
+         position: absolute;
+         top: 20%;
+         left: 8%;
+     }
+
+    #mobile{
+        width: 80%;
+        position: absolute;
+        top: 32%;
+        left: 8%;
+    }
+
+    #area{
+        width: 80%;
+        position: absolute;
+        top: 44%;
+        left: 8%;
+    }
+
+    #full{
+        width: 80%;
+        height: 30%;
+        position: absolute;
+        top: 56%;
+        left: 8%;
+    }
+
+    #name1{
+        width: 80%;
+        position: absolute;
+        top: 20%;
+        left: 8%;
+    }
+
+    #mobile1{
+        width: 80%;
+        position: absolute;
+        top: 32%;
+        left: 8%;
+    }
+
+    #area1{
+        width: 80%;
+        position: absolute;
+        top: 44%;
+        left: 8%;
+    }
+
+    #full1{
+        width: 80%;
+        height: 30%;
+        position: absolute;
+        top: 56%;
+        left: 8%;
+    }
+
+
+</style>
+<body th:style="'background-size: 100% 100%;background-image: url('+@{img/loginBack.jpg}+');background-repeat: no-repeat;background-position: center;background-attachment: fixed'" style="background-size: 100% 100%;background-image: url('../static/img/loginBack.jpg');background-repeat: no-repeat;background-position: center;background-attachment: fixed">
+<div id="header" class="fixed-top" >
+    <nav class="navbar navbar-expand-lg navbar-light color" style="height: 50px" >
+        <a class="navbar-brand color" href="#">
+            <img src="img/logo.png" alt="logo" style="height: 40px">
+        </a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarScroll" aria-controls="navbarScroll" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarScroll">
+            <ul class="navbar-nav mr-auto my-2 my-lg-0 navbar-nav-scroll" style="max-height: 100px;">
+                <li class="nav-item active">
+                    <a class="nav-link" href="#">Home <span class="sr-only">(current)</span></a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#">Link</a>
+                </li>
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" role="button" data-toggle="dropdown" aria-expanded="false">
+                        Link
+                    </a>
+                    <ul class="dropdown-menu">
+                        <li><a class="dropdown-item" href="#">Action</a></li>
+                        <li><a class="dropdown-item" href="#">Another action</a></li>
+                        <li><hr class="dropdown-divider"></li>
+                        <li><a class="dropdown-item" href="#">Something else here</a></li>
+                    </ul>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link disabled">Link</a>
+                </li>
+            </ul>
+            <form class="d-flex">
+                <input class="form-control mr-2" type="search" placeholder="Search" aria-label="Search">
+                <button class="btn btn-outline-success" type="submit">Search</button>
+            </form>
+            <div style="">
+                <ul class="navbar-nav mr-auto my-2 my-lg-0 navbar-nav-scroll" style="max-height: 100px;">
+                    <li class="nav-item dropdown" style="">
+                        <a class="nav-link dropdown-toggle" href="#" role="button" data-toggle="dropdown" aria-expanded="false">
+                            Username
+                        </a>
+                        <ul class="dropdown-menu" >
+                            <li><a class="dropdown-item" href="#">
+                                <i class="bi bi-list">&nbsp&nbsp</i>
+                                Order</a></li>
+                            <li><a class="dropdown-item" href="#">
+                                <i class="bi bi-person-lines-fill">&nbsp&nbsp</i>
+                                Profile</a></li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li><a class="dropdown-item" href="#">
+                                <i class="bi bi-box-arrow-right">&nbsp&nbsp</i>
+                                Log out</a></li>
+                        </ul>
+                    </li>
+                    <div class="brand" href="#" style="width: 40px;height: 40px;overflow: hidden;border-radius: 50%;float:right;box-shadow: 0 4px 8px rgba(0,0,0,.05);z-index: 1;">
+                        <img src="img/defaultAvatar.png" alt="Default avatar" style="width: 40px;height: 40px;" >
+                    </div>
+
+                </ul>
+            </div>
+
+
+        </div>
+    </nav>
+</div>
+<div class="row" style="margin-top: 5%;width: 100%;">
+    <h1>My delivery address</h1>
+</div>
+<div class="row"; style="margin-left: 60%">
+    <div class="col-7"><button type="button" class="btn btn-outline-info btnadd" onclick="add_addre()">Add address</button></div>
+    <div class="col-1"><button type="button" class="btn btn-outline-danger btndel">Delete</button></div>
+</div>
+
+
+<div class="main" style="margin-top: 3%; width: 80%; margin-left: 10%">
+
+    <div class="alert alert-info" role="alert">
+        All address are selected—check it out!
+    </div>
+
+    <form action="" method="post" name="formName">
+        <table>
+            <tr><td><input type="checkbox" name="running" class="form-control" value="" checked/></td> <td><div class="box white border" style="margin-left: 10%">name: shenzhuoyi<br>telephone: 19842732346<br>address: sodijfowijekjlaksdjfosiejfjlskdjfoiejf lasjdfjwiejlkalisjefiej lajjeijfaije</div></td> <td><button type="button" class="btn btn-primary" onclick="editpass()">Edit</button></td></tr>
+            <tr><td><input type="checkbox" name="running" class="form-control" value="" checked/></td> <td><div class="box white border" style="margin-left: 10%">name: shenzhuoyi<br>telephone: 19842732346<br>address: sodijfowijekjlaksdjfosiejfjlskdjfoiejf sljeifjaiewifij alsejfiojivjals</div></td> <td><button type="button" class="btn btn-primary" onclick="editpass()">Edit</button></td></tr>
+            <tr><td><input type="checkbox" name="running" class="form-control" value="" checked/></td> <td><div class="box white border" style="margin-left: 10%">name: shenzhuoyi<br>telephone: 19842732346<br>address: odijfowijekjlaksdjfosiejfjlskdjfoiejf ksheuoiajwei alsejfailjijvijlwjeifjaiwpeijilnsldfjwoiejofijaisjdfsd</div></td> <td><button type="button" class="btn btn-primary" onclick="editpass()">Edit</button></td></tr>
+            <tr><td><input type="checkbox" name="running" class="form-control" value="" checked/></td> <td><div class="box white border" style="margin-left: 10%">name: shenzhuoyi<br>telephone: 19842732346<br>address: sodijfowijekjlaksdjfosiejfjlskdjfoiejf sljeifjaiewifij alsejfiojivjals</div></td> <td><button type="button" class="btn btn-primary" onclick="editpass()">Edit</button></td></tr>
+            <tr><td><input type="checkbox" name="running" class="form-control" value="" checked/></td> <td><div class="box white border" style="margin-left: 10%">name: shenzhuoyi<br>telephone: 19842732346<br>address: odijfowijekjlaksdjfosiejfjlskdjfoiejf ksheuoiajwei alsejfailjijvijlwjeifjaiwpeijiln</div></td> <td><button type="button" class="btn btn-primary" onclick="editpass()">Edit</button></td></tr>
+            <tr><td><input type="checkbox" name="running" class="form-control" value="" checked/></td> <td><div class="box white border" style="margin-left: 10%">name: shenzhuoyi<br>telephone: 19842732346<br>address: sodijfowijekjlaksdjfosiejfjlskdjfoiejf sljeifjaiewifij alsejfiojivjals</div></td> <td><button type="button" class="btn btn-primary" onclick="editpass()">Edit</button></td></tr>
+            <tr><td><input type="checkbox" name="running" class="form-control" value="" checked/></td> <td><div class="box white border" style="margin-left: 10%">name: shenzhuoyi<br>telephone: 19842732346<br>address: odijfowijekjlaksdjfosiejfjlskdjfoiejf ksheuoiajwei alsejfailjijvijlwjeifjaiwpeijiln</div></td> <td><button type="button" class="btn btn-primary" onclick="editpass()">Edit</button></td></tr>
+        </table>
+    </form>
+
+</div>
+
+<script type="text/javascript">
+    function add_addre(){
+        var pop = document.getElementById("addadresspage");
+        pop.style.display = "block";
+        var pop1 = document.getElementById("grey");
+        pop1.style.display = "block";
+    }
+
+    function editpass(){
+        var pop = document.getElementById("editadresspage");
+        pop.style.display = "block";
+        var pop1 = document.getElementById("grey");
+        pop1.style.display = "block";
+    }
+    function exit(){
+        var exit = document.getElementById("addadresspage");
+        exit.style.display = "none"
+        var exit1 = document.getElementById("grey");
+        exit1.style.display = "none";
+    }
+
+    function exit1(){
+        var exit = document.getElementById("editadresspage");
+        exit.style.display = "none"
+        var exit1 = document.getElementById("grey");
+        exit1.style.display = "none";
+    }
+</script>
+
+<div id="grey">
+
+</div>
+
+<div id="addadresspage">
+    <button type="button" class="btn btn-secondary" style="margin-top: 2%; margin-left: 3%" onclick="exit()"><</button>
+    <div id="qwe" style="position:absolute;left: 8%;top:4%;">
+        <h3 style="color: #F7930F">Add address</h3>
+    </div>
+
+    <div id="name" class="input-group mb-3">
+        <div class="input-group-prepend">
+            <span class="input-group-text" id="inputGroup-sizing-default">name</span>
+        </div>
+        <input type="text" class="form-control" aria-label="Default" aria-describedby="inputGroup-sizing-default">
+    </div>
+
+    <div id="mobile" class="input-group mb-3">
+        <div class="input-group-prepend">
+            <span class="input-group-text" id="inputGroup-sizing-default">mobile phone number</span>
+        </div>
+        <input type="text" class="form-control" aria-label="Default" aria-describedby="inputGroup-sizing-default">
+    </div>
+
+    <div id="area" class="input-group mb-3">
+        <div class="input-group-prepend">
+            <span class="input-group-text" id="inputGroup-sizing-default">local area</span>
+        </div>
+        <input type="text" class="form-control" aria-label="Default" aria-describedby="inputGroup-sizing-default">
+    </div>
+
+    <div id="full" class="input-group mb-3">
+        <div class="input-group-prepend">
+            <span class="input-group-text" id="inputGroup-sizing-default">full address</span>
+        </div>
+        <textarea type="text" class="form-control" aria-label="Default"
+                  aria-describedby="inputGroup-sizing-default"></textarea>
+    </div>
+
+    <!-- Button trigger modal -->
+    <button type="button" class="btn btn-primary" style="position: absolute; top: 90%; left: 50%" data-toggle="modal" data-target="#exampleModalCenter">
+        save
+    </button>
+
+    <!-- Modal -->
+    <div class="modal fade" id="exampleModalCenter" style="position: absolute; top: 30%;" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalCenterTitle">Check!</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    These address information will be saved!
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-primary">Save changes</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="editadresspage">
+    <button type="button" class="btn btn-secondary" style="margin-top: 2%; margin-left: 3%" onclick="exit1()"><</button>
+    <div id="qwe1" style="position:absolute;left: 8%;top:4%;">
+        <h3 style="color: #F7930F">Edit address</h3>
+    </div>
+
+    <div id="name1" class="input-group mb-3">
+        <div class="input-group-prepend">
+            <span class="input-group-text" id="inputGroup-sizing-default">name</span>
+        </div>
+        <input type="text" class="form-control" aria-label="Default" aria-describedby="inputGroup-sizing-default">
+    </div>
+
+    <div id="mobile1" class="input-group mb-3">
+        <div class="input-group-prepend">
+            <span class="input-group-text" id="inputGroup-sizing-default">mobile phone number</span>
+        </div>
+        <input type="text" class="form-control" aria-label="Default" aria-describedby="inputGroup-sizing-default">
+    </div>
+
+    <div id="area1" class="input-group mb-3">
+        <div class="input-group-prepend">
+            <span class="input-group-text" id="inputGroup-sizing-default">local area</span>
+        </div>
+        <input type="text" class="form-control" aria-label="Default" aria-describedby="inputGroup-sizing-default">
+    </div>
+
+    <div id="full1" class="input-group mb-3">
+        <div class="input-group-prepend">
+            <span class="input-group-text" id="inputGroup-sizing-default">full address</span>
+        </div>
+        <textarea type="text" class="form-control" aria-label="Default" aria-describedby="inputGroup-sizing-default"></textarea>
+    </div>
+
+
+    <!-- Button trigger modal -->
+    <button type="button" class="btn btn-primary" style="position: absolute; top: 90%; left: 50%" data-toggle="modal" data-target="#exampleModalCenter1">
+        save
+    </button>
+
+    <!-- Modal -->
+    <div class="modal fade" id="exampleModalCenter1" style="position: absolute; top: 30%;" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalCenterTitle1">Check!</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    These address information will be saved!
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-primary">Save changes</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+
+
+
+</body>
+
+</html>
