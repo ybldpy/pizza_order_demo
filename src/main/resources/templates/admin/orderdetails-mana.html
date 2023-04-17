@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <base href="../../static/" th:href="@{/}">
+    <meta charset="UTF-8">
+    <title>order_details</title>
+    <script src="js/header.js"></script>
+    <link href="plugins/bootstrap-table/bootstrap-table.min.css" rel="stylesheet"/>
+    <script src="js/footer.js"></script>
+    <script src="plugins/bootstrap-table/bootstrap-table.min.js"></script>
+
+</head>
+
+<style>
+
+    .fontsize{
+        font-size: 30px;
+    }
+
+    .fontsize1{
+        font-size: 20px;
+    }
+
+    .background{
+        background-color: rgba(250,210,147, 50%);
+        width: 40%;
+        height: 60%;
+    }
+
+    .position{
+        position: absolute;
+        top:20%;
+        left: 10%;
+    }
+
+    .style{
+        font-family: "Monaco", Times, serif;
+        position: absolute;
+        top: 5%;
+        left: 5%;
+    }
+
+    #cn{
+        position: absolute;
+        top:20%;
+        left: 55%;
+        background-color:rgba(250,210,147, 50%) ;
+        outline-style: solid;
+        border-radius: 20px;
+        width: 40%;
+        height: 30%;
+     }
+
+    .time{
+        border-left-style: solid;
+        border-left-width: 10px;
+        border-left-color: rgb(250,210,147);
+        background-color: rgba(250,210,147, 50%);
+        width: 40%;
+        height: 10%;
+    }
+</style>
+
+<body>
+<!-- Button trigger modal -->
+<button type="button" id="status" style="position: absolute; left: 5%; top: 8%; width: 15%; height: 10%" class="btn btn-primary fontsize" data-toggle="modal" data-target="#exampleModalCenter">
+    incomplete
+</button>
+
+<!-- Modal -->
+<div class="modal fade" id="exampleModalCenter" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalCenterTitle">Prompt</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                You have completed this order!
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<script>
+    const like = document.getElementById("status");
+    // 点赞状态
+    let isLike = true;
+    // 添加点击事件
+    like.onclick = function () {
+        if (isLike == true) {
+            like.innerHTML = "complete";
+        } else {
+            like.innerHTML = "incomplete";
+        }
+        // 修改状态
+        isLike = !isLike;
+    };
+</script>
+
+<div class="background" style="position: absolute; left: 5%; top: 25%">
+    <h3 class="style">Food information</h3>
+    <div class="position">
+        <div><label class="btn btn-secondary active fontsize1">
+            <input type="checkbox" checked autocomplete="off"> Itlian pizza*2
+        </label>
+        </div>
+        <div>
+            <label class="btn btn-secondary fontsize1">
+                <input type="checkbox" autocomplete="off"> Greek pizza*1
+            </label>
+        </div>
+        <div>
+            <label class="btn btn-secondary fontsize1">
+                <input type="checkbox" autocomplete="off"> Berry smoothie*3
+            </label>
+        </div>
+    </div>
+</div>
+
+<div id="cn">
+    <h4 class="style">Customer note</h4>
+    <div style="position: absolute; top: 30%; left: 5%">
+        Greek pizza to go, berry smotthie cold.
+    </div>
+</div>
+
+<div class="time" style="position: absolute; top: 60%; left: 55%;">
+    <h4 class="style" style="position: absolute; top: 25%; left: 2%">order time:</h4>
+    <div style="position: absolute; top: 30%; left: 45%">2023-02-17 08:12:20</div>
+</div>
+
+<div class="time" style="position: absolute; top: 75%; left: 55%;">
+    <h4 class="style" style="position: absolute; top: 25%; left: 2%">completion time:</h4>
+<!--    <div style="position: absolute; top: 30%; left: 45%">2023-02-17 08:12:20</div>-->
+</div>
+
+
+</body>
+</html>
