@@ -94,9 +94,33 @@
     margin-top: 5%;
   }
 
+  #QRcodepage{
+    display: none;
+    background-color: white;
+    border-radius: 25px;
+    width: 50%;
+    height: 80%;
+    position: absolute;
+    right: 25%;
+    top: 10%;
+    border: 2px solid #FFBF3D;
+  }
+
+  #QRcodepagemu{
+    display: none;
+    background-color: #000000;
+    opacity: 0.5;
+    border-radius: 25px;
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    right: 0%;
+    top: 0%;
+  }
+
 
 </style>
-<body th:style="'background-size: 100% 100%;background-image: url('+@{img/loginBack.jpg}+');background-repeat: no-repeat;background-position: center;background-attachment: fixed'" style="background-size: 100% 100%;background-image: url('../static/img/loginBack.jpg');background-repeat: no-repeat;background-position: center;background-attachment: fixed">
+<body th:style="'background-size: 100% 100%;background-image: url('+@{img/loginBack.jpg}+');background-repeat: no-repeat;background-position: center;background-attachment: fixed'" style="background-size: 100% 100%;background-image: url('../../static/img/loginBack.jpg');background-repeat: no-repeat;background-position: center;background-attachment: fixed">
 <div id="header" class="fixed-top" >
   <nav class="navbar navbar-expand-lg navbar-light color" style="height-max: 100px" >
     <a class="navbar-brand color" href="#" style="height: 100%;padding: 0 0 ">
@@ -139,15 +163,12 @@
               Username
             </a>
             <ul class="dropdown-menu" >
-              <li><a class="dropdown-item" href="#">
+              <li><a class="dropdown-item" href="../templates/OrderDetail/All orders.html" th:href="@{/templates/Order/All orders.html}"">
                 <i class="bi bi-list">&nbsp&nbsp</i>
-                Order</a></li>
+                All Orders</a></li>
               <li><a class="dropdown-item" href="#">
                 <i class="bi bi-person-lines-fill">&nbsp&nbsp</i>
                 Profile</a></li>
-              <li><a class="dropdown-item" href="#">
-                <i class="bi bi-card-text">&nbsp&nbsp</i>
-                All Orders</a></li>
               <li><hr class="dropdown-divider"></li>
               <li><a class="dropdown-item" href="#">
                 <i class="bi bi-box-arrow-right">&nbsp&nbsp</i>
@@ -175,7 +196,7 @@
           <div class="QRcode" id="item-1">
             <span id="QRcode1" style="font-size: 44px"> #</span>
             <span id="QRcode2">  xxxxxx</span>
-            <button type="button" class="btn btn-outline-warning" style="float: right;margin-top: 3%;font-size: 23px;">QR code</button>
+            <button type="button" class="btn btn-outline-warning" style="float: right;margin-top: 3%;font-size: 23px;" onclick="QRcodePage()">QR code</button>
           </div>
           <div style="height: 20px"></div>
 
@@ -241,18 +262,27 @@
     </div>
   </div>
 </div>
+
+<div id="QRcodepagemu">
+</div>
+<div id="QRcodepage">
+  <button type="button" class="btn btn-warning" data-dismiss="modal" onclick="QRcodePageclose()" style="float: right; margin-top: 10px;margin-right: 10px">Back</button>
+</div>
+
 </body>
 <script>
-  $('#Postprandialbtn').on("click",function (){
-    $(".modal").modal("show")
-  })
-  $('body').scrollspy({ target: '#navbar-example3' })
-  $('[data-spy="scroll"]').each(function () {
-    var $spy = $(this).scrollspy('refresh')
-  })
-  $('[data-spy="scroll"]').on('activate.bs.scrollspy', function () {
-    // do something...
-  })
+  function QRcodePage(){
+    var popup=document.getElementById("QRcodepage")
+    var popup1 = document.getElementById("QRcodepagemu")
+    popup.style.display="block";
+    // popup1.style.display="block";
+  }
+  function QRcodePageclose(){
+    var popup=document.getElementById("QRcodepage")
+    // var popup1 = document.getElementById("QRcodepagemu")
+    popup.style.display="none";
+    // popup1.style.display="block";
+  }
 
 </script>
 </html>
