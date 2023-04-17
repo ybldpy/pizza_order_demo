@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <base href="../../static/" th:href="@{/}">
+    <meta charset="UTF-8">
+    <title>Dish Management</title>
+    <script src="js/header.js"></script>
+    <link rel="stylesheet" href="plugins/bootstrap-select/bootstrap-select.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+    <script src="js/footer.js"></script>
+    <script src="plugins/bootstrap-select/bootstrap-select.min.js"></script>
+    <style>
+        button{
+            background-color: #FFCB62;
+        }
+    </style>
+</head>
+<body>
+
+
+<div id="messageContainer" style="width: 30%;margin-top: 1%;position: fixed;z-index: 1055;margin-left: 35%;top: 0">
+    <!--        <div class="alert alert-danger fade" role="alert" style="font-size: 15px">-->
+    <!--            Server error-->
+    <!--            <button type="button" class="close" data-dismiss="alert" aria-label="Close">-->
+    <!--                <span aria-hidden="true">&times;</span>-->
+    <!--            </button>-->
+    <!--        </div>-->
+</div>
+<!--<div id="addContainer" class="modal" tabindex="-1">-->
+
+<!--    <div class="modal-dialog">-->
+<!--        <div class="modal-content">-->
+<!--            <div class="modal-header">-->
+<!--                <h5 class="modal-title">Add Topping</h5>-->
+<!--            </div>-->
+<!--            <div class="modal-body">-->
+<!--                <div class="input-group">-->
+<!--                    <select id="topping-item" class="form-control">-->
+<!--                    </select>-->
+<!--                </div>-->
+<!--            </div>-->
+<!--            <div class="modal-footer" style="width: 100%">-->
+<!--                <button type="button" class="btn btn-secondary addBtn" onclick="$('#addContainer').modal('hide')">Close</button>-->
+<!--                <button type="button" class="btn btn-warning addBtn">Add</button>-->
+<!--            </div>-->
+<!--        </div>-->
+<!--    </div>-->
+<!--</div>-->
+
+<div class="container" style="margin-top: 5%">
+    <form id="form">
+        <div class="form-row">
+            <input type="number" id="dishId" value="" th:value="${dish.id}" hidden>
+            <div class="form-group col-md-5">
+                <label for="dishName">Dish name</label>
+                <input class="form-control" type="text" name="name" id="dishName" th:value="${dish.dishName}" oninput="$(this).siblings('.invalid-feedback').hide();"/>
+                <div class="invalid-feedback" id="dishNameFeedback">You must input dish name</div>
+            </div>
+            <div class="form-group col-md-7">
+                <label for="categoryName">Choose category</label>
+                <select name="categoryName" class="form-control" id="categoryName" onclick="$(this).siblings('.invalid-feedback').hide();">
+                    <option th:each="category:${categories}" th:value="${category.categoryName}" th:selected="${dish.categoryName eq category.categoryName}">[(${category.categoryName})]</option>
+                </select>
+                <div class="invalid-feedback" id="categoryNameFeedback">You must select a category</div>
+            </div>
+            <!--            <div class="form-group col-md-4">-->
+            <!--                <label for="price">Price</label>-->
+            <!--                <input type="number" name="price" class="form-control" id="price" value="" oninput="$(this).siblings('.invalid-feedback').hide();" />-->
+            <!--                <div class="invalid-feedback" id="priceFeedback">You must set price</div>-->
+            <!--            </div>-->
+        </div>
+        <div class="form-row">
+            <div class="form-group col-md-4">
+                <button class="btn btn-warning" type="button" onclick="addGroupItem(document.getElementById('sizeAndPrice'))">Add Size</button>
+            </div>
+        </div>
+
+        <div id="sizeAndPrice">
+            <div class="form-row group-item" th:each="sizePrice:${sizePrice}">
+                <div class="form-group col-md-4">
+                    <input type="number" class="form-control" placeholder="Input size" th:value="${sizePrice.size}"/>
+                </div>
+                <div class="form-group col-md-4">
+                    <input type="number" class="form-control" placeholder="Input price" th:value="${sizePrice.price}"/>
+                </div>
+                <div class="form-group col-md-4">
+                    <button type="button" class="btn btn-warning delete-size" onclick="deleteGroupItem($(this).parents('div.group-item'),document.getElementById('sizeAndPrice'))">Delete</button>
+                </div>
+            </div>
+        </div>
+        <div class="form-row" style="height: 5%">
+            <input name="img" type="text" th:value="${dish.img}" hidden/>
+            <input id="img-upload" type="file" onchange="chooseFile(this)" accept="image/*" hidden/>
+            <div class="form-group col-3">
+                <div style="height: 80%;cursor: pointer;width: 100%" onclick="document.getElementById('img-upload').click();">
+                    <label for="image-container">Choose image to upload</label>
+                    <img id="image-container" th:src="${dish.img}" src="img/default.jpg" class="img-fluid img-thumbnail"/>
+                </div>
+            </div>
+            <div class="form-group col-4" style="margin-top: 5%">
+                <button id="upload-image-btn" type="button" class="btn btn-warning">Upload</button>
+            </div>
+        </div>
+        <div class="form-row">
+            <div class="form-group col-5">
+                <!--                <div id="topping-item-container" class="form-control"><span>&times;</span></div>-->
+                <label>Add topping</label>
+                <select class="form-control selectpicker" id="topping" multiple>
+                    <option th:each="topping:${allToppings}" th:value="${topping.toppingName}" th:selected="${#lists.contains(toppings,topping.toppingName)}">[(${topping.toppingName})]</option>
+                </select>
+            </div>
+
+            <div class="form-group col-5">
+                <label>Set status</label>
+                <select class="form-control selectpicker" name="state">
+                    <option value="1">Selling</option>
+                    <option value="0">Hide</option>
+                </select>
+            </div>
+            <!--            <div class="form-group col-4">-->
+            <!--                <button class="btn btn-warning" type="button">Add topping</button>-->
+            <!--            </div>-->
+            <!--            <div class="form-group col-4">-->
+            <!--                <label for="status">Choose status of dish</label>-->
+            <!--                <select name="status" id="status" class="form-control">-->
+            <!--                    <option value="1" selected>Sell</option>-->
+            <!--                    <option value="0">Hide</option>-->
+            <!--                </select>-->
+            <!--            </div>-->
+        </div>
+        <div class="form-row">
+            <div class="form-group col-8">
+                <label for="description">description</label>
+                <textarea name="description" class="form-control" id="description" th:text="${dish.remark}"></textarea>
+            </div>
+        </div>
+    </form>
+    <div class="form-row" style="margin-top: 5px">
+        <div class="form-group col-12">
+            <button type="button" class="btn btn-warning btn-block submitBtn" id="addDishBtn">
+                Save
+            </button>
+        </div>
+    </div>
+</div>
+
+
+<script th:inline="javascript">
+
+
+    function addDish(){
+
+
+        let dish = {};
+        dish["dishName"] = $("#dishName").val();
+        dish["categoryName"] = $("#categoryName").val();
+        let size_price = [];
+        let items = $("#sizeAndPrice").find(".group-item");
+        for(let i=0;i<items.length;i++){
+            let inputs = items.find("input[type='number']");
+            let jsonObj = {};
+            jsonObj["size"] = parseInt(inputs[0].value);
+            jsonObj["price"] = parseInt(inputs[0].value);
+            size_price.push(jsonObj);
+        }
+        dish["sizePrice"] = size_price;
+        dish["img"] = $("input[name='img']").val();
+        dish["topping"] = $("#topping").val();
+        dish["state"] = parseInt($("select[name='state']").val());
+        dish["remark"] = $("textarea[name='description']").val();
+        let btn = this;
+
+
+        $.ajax(
+            {
+                type:"post",
+                url:"dish/modify?dishId="+[[${dish.id}]],
+                contentType: "application/json",
+                data:JSON.stringify(dish),
+                beforeSend:function (){
+                    let canSend = true;
+                    let dishName = $("#dishName");
+                    let categoryName = $("#categoryName");
+                    if (isBlank(dishName.val())){
+                        dishName.siblings(".invalid-feedback").show();
+                        canSend = false;
+                    }
+                    let sizeAndPrice = $("#sizeAndPrice");
+                    let inputs = sizeAndPrice.find("input");
+                    for(let i=0;i<inputs.length;i++){
+                        if (isBlank(inputs[i].value)){
+                            alertUtil.message("You have to fill in both size and price",warningType,document.getElementById("messageContainer"));
+                            canSend = false;
+                            break;
+                        }
+                    }
+                    if (isBlank(categoryName.val())){
+                        categoryName.siblings(".invalid-feedback").show();
+                        canSend = false;
+                    }
+                    if (canSend){
+                        enableLoadingVideo($(btn));
+                    }
+                    return canSend;
+                },
+                success:function (result){
+                    disableLoadingVideo($(btn),"Save");
+                    if (result==null||result==undefined){
+                        alertUtil.message("Save failed",dangerType,document.getElementById("messageContainer"));
+                        return;
+                    }
+                    if (result.code!=1){
+                        alertUtil.message(result.message,warningType,document.getElementById("messageContainer"));
+                        return;
+                    }
+                    alertUtil.message("Save success",successType,document.getElementById("messageContainer"));
+                },
+                error:function (){
+                    disableLoadingVideo($(btn),"Save");
+                }
+            }
+        )
+
+
+    }
+
+
+
+    function chooseFile(inputElement){
+        let files = inputElement.files;
+        let fileReader = new FileReader();
+
+        fileReader.onload = function (e){
+            $("#image-container").attr("src",this.result);
+        }
+        fileReader.onerror = function (e){
+            alertUtil.message("Error happen during reading image","danger",$("#messageContainer"));
+        }
+        fileReader.readAsDataURL(files[0]);
+
+    }
+    function addGroupItem(container){
+        let itemContent = "<div class=\"form-row group-item\">\n" +
+            "                <div class=\"form-group col-md-4\">\n" +
+            "                    <input type=\"number\" name=\"size\" class=\"form-control\" placeholder=\"Input size\"/>\n" +
+            "                </div>\n" +
+            "                <div class=\"form-group col-md-4\">\n" +
+            "                    <input type=\"number\" name=\"price\" class=\"form-control\" placeholder=\"Input price\"/>\n" +
+            "                </div>\n" +
+            "                <div class=\"form-group col-md-4\">\n" +
+            "                    <button type=\"button\" class=\"btn btn-warning delete-size\" onclick=\"deleteGroupItem($(this).parents('div.group-item'),document.getElementById('sizeAndPrice'))\">Delete</button>\n" +
+            "                </div>\n" +
+            "            </div>"
+        let item = $(itemContent);
+        $(container).append(item);
+    }
+
+    function deleteGroupItem(item,container){
+        let items = $(container).find(".group-item");
+        if (items.length==1){
+            alertUtil.message("At least one size is required",warningType,document.getElementById("messageContainer"));
+            return;
+        }
+        $(item).remove();
+    }
+
+    function getCategory(){
+        $.ajax(
+            {
+                type:"get",
+                url:"category/query",
+                success:function (result){
+                    if (result==null||result==undefined||result.total==undefined||result.total==null){
+                        alertUtil.message("Get category failed, try to refresh",dangerType,document.getElementById("messageContainer"));
+                    }
+                    else {
+                        let select = $("select[name='categoryName']");
+                        let rows = result.rows;
+                        for(let i=0;i<rows.length;i++){
+                            select.append("<option value='"+rows[i].categoryName+"'>"+rows[i].categoryName+"</option>");
+                        }
+
+                    }
+                },
+                error:function (){
+                    alertUtil.message("Get category failed, try to refresh",dangerType,document.getElementById("messageContainer"));
+                }
+            }
+        );
+    }
+    function getTopping(){
+        $.ajax(
+            {
+                type:"get",
+                url:"topping/get",
+                success:function (result){
+                    if (result==null||result==undefined){
+                        alertUtil.message("Get topping failed, try to refresh",dangerType,document.getElementById("messageContainer"));
+                    }
+                    else {
+                        let select = $("#topping");
+                        let prefix = "<option value='";
+                        let postFix = "</option>"
+                        for(let i=0;i<result.total;i++){
+                            select.append(prefix+result.rows[i].toppingName+"'>"+result.rows[i].toppingName+postFix);
+                        }
+                        select.selectpicker("refresh");
+                    }
+                },
+                error:function (){
+                    alertUtil.message("Get topping failed, try to refresh",dangerType,document.getElementById("messageContainer"));
+                }
+            }
+        );
+    }
+
+    $(function (){
+        // getCategory();
+        // getTopping();
+        $("#addDishBtn").on("click",addDish);
+
+        $("#upload-image-btn").on("click",function (){
+            let files = document.getElementById("img-upload").files;
+            if (files==null||files==undefined||files.length==0){alertUtil.message("You should choose a img file to upload","warning",document.getElementById("messageContainer"));return;}
+            let formData = new FormData();
+            formData.append("img",files[0]);
+            $.ajax({
+                type:"post",
+                url:"file/img/upload",
+                data:formData,
+                processData:false,
+                contentType:false,
+                beforeSend:function (){
+                    enableLoadingVideo($("#upload-image-btn"))
+                },
+                success:function (result){
+                    disableLoadingVideo($("#upload-image-btn"),"Upload");
+                    if (result==null||result==undefined){
+                        alertUtil.message("Upload failed","danger",document.getElementById("messageContainer"));
+                    }
+                    else if (result.code!=1){
+                        alertUtil.message(result.message,"warning",document.getElementById("messageContainer"));
+                    }
+                    else {
+                        alertUtil.message("Upload success","success",document.getElementById("messageContainer"));
+                        alert(result.data)
+                        $("input[name='img']")[0].value = result.data
+                    }
+                },
+                error:function (){
+                    disableLoadingVideo($("#upload-image-btn"),"Upload");
+                    alertUtil.message("Upload failed","danger",document.getElementById("messageContainer"));
+                }
+            })
+
+        });
+    })
+</script>
+</body>
+</html>

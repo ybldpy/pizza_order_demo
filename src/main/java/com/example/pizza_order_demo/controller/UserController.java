@@ -27,8 +27,10 @@ import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.*;
 
 
+import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServletRequest;
 import java.security.Security;
+import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 
 @Controller
@@ -77,6 +79,13 @@ public class UserController {
     @ResponseBody
     public Result loginFail(String username,String password){
         return new Result(ResultConstant.CODE_FAILED,ErrorConstant.USER_LOGIN_USERNAME_PASSWORD_WRONG,null);
+    }
+
+    @RequestMapping("/login/test")
+    @ResponseBody
+    public Result test(String param1,String param2){
+        return new Result(ResultConstant.CODE_FAILED,ErrorConstant.MAIL_EMPTY,new String[]{param1,param2});
+
     }
 
     @GetMapping("/forget/username")
@@ -193,11 +202,11 @@ public class UserController {
         }
         user.setPwd(passwordEncoder.encode(user.getPwd()));
         user.setGender(user.getGender()==null?0:user.getGender());
-        user.setStatus(1);
+        user.setState(1);
         int res = userService.insert(user);
         if (res<1){throw new CURDException();}
         RoleExample roleExample = new RoleExample();
-        roleExample.or().andNameEqualTo(UserConstant.ROLE_CUSTOMER);
+        roleExample.or().andRoleNameEqualTo(UserConstant.ROLE_CUSTOMER);
         Role role = roleService.selectFirstByExample(roleExample);
         if (ObjectUtils.isEmpty(role)){
             throw new InternalException("role cannot find");

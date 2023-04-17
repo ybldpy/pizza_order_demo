@@ -2,11 +2,13 @@ package com.example.pizza_order_demo.controller;
 
 
 import com.example.pizza_order_demo.commons.Result;
+import com.example.pizza_order_demo.commons.constant.ErrorConstant;
 import com.example.pizza_order_demo.commons.constant.ResultConstant;
 import com.example.pizza_order_demo.exception.CURDException;
 import com.example.pizza_order_demo.model.Category;
 import com.example.pizza_order_demo.model.CategoryExample;
 import com.example.pizza_order_demo.service.CategoryService;
+import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -29,7 +31,7 @@ public class CategoryController {
 
 
     @GetMapping("/category/management")
-    @PreAuthorize("hasRole('admin')")
+//    @PreAuthorize("hasRole('admin')")
     public String categoryManagement(){
         return "admin/categoryManagement";
     }
@@ -43,7 +45,7 @@ public class CategoryController {
             return result;
         }
         CategoryExample categoryExample=new CategoryExample();
-        categoryExample.or().andCategoryNameEqualTo(categoryName);
+        categoryExample.or().andCategoryNameEqualTo(categoryName).andDeletedEqualTo(0);
         List<Category> categoryList= categoryService.selectByExample(categoryExample);
         if(categoryList.size()==0){
             Category category = new Category();
@@ -63,11 +65,14 @@ public class CategoryController {
     }
 
 
+
+
     @GetMapping("/category/query")
 //    @PreAuthorize("hasRole('admin')")
     @ResponseBody
     public Object getCategories(){
         CategoryExample categoryExample = new CategoryExample();
+        categoryExample.or().andDeletedEqualTo(0);
 //        if (!StringUtils.isBlank(search)){
 //            categoryExample.or().andCategoryNameLike("%"+search+"%");
 //            if (StringUtils.isNumeric(search)){
@@ -82,5 +87,27 @@ public class CategoryController {
         resultMap.put("rows",categoryList);
         return resultMap;
 
+    }
+    @PostMapping("/category/delete")
+    @Transactional(rollbackFor = Exception.class)
+    @ResponseBody
+    public Result deleteCategory(List<String> categoryName){
+        if (ObjectUtils.isEmpty(categoryName)){
+            return new Result(ResultConstant.CODE_FAILED, ErrorConstant.PARAM_MISSING,null);
+        }
+        CategoryExample categoryExample = new CategoryExample();
+        categoryExample.or().andDeletedEqualTo(0).andCategoryNameIn(categoryName);
+        List<Category> categoryList = categoryService.selectByExample(categoryExample);
+        if (ObjectUtils.isEmpty(categoryList)||categoryList.size()!=categoryName.size()){
+            return new Result(ResultConstant.CODE_FAILED,"One or more than one categories don't find",null);
+        }
+
+        Category category = new Category();
+        category.setDeleted(1);
+        int res = categoryService.updateByExampleSelective(category,categoryExample);
+        if (res!=categoryList.size()){
+            throw new CURDException();
+        }
+        return new Result(ResultConstant.CODE_SUCCESS,ResultConstant.MESSAGE_SUCCESS,null);
     }
 }

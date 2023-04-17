@@ -12,11 +12,13 @@ import org.springframework.stereotype.Service;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.ParameterizedType;
+import java.util.ArrayList;
 import java.util.List;
 
 public abstract class BaseServiceImpl<Mapper, Record, Example> implements BaseService<Record, Example> {
 
     private static final Log log = LogFactory.getLog(BaseServiceImpl.class);
+    private Example EMPTY_EXAMPLE;
 
     public Mapper mapper;
 
@@ -394,5 +396,4 @@ public abstract class BaseServiceImpl<Mapper, Record, Example> implements BaseSe
     public Class<Mapper> getMapperClass() {
         return (Class<Mapper>) ((ParameterizedType) getClass().getGenericSuperclass()).getActualTypeArguments()[0];
     }
-
 }

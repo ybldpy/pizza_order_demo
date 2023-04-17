@@ -1,0 +1,563 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Postprandial evaluation</title>
+  <base href="../../static/" th:href="@{/}">
+  <script src="js/header.js"></script>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+  <link href="plugins/bootstrap-table/bootstrap-table.min.css" rel="stylesheet"/>
+  <script src="js/footer.js"></script>
+  <script src="plugins/bootstrap-table/bootstrap-table.min.js"></script>
+</head>
+<style>
+
+  body{
+    position: relative;
+    overflow-y:scroll;
+  }
+
+  .color{
+    background-color: #FFBF3D !important;
+  }
+
+  a.color:focus,a.color:hover,button.color:focus,button.color:hover{
+    background-color:#DFB300!important
+  }
+
+  .iconcolor{
+      color: #FF5500;
+      width: 20px;
+  }
+
+
+  .Big{
+    width: 95%;
+    margin-left: 2.5%;
+    /*margin-top: 80px;*/
+
+    margin-bottom: 50px;
+  }
+
+  .Bigbox{
+    position: fixed;
+    width: 13%;
+    margin-right: 1%;
+  }
+
+  .Bigboxmain{
+    /*max-height: 1000px;*/
+    /*overflow-y: hidden;*/
+    float: right;
+    width: 85%;
+    background-color: rgba(255,249,249,0.7);
+    padding-bottom: 20px;
+
+  }
+  .mainbody{
+    /*position: relative;*/
+    width: 95%;
+    padding-top: 10px;
+    padding-right: 15px;
+    padding-left: 15px;
+  }
+
+  .q{
+      font-size: 20px;
+      margin-left: 5%;
+      padding: 15px 8px;
+  }
+
+  .qu{
+      font-size: 17px;
+      margin-left: 40px;
+      margin-top: 5px;
+  }
+
+  .chose{
+      margin-left: 40px;
+      font-size: 17px;
+      color: #4e555b;
+  }
+
+
+  .contentsize{
+      background-color: rgba(255,249,249,0.7);
+      padding-bottom: 20px;
+      flex: 0 0 80%;
+      max-width: 80%;
+      border-radius: 10px;
+  }
+
+  .title{
+      font-size: 45px;
+      color: #FFBF3D;
+      padding-left: 20px;
+  }
+
+  .beginWords{
+      background-color: rgba(255,135,0,0.5);
+      font-size: 19px;
+      /*margin-left: 22%;*/
+      /*width: 56%;*/
+      padding: 5px 25px;
+      border-radius: 10px;
+  }
+
+  #q3Gi{
+      display: none;
+  }
+
+
+  </style>
+  <body th:style="'background-size: 100% 100%;background-image: url('+@{img/loginBack.jpg}+');background-repeat: no-repeat;background-position: center;background-attachment: fixed'" style="background-size: 100% 100%;background-image: url('../../static/img/loginBack.jpg');background-repeat: no-repeat;background-position: center;background-attachment: fixed">
+  <div id="header" class="fixed-top" >
+      <nav class="navbar navbar-expand-lg navbar-light color" style="height-max: 100px" >
+          <a class="navbar-brand color" href="#" style="height: 100%;padding: 0 0 ">
+              <img src="img/logo.png" alt="logo"  style="height: 40px;">
+          </a>
+          <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarScroll" aria-controls="navbarScroll" aria-expanded="false" aria-label="Toggle navigation">
+              <span class="navbar-toggler-icon"></span>
+          </button>
+          <div class="collapse navbar-collapse" id="navbarScroll">
+              <ul class="navbar-nav mr-auto my-2 my-lg-0 navbar-nav-scroll" style="max-height: 100px;">
+                  <li class="nav-item active">
+                      <a class="nav-link" href="#">Home <span class="sr-only">(current)</span></a>
+                  </li>
+                  <li class="nav-item">
+                      <a class="nav-link" href="#">Link</a>
+                  </li>
+                  <li class="nav-item dropdown">
+                      <a class="nav-link dropdown-toggle" href="#" role="button" data-toggle="dropdown" aria-expanded="false">
+                          Link
+                      </a>
+                      <ul class="dropdown-menu">
+                          <li><a class="dropdown-item" href="#">Action</a></li>
+                          <li><a class="dropdown-item" href="#">Another action</a></li>
+                          <li><hr class="dropdown-divider"></li>
+                          <li><a class="dropdown-item" href="#">Something else here</a></li>
+                      </ul>
+                  </li>
+                  <li class="nav-item">
+                      <a class="nav-link disabled">Link</a>
+                  </li>
+              </ul>
+              <form class="d-flex">
+                  <input class="form-control mr-2" type="search" placeholder="Search" aria-label="Search">
+                  <button class="btn btn-outline-success" type="submit">Search</button>
+              </form>
+              <div style="">
+                  <ul class="navbar-nav mr-auto my-2 my-lg-0 navbar-nav-scroll" style="max-height: 100px;">
+                      <li class="nav-item dropdown" style="">
+                          <a class="nav-link dropdown-toggle" href="#" role="button" data-toggle="dropdown" aria-expanded="false">
+                              Username
+                          </a>
+                          <ul class="dropdown-menu" >
+                              <li><a class="dropdown-item" href="../templates/OrderDetail/All orders.html" th:href="@{/templates/Order/All orders.html}"">
+                                  <i class="bi bi-list">&nbsp&nbsp</i>
+                                  All Orders</a></li>
+                              <li><a class="dropdown-item" href="#">
+                                  <i class="bi bi-person-lines-fill">&nbsp&nbsp</i>
+                                  Profile</a></li>
+                              <li><hr class="dropdown-divider"></li>
+                              <li><a class="dropdown-item" href="#">
+                                  <i class="bi bi-box-arrow-right">&nbsp&nbsp</i>
+                                  Log out</a></li>
+                          </ul>
+                      </li>
+                      <div class="brand" href="#" style="width: 40px;height: 40px;overflow: hidden;border-radius: 50%;float:right;box-shadow: 0 4px 8px rgba(0,0,0,.05);z-index: 1;">
+                          <img src="img/defaultAvatar.png" alt="Default avatar" style="width: 40px;height: 40px;" >
+                      </div>
+
+                  </ul>
+              </div>
+
+
+          </div>
+      </nav>
+  </div>
+
+  <div style="height: 80px"></div>
+  <div id="messageContainer" style="width: 40%;z-index: 5;margin-top: 0.5%;position: absolute;margin-left: 30%;"></div>
+      <div class="Big">
+          <p2 class="title"> <strong>Postprandial evaluation
+<!--              <a class="btn  btn-warning" href="../templates/OrderDetail/OrderDetail.html" role="button" style="float: right;margin-top: 20px; font-size: 20px">Finish</a>-->
+              <a class="btn  btn-warning finishbtn" onclick="questionData()" role="button" style="float: right;margin-top: 20px; font-size: 20px">Finish</a>
+          </strong></p2>
+          <hr class="dropdown-divider" style="border-top: 3px solid #FFBF3D; ">
+          <div class="beginWords">
+              <p>Thank you for dining with us today! </p>
+              <p>We hope you enjoyed your meal and had a pleasant experience at our restaurant. </p>
+              <p>To help us continue improving, please take a moment to fill out this brief survey.</p></div>
+          <div style="height: 15px;"></div>
+          <div class="row">
+              <div class="col-4" style="flex: 0 0 20%; width: 20%;">
+                  <div class="list-group" id="list-tab" role="tablist">
+                      <a class="list-group-item list-group-item-action active" id="list-home-list" data-toggle="list" href="#list-home" role="tab" aria-controls="home">Single-choice questions:</a>
+                      <a class="list-group-item list-group-item-action" id="list-profile-list" data-toggle="list" href="#list-profile" role="tab" aria-controls="profile">Multiple-choice questions:</a>
+                      <a class="list-group-item list-group-item-action" id="list-messages-list" data-toggle="list" href="#list-messages" role="tab" aria-controls="messages">Short answer questions</a>
+                  </div>
+              </div>
+              <div class="col-8 contentsize">
+                  <div class="tab-content " id="nav-tabContent">
+                      <div class="tab-pane fade show active" id="list-home" role="tabpanel" aria-labelledby="list-home-list">
+                          <div class="radio disabled q question-item" id = "RadioQuestion1">
+                              <i class="bi bi-pencil-square iconcolor"></i> &nbsp;&nbsp;Question 1:
+                              <p class="qu">How satisfied were you with the quality of the food?</p>
+                              <label class="checkbox-inline chose">
+                                  <input type="radio" name="R1" value="A">  &nbsp;A. Very satisfied
+                              </label>
+                              <label class="checkbox-inline chose">
+                                  <input type="radio" name="R1" value="B"> &nbsp;B. Satisfied
+                              </label>
+                              <label class="checkbox-inline chose">
+                                  <input type="radio" name="R1" value="C"> &nbsp;C. Neutral
+                              </label>
+                              <label class="checkbox-inline chose">
+                                  <input type="radio" name="R1" value="D"> &nbsp;D. Not satisfied
+                              </label>
+                              <label class="checkbox-inline chose">
+                                  <input type="radio" name="R1" value="E"> &nbsp;E. Very dissatisfied
+                              </label>
+                          </div>
+                          <div class="radio disabled q question-item" id = "RadioQuestion2">
+                              <i class="bi bi-pencil-square iconcolor"></i> &nbsp;&nbsp;Question 2:
+                              <p class="qu">How satisfied were you with the speed of service?</p>
+                              <label class="checkbox-inline chose">
+                                  <input type="radio" name="R2" value="A">  &nbsp;A. Very satisfied
+                              </label>
+                              <label class="checkbox-inline chose">
+                                  <input type="radio" name="R2" value="B"> &nbsp;B. Satisfied
+                              </label>
+                              <label class="checkbox-inline chose">
+                                  <input type="radio" name="R2" value="C"> &nbsp;C. Neutral
+                              </label>
+                              <label class="checkbox-inline chose">
+                                  <input type="radio" name="R2" value="D"> &nbsp;D. Not satisfied
+                              </label>
+                              <label class="checkbox-inline chose">
+                                  <input type="radio" name="R2" value="E"> &nbsp;E. Very dissatisfied
+                              </label>
+                          </div>
+                          <div class="radio disabled q question-item" id = "RadioQuestion3">
+                              <i class="bi bi-pencil-square iconcolor"></i> &nbsp;&nbsp;Question 3:
+                              <p class="qu">How satisfied were you with the cleanliness of the restaurant?</p>
+                              <label class="checkbox-inline chose">
+                                  <input type="radio" name="R3" value="A">  &nbsp;A. Very satisfied
+                              </label>
+                              <label class="checkbox-inline chose">
+                                  <input type="radio" name="R3" value="B"> &nbsp;B. Satisfied
+                              </label>
+                              <label class="checkbox-inline chose">
+                                  <input type="radio" name="R3" value="C"> &nbsp;C. Neutral
+                              </label>
+                              <label class="checkbox-inline chose">
+                                  <input type="radio" name="R3" value="D"> &nbsp;D. Not satisfied
+                              </label>
+                              <label class="checkbox-inline chose">
+                                  <input type="radio" name="R3" value="E"> &nbsp;E. Very dissatisfied
+                              </label>
+                          </div>
+                          <div class="radio disabled q question-item" id = "RadioQuestion4">
+                              <i class="bi bi-pencil-square iconcolor"></i> &nbsp;&nbsp;Question 4:
+                              <p class="qu">How likely are you to recommend this restaurant to others?</p>
+                              <label class="checkbox-inline chose">
+                                  <input type="radio" name="R4" value="A">  &nbsp;A. Very likely
+                              </label>
+                              <label class="checkbox-inline chose">
+                                  <input type="radio" name="R4" value="B"> &nbsp;B. Likely
+                              </label>
+                              <label class="checkbox-inline chose">
+                                  <input type="radio" name="R4" value="C"> &nbsp;C. Neutral
+                              </label>
+                              <label class="checkbox-inline chose">
+                                  <input type="radio" name="R4" value="D"> &nbsp;D. Unlikely
+                              </label>
+                              <label class="checkbox-inline chose">
+                                  <input type="radio" name="R4" value="E"> &nbsp;E. Very unlikely
+                              </label>
+                          </div>
+                          <div class="radio disabled q question-item" id = "RadioQuestion5">
+                              <i class="bi bi-pencil-square iconcolor"></i> &nbsp;&nbsp;Question 5:
+                              <p class="qu">How likely are you to return to this restaurant?</p>
+                              <label class="checkbox-inline chose">
+                                  <input type="radio" name="R5" value="A">  &nbsp;A. Very likely
+                              </label>
+                              <label class="checkbox-inline chose">
+                                  <input type="radio" name="R5" value="B"> &nbsp;B. Likely
+                              </label>
+                              <label class="checkbox-inline chose">
+                                  <input type="radio" name="R5" value="C"> &nbsp;C. Neutral
+                              </label>
+                              <label class="checkbox-inline chose">
+                                  <input type="radio" name="R5" value="D"> &nbsp;D. Unlikely
+                              </label>
+                              <label class="checkbox-inline chose">
+                                  <input type="radio" name="R5" value="E"> &nbsp;E. Very unlikely
+                              </label>
+                          </div>
+                      </div>
+                      <div class="tab-pane fade" id="list-profile" role="tabpanel" aria-labelledby="list-profile-list">
+                          <div class="radio disabled q question-item" id = "CheckQuestion1">
+                              <i class="bi bi-pencil-square iconcolor"></i> &nbsp;&nbsp;Question 1:
+                              <p class="qu">Which of the following aspects of your meal were most satisfying to you? (select all that apply)</p>
+                              <label class="checkbox-inline chose">
+                                  <input type="checkbox" name="M1" value="A"> A. Food quality
+                              </label>
+                              <label class="checkbox-inline chose">
+                                  <input type="checkbox" name="M1" value="B"> B. Food presentation
+                              </label>
+                              <label class="checkbox-inline chose">
+                                  <input type="checkbox" name="M1" value="C"> C. Taste of food
+                              </label>
+                              <label class="checkbox-inline chose">
+                                  <input type="checkbox" name="M1" value="D"> D. Portion size
+                              </label>
+                              <label class="checkbox-inline chose">
+                                  <input type="checkbox" name="M1" value="E"> E. Temperature of food
+                              </label>
+                              <label class="checkbox-inline chose">
+                                  <input type="checkbox" name="M1" value="F"> F. Variety of menu options
+                              </label>
+                              <label class="checkbox-inline chose">
+                                  <input type="checkbox" name="M1" value="G"> G. Service from staff
+                              </label>
+                              <label class="checkbox-inline chose">
+                                  <input type="checkbox" name="M1" value="H"> H. Ambience of the restaurant
+                              </label>
+                          </div>
+                          <div class="radio disabled q question-item" id = "CheckQuestion2">
+                              <i class="bi bi-pencil-square iconcolor"></i> &nbsp;&nbsp;Question 2:
+                              <p class="qu">Which of the following aspects of your meal were least satisfying to you? (select all that apply)</p>
+                              <label class="checkbox-inline chose">
+                                  <input type="checkbox" name="M2" value="A"> A. Food quality
+                              </label>
+                              <label class="checkbox-inline chose">
+                                  <input type="checkbox" name="M2" value="B"> B. Food presentation
+                              </label>
+                              <label class="checkbox-inline chose">
+                                  <input type="checkbox" name="M2" value="C"> C. Taste of food
+                              </label>
+                              <label class="checkbox-inline chose">
+                                  <input type="checkbox" name="M2" value="D"> D. Portion size
+                              </label>
+                              <label class="checkbox-inline chose">
+                                  <input type="checkbox" name="M2" value="E"> E. Temperature of food
+                              </label>
+                              <label class="checkbox-inline chose">
+                                  <input type="checkbox" name="M2" value="F"> F. Variety of menu options
+                              </label>
+                              <label class="checkbox-inline chose">
+                                  <input type="checkbox" name="M2" value="G"> G. Service from staff
+                              </label>
+                              <label class="checkbox-inline chose">
+                                  <input type="checkbox" name="M2" value="H"> H. Ambience of the restaurant
+                              </label>
+                          </div>
+                          <div class="radio disabled q question-item" id = "CheckQuestion3">
+                              <i class="bi bi-pencil-square iconcolor"></i> &nbsp;&nbsp;Question 3:
+                              <p class="qu">Did you encounter any issues during your dining experience today? (select all that apply)</p>
+                              <label class="checkbox-inline chose">
+                                  <input type="checkbox" name="M3" value="A"> A. Long wait times
+                              </label>
+                              <label class="checkbox-inline chose">
+                                  <input type="checkbox" name="M3" value="B"> B. Order errors
+                              </label>
+                              <label class="checkbox-inline chose">
+                                  <input type="checkbox" name="M3" value="C"> C. Food quality issues
+                              </label>
+                              <label class="checkbox-inline chose">
+                                  <input type="checkbox" name="M3" value="D"> D. Service issues
+                              </label>
+                              <label class="checkbox-inline chose">
+                                  <input type="checkbox" name="M3" value="E"> E. Cleanliness issues
+                              </label>
+                              <label class="checkbox-inline chose">
+                                  <input type="checkbox" name="M3" value="F"> F. Ambience issues
+                              </label>
+                              <label class="checkbox-inline chose">
+                                  <input type="checkbox" name="M3" value="G" id="q3Gq"> G. Other (please specify)
+                                  <input type="text" name="M3" id="q3Gi">
+                              </label>
+                          </div>
+                          <div class="radio disabled q question-item" id = "CheckQuestion4">
+                              <i class="bi bi-pencil-square iconcolor"></i> &nbsp;&nbsp;Question 4:
+                              <p class="qu">How often do you dine out at restaurants?</p>
+                              <label class="checkbox-inline chose">
+                                  <input type="checkbox" name="M4" value="A"> A. Multiple times per week
+                              </label>
+                              <label class="checkbox-inline chose">
+                                  <input type="checkbox" name="M4" value="B"> B. Once per week
+                              </label>
+                              <label class="checkbox-inline chose">
+                                  <input type="checkbox" name="M4" value="C"> C. Multiple times per month
+                              </label>
+                              <label class="checkbox-inline chose">
+                                  <input type="checkbox" name="M4" value="D"> D. Once per month
+                              </label>
+                              <label class="checkbox-inline chose">
+                                  <input type="checkbox" name="M4" value="C"> E. Less than once per month
+                              </label>
+                          </div>
+                          <div class="radio disabled q question-item" id = "CheckQuestion5">
+                              <i class="bi bi-pencil-square iconcolor"></i> &nbsp;&nbsp;Question 5:
+                              <p class="qu">How important are online reviews in your decision to dine at a new restaurant?</p>
+                              <label class="checkbox-inline chose">
+                                  <input type="checkbox" name="M5" value="A"> A. Very important
+                              </label>
+                              <label class="checkbox-inline chose">
+                                  <input type="checkbox" name="M5" value="B"> B. Somewhat important
+                              </label>
+                              <label class="checkbox-inline chose">
+                                  <input type="checkbox" name="M5" value="C"> C. Neutral
+                              </label>
+                              <label class="checkbox-inline chose">
+                                  <input type="checkbox" name="M5" value="D"> D. Somewhat unimportant
+                              </label>
+                              <label class="checkbox-inline chose">
+                                  <input type="checkbox" name="M5" value="E"> E. Very unimportant
+                              </label>
+                          </div>
+                      </div>
+                      <div class="tab-pane fade" id="list-messages" role="tabpanel" aria-labelledby="list-messages-list">
+                          <div class="q question-item">
+                              <i class="bi bi-pencil-square iconcolor"></i>  &nbsp;&nbsp;Question 1:
+                              <p class="qu">Apart from the above, do you have any questions? If so, please describe it in detail.</p>
+                              <textarea class="qu textq1" style="width: 80%;max-height: 100px;"></textarea>
+                          </div>
+                      </div>
+                  </div>
+              </div>
+          </div>
+      </div>
+  </body>
+
+<script>
+    let qdata = {
+        single: null,
+        Multiple:null,
+        Short:null,
+    }
+
+    function questionData(){
+        let data = [];
+        let singleQuestionContainer = $("#list-home");
+        let questionItems = singleQuestionContainer.children(".question-item");
+        let singleQuestionAnswerList = [];
+        // 对每个item查找里面的input
+        for(let i=0;i<questionItems.length;i++){
+            let input = $(questionItems[i]).find("input");
+            for(let u=0;u<input.length;u++){
+                if (input[u].checked){
+                    singleQuestionAnswerList.push(input[u].value);
+                }
+            }
+        }
+        data.push(singleQuestionAnswerList);
+
+        let mQuestionContainer = $("#list-profile");
+        let mQuestionItem = mQuestionContainer.find(".question-item");
+        let MQuestionAnswerList = []
+
+        for (let j = 0;j<mQuestionItem.length;j++){
+            let MQuestionAnswerListDetail = []
+            let input = $(mQuestionItem[j]).find("input");
+            let itemLength = input.length
+            for (let k=0;k<itemLength;k++){
+                if (input[k].checked) {
+                    MQuestionAnswerListDetail.push(input[k].value)
+                    if (input[k].value === "G" && j===2) {
+                        MQuestionAnswerListDetail.pop()
+                        let Q3G={
+                            "G": true, "text": $("#q3Gi").val()
+                        }
+                        MQuestionAnswerListDetail.push(Q3G)
+                    }
+                }
+            }
+            MQuestionAnswerList.push(MQuestionAnswerListDetail)
+        }
+        data.push(MQuestionAnswerList);
+
+        let messageQuestionContainer = $("#list-messages")
+        let messageItem = messageQuestionContainer.find(".question-item")
+        let messageAnswerList = []
+        for (let a=0;a<messageItem.length;a++){
+            let input = $(messageItem[a]).find("textarea")
+            for (let b=0; b<input.length;b++){
+                if (input[b].value.length!==0){
+                    messageAnswerList.push(input[b].value)
+                }
+            }
+        }
+        data.push(messageAnswerList);
+
+        let commentData ={
+            orderid: 1, //orderID
+            remark:data,
+        };
+
+        $.ajax(
+            {
+                type: "Post",
+                url:"Postprandial evaluation",
+                data: JSON.stringify(commentData),
+                beforeSend:function (){
+                    let canSend = true
+                    if (data.at(0).length!==5) {
+                        canSend = false;
+                        alertUtil.message("There are some unanswered questions, please finish.","danger",$("#messageContainer"))
+                    }
+                    for (let i=0;i<data.at(1).length;i++){
+                        if (data.at(1).at(i).length===0) {
+                            canSend =false
+                            alertUtil.message("There are some unanswered questions, please finish.","danger",$("#messageContainer"))
+                        }
+                    }
+                    // if (canSend){
+                    //     // window.location.href= "../templates/OrderDetail/OrderDetail.html"
+                    // }
+                    return canSend
+                },
+                success:function (result){
+                    if (result === undefined||result===null){
+                        alertUtil.message("server error","danger",$("#messageContainer"));
+                    }
+                    else if (result.code!==1){
+                        alertUtil.message(result.message,"warning",$("#messageContainer"));
+                    }else window.location.href= "/OrderDetail.html"
+                },
+                error:function (){
+                    // alertUtil.message("server error","danger",$("#messageContainer"));
+                }
+            })
+    }
+
+
+
+    $('#myList a').on('click', function (event) {
+        event.preventDefault()
+        $(this).tab('show')
+    })
+
+    $('a[data-toggle="list"]').on('shown.bs.tab', function (event) {
+        event.target // newly activated tab
+        event.relatedTarget // previous active tab
+    })
+
+    $('#q3Gq').on('click',function (){
+        // $(this).attr("checked",true)
+        if ($("#q3Gq")[0].checked){
+            $('#q3Gi')[0].style.display = "block"
+        }
+        else {
+            $('#q3Gi')[0].style.display = "none"
+        }
+    })
+
+
+</script>
+
+
+</script>
+</html>

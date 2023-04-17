@@ -7,5 +7,5 @@ import com.example.pizza_order_demo.service.DishService;
 import org.springframework.stereotype.Service;
 
 @Service
-public class DishServiceImpl extends BaseServiceImpl<DishMapper,Dish, DishExample> implements DishService {
+public class DishServiceImpl extends BaseServiceImpl<DishMapper, Dish, DishExample> implements DishService {
 }

@@ -93,7 +93,7 @@
 .navbar .right-menu .logout {
   margin-left: 20px;
   width: 28px;
-  font-size: 14px;
+  font-size: 18px;
   color: #ffc200;
   cursor: pointer;
 }
@@ -151,7 +151,7 @@
   /* background: #fff; */
   color: #333333;
   height: 64px;
-  font-size: 16px;
+  font-size: 24px;
   width: 300px;
   padding-left: 22px;
   line-height: 64px;
@@ -192,11 +192,11 @@
 
 .logo {
   text-align: center;
-  background-color: rgb(52, 55, 68);
+  background-color:#F5E895;
   /* height: 100px;
   line-height: 100px;
   padding: 12px 5px; */
-  padding: 46px 37px 67px 36px;
+  padding: 35px 15px 50px 15px
 }
 
 .img {
@@ -219,7 +219,7 @@
 .el-submenu > .el-submenu__title,
 .el-submenu .el-menu-item {
   min-width: 190px !important;
-  background-color: #272a36 !important;
+  background-color:#F5E895 !important;
 }
 /* .el-submenu > .el-submenu__title:hover, .el-submenu .el-menu-item:hover {
   background-color: #0e132b !important;
@@ -236,7 +236,7 @@
 }
 .el-menu .el-menu-item {
   padding: 0 0 0 32px !important;
-  margin: 0 34px 20px 0;
+  margin: 0 0 20px 0;
   border-radius: 0 21px 21px 0 !important;
 }
 .el-menu .el-menu-item:hover {
@@ -254,6 +254,7 @@
 .el-menu .el-menu-item:active span {
   color: #333333 !important;
 }
+
 
 .el-menu .el-menu-item.is-active {
   background-color: #ffc200 !important;

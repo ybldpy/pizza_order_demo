@@ -7,6 +7,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Delizza admin</title>
     <!-- 引入样式 -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
     <link rel="stylesheet" href="plugins/element-ui/index.css" />
     <link rel="stylesheet" href="css/admin/common.css" />
     <link rel="stylesheet" href="css/admin/index.css" />
@@ -22,6 +23,9 @@
             width: 100%;
             height: 100%;
         }
+
+
+
     </style>
 </head>
 
@@ -30,7 +34,7 @@
     <div class="app-wrapper openSidebar clearfix">
         <!-- sidebar -->
         <div class="sidebar-container">
-            <div class="logo">
+            <div class="logo" style=>
                 <!-- <img src="images/logo.png" width="122.5" alt="" /> -->
                 <img src="img/logo.png" alt="" style="width: 100%; height: 20%;" />
             </div>
@@ -40,8 +44,8 @@
                         :default-active="defAct"
                         :unique-opened="false"
                         :collapse-transition="false"
-                        background-color="#343744"
-                        text-color="#bfcbd9"
+                        background-color="#F5E895"
+                        text-color="#4F545A"
                         active-text-color="#f4f4f5"
                 >
                     <div v-for="item in menuList" :key="item.id">
@@ -56,7 +60,7 @@
                                     :key="sub.id"
                                     @click="menuHandle(sub,false)">
                                 <i :class="iconfont" :class="sub.icon"></i>
-                                <span slot="title">{{sub.name}}</span>
+                                <span slot="title" >{{sub.name}}</span>
                             </el-menu-item>
                         </el-submenu>
                         <el-menu-item v-else :index="item.id" @click="menuHandle(item,false)">
@@ -72,14 +76,17 @@
             <div class="navbar">
                 <div class="head-lable">
               <span v-if="goBackFlag" class="goBack" @click="goBack()"
-              ><img src="images/icons/btn_back@2x.png" alt="" /> 返回</span
+              ><img src="images/icons/btn_back@2x.png" alt="" />返回</span
               >
                     <span>{{headTitle}}</span>
                 </div>
                 <div class="right-menu">
                     <div class="avatar-wrapper">{{ userInfo.name }}</div>
-                    <!-- <div class="logout" @click="logout">退出</div> -->
-                    <img src="images/icons/btn_close@2x.png" class="outLogin" alt="退出" @click="logout" />
+                     <div class="logout" @click="logout" style="margin-left: 0px;position: relative;width: auto">
+                         <i class="bi bi-box-arrow-left" style="float: left"></i>
+                         <div STYLE="float: right">&nbsp EXIT</div>
+<!--                         <img src="images/icons/btn_close@2x.png" class="outLogin" alt="EXIT" @click="logout" />-->
+                     </div>
                 </div>
             </div>
             <div class="app-main" v-loading="loading">
@@ -121,7 +128,7 @@
                     //   name: '门店管理',
                     //   children: [
                     {
-                      id: '2',
+                      id: '0',
                       name: '外卖员管理',
                       url: 'page/member/list.html',
                       icon: 'icon-member'
@@ -134,8 +141,19 @@
                     },
                     {
                         id: '2',
-                        name: '菜品管理',
-                        url: 'one',
+                        name: 'Dish Management',
+                        children: [
+                            {
+                                id:'6',
+                                name:'Dish Table',
+                                url:"Dish/table",
+                            },
+                            {
+                                id:"7",
+                                name:"Add Dish",
+                                url:"Dish/add"
+                            }
+                        ],
                         icon: 'icon-food'
                     },
                     {

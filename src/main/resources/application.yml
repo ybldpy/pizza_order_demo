@@ -1,12 +1,16 @@
-
+file:
+  upload-path: D:/pizza_order_demo/upload
 spring:
   thymeleaf:
     cache: false
+  servlet:
+    multipart:
+      max-file-size: 30MB
 
   datasource:
     driver-class-name: com.mysql.jdbc.Driver
     url: jdbc:mysql://124.220.16.197:3306/pizza_shop
-    username: cyj
+    username: ztn
     password: qwertyuiop
 
   mail:
@@ -44,6 +48,7 @@ server:
     context-path: /pizza_shop
 
 
+
 mybatis:
   configuration:
     map-underscore-to-camel-case: true
@@ -52,5 +57,5 @@ mybatis:
     level:
       com.example.pizza_order_demo.mapper: debug
   type-aliases-package: com.example.pizza_order_demo.model
-  mapper-locations: classpath*:/mappers/*Mapper.xml
+  mapper-locations: classpath:/mappers/*Mapper.xml
 #  mybatis.configuration.map-underscore-to-camel-case=true

@@ -6,7 +6,4 @@ import com.example.pizza_order_demo.model.CategoryExample;
 
 public interface CategoryService extends BaseService<Category, CategoryExample> {
 
-
-
-
 }

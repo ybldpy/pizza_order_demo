@@ -20,7 +20,7 @@
 <!--    &lt;!&ndash;        </div>&ndash;&gt;-->
 <!--</div>-->
 
-<div id="messageContainer" style="width: 20%;margin-top: 1%;position: absolute;z-index: 1055;margin-left: 40%;top: 0">
+<div id="messageContainer" style="width: 20%;margin-top: 1%;position: fixed;z-index: 1055;margin-left: 40%;top: 0">
     <!--        <div class="alert alert-danger fade" role="alert" style="font-size: 15px">-->
     <!--            Server error-->
     <!--            <button type="button" class="close" data-dismiss="alert" aria-label="Close">-->
@@ -63,7 +63,7 @@
 
     <div id="toolbar">
         <div class="btns">
-            <a class="btn-primary btn" onclick="$('#addContainer').modal({keyboard:true,focus:true,show:true})">Add Category</a>
+            <a class="btn-primary btn" onclick="" id="addCategoryBtn">Add Category</a>
         </div>
 <!--        <div class="col-3">-->
 <!--            <input class="form-control" type="text" id="searchText" placeholder="search here"/>-->
@@ -75,6 +75,12 @@
 </div>
 <script>
     $(function (){
+        $("#addContainer").on("hide.bs.modal",function (){
+            document.getElementById("addCategoryInput").value = '';
+        })
+        $("#addCategoryBtn").on("click",function (){
+            $("#addContainer").modal({keyboard:true,focus:true,show:true});
+        })
         $('#table').bootstrapTable({
             search:true,
             toolbar:"#toolbar",
@@ -93,6 +99,7 @@
                     title:"operation",
                     clickToSelect: false,
                     align:'center',
+                    searchable:false,
                     events: window.operateEvents,
                     formatter: operateFormatter
                 }

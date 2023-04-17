@@ -2,6 +2,9 @@
 const illegalUsername = "The length of user name is 5-30 and only letters and numbers are allowed to appear in username";
 const illegalPassword = "The length of user name is 5-16 and only letters and numbers are allowed to appear in password";
 const repeatPasswordNotEqual = "Repeat password must equals to password";
+const successType = "success";
+const dangerType = "danger";
+const warningType = "warning";
 
 function redirect(url){
     window.location.href = url;
@@ -98,7 +101,9 @@ function checkUserNameAndPwd(username,password){
 }
 
 function showFeedback(e,eId,msg){
+    if (e == null||e==undefined){return;}
     let target = e.siblings("#"+eId+"Feedback");
+    if (target[0]==undefined||target[0]==null){return;}
     target[0].innerText = msg;
     target.show();
 }
@@ -149,5 +154,12 @@ function disableLoadingVideo(btn,msg){
     if (btn[0]==undefined||btn[0]==null){return;}
     btn[0].disabled = false;
     btn[0].innerHTML = msg;
+}
+
+function isBlank(val){
+
+    if (typeof val!="string"){return val==null||val==undefined;}
+    return val==null||val==undefined||val.length==0;
+
 }
 
