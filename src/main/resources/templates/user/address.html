@@ -59,9 +59,9 @@
          background-color: white;
          border-radius: 25px;
          width: 80%;
-         height: 80%;
-         position:absolute;
-         top:15%;
+         height: 60%;
+         position:fixed;
+         top:20%;
          left:10%;
      }
 
@@ -72,7 +72,7 @@
         border-radius: 25px;
         width: 80%;
         height: 80%;
-        position:absolute;
+        position:fixed;
         top:15%;
         left:10%;
     }
@@ -82,22 +82,22 @@
          background-color: rgba(0,0,0,0.5);
          width: 100%;
          height: 100%;
-         position:absolute;
+         position:fixed;
          top:0%;
          left:0%;
      }
 
      #name{
          width: 80%;
-         position: absolute;
-         top: 20%;
+         /*position: absolute;*/
+         /*top: 20%;*/
          left: 8%;
      }
 
     #mobile{
         width: 80%;
-        position: absolute;
-        top: 32%;
+        /*position: absolute;*/
+        /*top: 32%;*/
         left: 8%;
     }
 
@@ -110,9 +110,9 @@
 
     #full{
         width: 80%;
-        height: 30%;
-        position: absolute;
-        top: 56%;
+        height: 100%;
+        /*position: absolute;*/
+        /*top: 56%;*/
         left: 8%;
     }
 
@@ -224,7 +224,7 @@
 <!--    <div class="col-1"><button type="button" class="btn btn-outline-danger btndel">Delete</button></div>-->
 <!--</div>-->
 <div id="toolbar">
-    <button type="button" class="btn btn-outline-info" id="addAddressBtn">Add address</button>
+    <button type="button" class="btn btn-outline-info" id="addContainer">Add address</button>
     <button type="button" class="btn btn-outline-danger" id="deleteAddressBtn">Delete</button>
 </div>
 
@@ -291,12 +291,44 @@
         )
     }
 
+    function addAddress(){
+        let $form = $("#add-addresss-form");
+        $.ajax(
+            {
+                type:"post",
+                url:"user/address/add",
+                data:$form.serialize(),
+                beforeSend:function (){
+                    let contact = $form.find("input[name='contact']");
+                    let canSend = true;
+                    if (isBlank(contact.val())){
+                        canSend = false;
+                        contact.siblings("div.invalid-feedback").show();
+                    }
+                    let phone = $form.find("input[name='phone']");
+                    if (isBlank(phone.val())){
+                        canSend = false;
+                        contact.siblings("div.invalid-feedback").show();
+                    }
+                    let location = $form.find("textarea[name='location']");
+                    if (isBlank(location.val())){
+                        canSend = false;
+                        contact.siblings("div.invalid-feedback").show();
+                    }
+                    return canSend;
+                }
+            }
+        )
+    }
+
 
     $(function (){
 
 
-        $("#addAddressBtn").click(add_addre);
+        $("#addContainer").click(add_addre);
         $("#deleteAddressBtn").click(deleteAddress);
+        $("#addAddressBtn").click(addAddress);
+
 
         $("#address-table").bootstrapTable(
             {
@@ -368,50 +400,55 @@
     }
 </script>
 
-<!--<div id="grey">-->
+<div id="grey">
 
-<!--</div>-->
+</div>
 
 <div id="addadresspage">
-    <button type="button" class="btn btn-secondary" style="margin-top: 2%; margin-left: 3%" onclick="exit()"><</button>
-    <div id="qwe" style="position:absolute;left: 8%;top:4%;">
-        <h3 style="color: #F7930F">Add address</h3>
+    <div style="margin-top: 2%; margin-left: 3%;display: flex">
+        <div style="margin-right: 2%"><button type="button" class="btn btn-secondary" onclick="exit()"><</button></div>
+        <div id="qwe">
+            <h3 style="color: #F7930F">Add address</h3>
+        </div>
     </div>
-    <form id="add-addresss-form">
+    <form id="add-addresss-form" style="margin-top: 4%">
     <div id="name" class="input-group mb-3">
         <div class="input-group-prepend">
-            <span class="input-group-text" class="inputGroup-sizing-default">name</span>
+            <span class="input-group-text" class="inputGroup-sizing-default">Contact</span>
         </div>
-        <input type="text" class="form-control" aria-label="Default" aria-describedby="inputGroup-sizing-default">
+        <input type="text" name='contact' class="form-control" aria-label="Default" aria-describedby="inputGroup-sizing-default">
+        <div class="invalid-feedback">You must input contact name</div>
     </div>
 
     <div id="mobile" class="input-group mb-3">
         <div class="input-group-prepend">
-            <span class="input-group-text" class="inputGroup-sizing-default">mobile phone number</span>
+            <span class="input-group-text" class="inputGroup-sizing-default">Mobile phone number</span>
         </div>
-        <input type="text" class="form-control" aria-label="Default" aria-describedby="inputGroup-sizing-default">
+        <input type="text" name="phone" class="form-control" aria-label="Default" aria-describedby="inputGroup-sizing-default">
+        <div class="invalid-feedback">You must input a phone</div>
     </div>
 
-    <div id="area" class="input-group mb-3">
-        <div class="input-group-prepend">
-            <span class="input-group-text" classs="inputGroup-sizing-default">local area</span>
-        </div>
-        <input type="text" class="form-control" aria-label="Default" aria-describedby="inputGroup-sizing-default">
-    </div>
-
+<!--    <div id="area" class="input-group mb-3">-->
+<!--        <div class="input-group-prepend">-->
+<!--            <span class="input-group-text" classs="inputGroup-sizing-default">Address</span>-->
+<!--        </div>-->
+<!--        <input type="text" class="form-control" aria-label="Default" aria-describedby="inputGroup-sizing-default">-->
+<!--    </div>-->
     <div id="full" class="input-group mb-3">
         <div class="input-group-prepend">
             <span class="input-group-text" class="inputGroup-sizing-default">full address</span>
         </div>
-        <textarea type="text" class="form-control" aria-label="Default"
+        <textarea type="text" name="location" class="form-control" aria-label="Default"
                   aria-describedby="inputGroup-sizing-default"></textarea>
+        <div class="invalid-feedback">You must input a addresss</div>
     </div>
+
+        <button type="button" id="addAddressBtn" class="btn btn-primary" style="width: 15%;margin-left:42.5%;margin-top: 2%">
+            Add
+        </button>
     </form>
 
     <!-- Button trigger modal -->
-    <button type="button" class="btn btn-primary" style="position: absolute; top: 90%; left: 50%" data-toggle="modal" data-target="#exampleModalCenter">
-        save
-    </button>
 
     <!-- Modal -->
     <div class="modal fade" id="exampleModalCenter" style="position: absolute; top: 30%;" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
@@ -443,28 +480,28 @@
 
     <div id="name1" class="input-group mb-3">
         <div class="input-group-prepend">
-            <span class="input-group-text" id="inputGroup-sizing-default">name</span>
+            <span class="input-group-text" class="inputGroup-sizing-default">name</span>
         </div>
         <input type="text" class="form-control" aria-label="Default" aria-describedby="inputGroup-sizing-default">
     </div>
 
     <div id="mobile1" class="input-group mb-3">
         <div class="input-group-prepend">
-            <span class="input-group-text" id="inputGroup-sizing-default">mobile phone number</span>
+            <span class="input-group-text" classs="inputGroup-sizing-default">mobile phone number</span>
         </div>
         <input type="text" class="form-control" aria-label="Default" aria-describedby="inputGroup-sizing-default">
     </div>
 
     <div id="area1" class="input-group mb-3">
         <div class="input-group-prepend">
-            <span class="input-group-text" id="inputGroup-sizing-default">local area</span>
+            <span class="input-group-text" class="inputGroup-sizing-default">local area</span>
         </div>
         <input type="text" class="form-control" aria-label="Default" aria-describedby="inputGroup-sizing-default">
     </div>
 
     <div id="full1" class="input-group mb-3">
         <div class="input-group-prepend">
-            <span class="input-group-text" id="inputGroup-sizing-default">full address</span>
+            <span class="input-group-text" class="inputGroup-sizing-default">full address</span>
         </div>
         <textarea type="text" class="form-control" aria-label="Default" aria-describedby="inputGroup-sizing-default"></textarea>
     </div>
