@@ -2,6 +2,7 @@ package com.example.pizza_order_demo.controller;
 
 import com.example.pizza_order_demo.commons.constant.ErrorConstant;
 import com.example.pizza_order_demo.commons.constant.ResultConstant;
+import com.example.pizza_order_demo.exception.CURDException;
 import com.example.pizza_order_demo.model.User;
 import com.example.pizza_order_demo.model.UserAddress;
 import com.example.pizza_order_demo.model.UserAddressExample;
@@ -16,8 +17,11 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.ResponseBody;
 import com.example.pizza_order_demo.commons.Result;
+
+import java.util.List;
 
 @Controller
 public class UserAddressController {
@@ -27,7 +31,7 @@ public class UserAddressController {
     @Autowired
     private UserAddressService userAddressService;
 
-    @PostMapping("/userAddress/add")
+    @PostMapping("/user/address/add")
     @Transactional(rollbackFor = Exception.class)
     @ResponseBody
     public Result addAddress(UserAddress userAddress){
@@ -42,6 +46,22 @@ public class UserAddressController {
         userAddress.setUserId(user.getId());
         int res = userAddressService.insert(userAddress);
         if (res<1){return new Result(ResultConstant.CODE_FAILED,ResultConstant.MESSAGE_FAILED,null);}
+        return new Result(ResultConstant.CODE_SUCCESS,ResultConstant.MESSAGE_SUCCESS,null);
+    }
+
+    @PostMapping("/user/address/delete")
+    @Transactional(rollbackFor = Exception.class)
+    @ResponseBody
+    public Result deleteAddress(@RequestBody List<Integer> ids){
+        if (ObjectUtils.isEmpty(ids)){
+            return new Result(ResultConstant.CODE_FAILED,ErrorConstant.PARAM_MISSING,null);
+        }
+        UserAddressExample userAddressExample = new UserAddressExample();
+        userAddressExample.or().andIdIn(ids);
+        int res = userAddressService.deleteByExample(userAddressExample);
+        if (res!=ids.size()){
+            throw new CURDException();
+        }
         return new Result(ResultConstant.CODE_SUCCESS,ResultConstant.MESSAGE_SUCCESS,null);
     }
 }

@@ -1,0 +1,569 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <base href="../../static/" th:href="@{/}">
+    <meta charset="UTF-8">
+    <title>Meue</title>
+    <script src="js/header.js"></script>
+    <link rel="stylesheet" href="font/fonts.css">
+    <script src="js/footer.js"></script>
+    <style>
+        body{
+            position: relative;
+            overflow-y:scroll;
+        }
+        .big{
+            width: 95%;
+            margin-left: 2.5%;
+            /*margin-top: 80px;*/
+
+            margin-bottom: 50px;
+        }
+        .yellow-active{
+            background: #FFCB62;
+        }
+    </style>
+</head>
+<body style="background-size: 100% 100%;background-image: url('img/loginBack.jpg');background-repeat: no-repeat;background-position: center;background-attachment: fixed">
+<textarea id="toppings" type="text" style="display: none">[(${toppings})]</textarea>
+<input type="number" th:value="${deliveryType}" hidden/>
+<div id="messageContainer" style="width: 30%;margin-top: 1%;position: fixed;z-index: 1055;margin-left: 35%;top: 0">
+</div>
+<div id="header" class="fixed-top">
+    <nav class="navbar navbar-expand-lg navbar-light color" style="height-max: 100px" >
+        <a class="navbar-brand color" href="#" style="height: 100%;padding: 0 0 ">
+            <img src="img/logo.png" alt="logo"  style="height: 40px;">
+        </a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarScroll" aria-controls="navbarScroll" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarScroll">
+            <ul class="navbar-nav mr-auto my-2 my-lg-0 navbar-nav-scroll" style="max-height: 100px;">
+                <li class="nav-item active">
+                    <a class="nav-link" href="#">Home <span class="sr-only">(current)</span></a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#">Link</a>
+                </li>
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" role="button" data-toggle="dropdown" aria-expanded="false">
+                        Link
+                    </a>
+                    <ul class="dropdown-menu">
+                        <li><a class="dropdown-item" href="#">Action</a></li>
+                        <li><a class="dropdown-item" href="#">Another action</a></li>
+                        <li><hr class="dropdown-divider"></li>
+                        <li><a class="dropdown-item" href="#">Something else here</a></li>
+                    </ul>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link disabled">Link</a>
+                </li>
+            </ul>
+            <form class="d-flex">
+                <input class="form-control mr-2" type="search" placeholder="Search" aria-label="Search">
+                <button class="btn btn-outline-success" type="submit">Search</button>
+            </form>
+            <div style="">
+                <ul class="navbar-nav mr-auto my-2 my-lg-0 navbar-nav-scroll" style="max-height: 100px;">
+                    <li class="nav-item dropdown" style="">
+                        <a class="nav-link dropdown-toggle" href="#" role="button" data-toggle="dropdown" aria-expanded="false">
+                            Username
+                        </a>
+                        <ul class="dropdown-menu" >
+                            <li><a class="dropdown-item" href="../templates/OrderDetail/All orders.html" th:href="@{/Order/All orders.html}">
+                                <i class="bi bi-list">&nbsp&nbsp</i>
+                                All Orders</a></li>
+                            <li><a class="dropdown-item" href="#">
+                                <i class="bi bi-person-lines-fill">&nbsp&nbsp</i>
+                                Profile</a></li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li><a class="dropdown-item" href="#">
+                                <i class="bi bi-box-arrow-right">&nbsp&nbsp</i>
+                                Log out</a></li>
+                        </ul>
+                    </li>
+                    <div class="brand" href="#" style="width: 40px;height: 40px;overflow: hidden;border-radius: 50%;float:right;box-shadow: 0 4px 8px rgba(0,0,0,.05);z-index: 1;">
+                        <img src="img/defaultAvatar.png" alt="Default avatar" style="width: 40px;height: 40px;" >
+                    </div>
+
+                </ul>
+            </div>
+        </div>
+    </nav>
+</div>
+
+
+<div id="shopping-car-container" class="modal" tabindex="-1">
+
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Shopping car</h5>
+            </div>
+            <div class="modal-body">
+                <ul class="list-group" id="bought-list">
+
+                </ul>
+            </div>
+            <div class="modal-footer" style="width: 100%">
+                <button type="button" class="btn btn-secondary addBtn" onclick="$('#shopping-car-container').modal('hide')">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<div id="customizationContainer" class="modal" tabindex="-1">
+
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Customization</h5>
+            </div>
+            <input type="text" id="dishName" value="" hidden>
+            <div class="modal-body customization-container">
+                <h5>Size</h5>
+                <div id="size-option">
+
+                </div>
+                <hr/>
+                <h5>Topping</h5>
+                <div id="topping-option">
+                    <ul id="topping-list" style="overflow-y: scroll;height: 150px">
+                    </ul>
+                </div>
+                <h5 id="cur-price">$ 0</h5>
+            </div>
+            <div class="modal-footer" style="width: 100%">
+                <button type="button" class="btn btn-secondary addBtn">Close</button>
+                <button id="add-btn" type="button" class="btn btn-warning addBtn">Add to shopping car</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div style="height: 80px" id="tes">
+</div>
+<script>
+</script>
+<div class="row big">
+    <div class="col-3">
+        <div class="list-group" role="tablist" id="categoryList">
+            <a th:each="category:${categories}" data-toggle="list" href="#te" role="tab" th:href="'#c-'+${category.categoryName}" class="list-group-item list-group-item-action">[(${category.categoryName})]</a>
+        </div>
+    </div>
+    <div class="col-7">
+        <div class="tab-content" id="nav-tabContent">
+            <div class="tab-pane fade" id="te" th:each="category:${categories}" th:id="'c-'+${category.categoryName}" role="tabpanel">
+                <div class="card">
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-3">
+                                    <img src="img/titlelogo1.png" class="img-fluid"/>
+                                </div>
+                                <div class="col-5">
+                                    <h5 class = 'dishName'>
+<!--                                        名字-->1111
+                                    </h5>
+                                    <h5 class="dishPrice">
+<!--                                        $ 333-->111
+                                    </h5>
+                                    <h5>Description</h5>
+                                    <div class="dishRemark" style="overflow-y: scroll;max-height: 35%">
+                                    </div>
+                                    <span style="cursor: pointer;"><a><i class="bi bi-plus-circle" style="background: #FFCB62;"></i></a></span>
+                                </div>
+                            </div>
+
+                        </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+    <span style="border-radius: 25px;position: fixed;bottom: 5%;width: 25%;margin-left: 37.5%;background: #000000">
+        <span><button class="btn btn-warning" style="border-radius: 25px" onclick="renderShoppingCar()"><i class="bi bi-arrow-up"></i></button></span>
+        <span class="btn" style="color: white;cursor: auto;" id="total-price">Total: $ 0</span>
+        <span style="float: right">
+            <a style="border-radius:27px;float: right" class="btn btn-warning" id="paymentBtn">Check out</a>
+        </span>
+    </span>
+
+
+
+
+
+<script>
+
+    function getJsonLen(obj){
+        if (typeof obj!="object"||obj==null){return 0;}
+        let len = 0;
+        for(let i in obj){
+            len++;
+        }
+        return len;
+    }
+
+    function addToShoppingCar(dishName,option,price){
+
+        for(let i=0;i<shoppingCar.length;i++){
+            let item = shoppingCar[i];
+            if (item["dishName"]==dishName&&item["size"]==option["size"]&&getJsonLen(item["topping"])==getJsonLen(option["topping"])){
+                let flag = true;
+                for(let key in item["topping"]){
+                    if (option["topping"][key]==undefined||option["topping"][key]!=item["topping"][key]){
+                        flag = false;
+                        break;
+                    }
+                }
+                if (flag){
+                    item.count = item.count+1;
+                    updatePriceBar();
+                    return;
+                }
+            }
+        }
+        let newItem = {
+            dishName:dishName,
+            count:1,
+            size:option["size"],
+            topping:option["topping"]==undefined||option["topping"]==null?{}:option["topping"],
+            img:option["img"],
+            singlePrice:price
+        }
+        shoppingCar.push(newItem);
+        updatePriceBar();
+    }
+
+    function updatePriceBar(){
+        let price = 0;
+        for(let i in shoppingCar){
+            price+=shoppingCar[i]["count"]*shoppingCar[i]["singlePrice"];
+        }
+        document.getElementById("total-price").innerText = "$ "+price
+    }
+    function renderShoppingCar(){
+        let ul = $("#bought-list");
+        let liPrefix = "<li class='list-group-item'>";
+        for(let i in shoppingCar){
+            if (shoppingCar[i].count<=0){continue;}
+            let option = {
+                size:shoppingCar[i].size,
+                topping:shoppingCar[i].topping,
+                img:shoppingCar[i].img
+            }
+            let str = "<li class=\"list-group-item\">\n" +
+                "        <div class=\"row\">\n" +
+                "            <div class=\"col-2\">\n" +
+                "                <img src='"+shoppingCar[i].img+"' style=\"max-width: 100%;max-height: 100%;\"/>\n" +
+                "            </div>\n" +
+                "            <div class=\"col-4 item-info\">\n" +
+                "                <h5>"+shoppingCar[i].dishName+"</h5>\n" +
+                "                <div>size: "+shoppingCar[i].size+"</div>\n" +
+                "                <div>"+getChosenToppingStr(shoppingCar[i].topping)+"</div>\n" +
+                "                <h5 class='item-price'>$ "+shoppingCar[i].singlePrice*shoppingCar[i].count+"</h5>\n" +
+                "            </div>\n" +
+                "            <div class=\"col-4 operationContainer\">\n" +
+                "                <span style=\"position: absolute;top: 40%;right: 5%\"><a class='minus' style='cursor: pointer'><i class=\"bi bi-dash-circle\"></i></a><span class='count'>"+shoppingCar[i].count+"</span><a class='plus' style='cursor: pointer'><i class=\"bi bi-plus-circle\"></i></a></span>\n" +
+                "            </div>\n" +
+                "        </div>\n" +
+                "\n" +
+                "    </li>";
+            let li = $(str);
+            let item = shoppingCar[i];
+            li.find("a.minus").click(function (){
+                deleteShoppingCarItem(item.dishName,option);
+                if (item.count<=0){
+                    li.remove();
+                }
+                else {
+                    updateShoppingCarItemContainer($(this),item)
+                }
+            });
+            li.find("a.plus").click(function (){
+                addToShoppingCar(shoppingCar[i].dishName,option,shoppingCar[i].singlePrice);
+                updateShoppingCarItemContainer($(this),item);
+            });
+            ul.append(li);
+        }
+        $("#shopping-car-container").modal("show");
+    }
+
+    function updateShoppingCarItemContainer($element,item){
+        $element.siblings("span.count")[0].innerText = item.count;
+        $($element.parents("div.operationContainer")[0]).siblings("div.item-info").children("h5.item-price")[0].innerText = "$ "+item.singlePrice*item.count;
+    }
+
+    function getChosenToppingStr(chosenTopping){
+        if (chosenTopping==null||chosenTopping==undefined||typeof chosenTopping!='object'){return "";}
+        let strList = [];
+        for(let key in chosenTopping){
+            strList.push(key+"x"+chosenTopping[key]);
+        }
+        return strList.join(", ");
+    }
+
+    function deleteShoppingCarItem(dishName,option){
+
+        for(let i=0;i<shoppingCar.length;i++){
+            let item = shoppingCar[i];
+            if (item.dishName!=dishName){continue;}
+            if (item.size==option.size&&getJsonLen(item.topping)==getJsonLen(option.topping)){
+                let flag = true;
+                for(let key in item.topping){
+                    if (option["topping"][key]==undefined||option["topping"][key]!=item["topping"][key]){
+                        flag = false;
+                    }
+                }
+                if (flag){
+                    item.count = item.count-1;
+                    if (item.count<=0){
+                        shoppingCar.slice(i,1);
+                    }
+                    updatePriceBar();
+                    return;
+                }
+            }
+        }
+    }
+
+
+    let shoppingCar = [];
+    const food = [];
+    let toppings = {};
+    $(function (){
+
+
+        $("#paymentBtn").click(function (){
+
+        })
+
+        $("#shopping-car-container").on("hidden.bs.modal",function (){
+            $("#bought-list")[0].innerHTML = "";
+
+        })
+
+        $("#customizationContainer").on("hidden.bs.modal",function (){
+            $("#topping-list")[0].innerHTML = "";
+            $("#size-option")[0].innerHTML = "";
+            $("#dishName")[0].value = "";
+        })
+
+        $("#add-btn").click(function (){
+            let dishName = $("#dishName").val();
+            let size = $("#customizationContainer").find("a.yellow-active")[0].innerText;
+            let foodItem = null;
+            for(let i in food){
+                if (food[i]["dishName"]==dishName){
+                    foodItem = food[i];
+                    break;
+                }
+            }
+            let price = 0;
+            if (foodItem != null){
+                for(let i in foodItem["sizePrice"]){
+                    if (foodItem["sizePrice"][i]["size"]==size){
+                        price+=parseInt(foodItem["sizePrice"][i]["price"]);
+                        break;
+                    }
+                }
+            }
+            else {return;}
+
+            let topping = {};
+            let toppingList = $("#topping-list").children("li");
+            for(let i=0;i<toppingList.length;i++){
+                let toppingName = $(toppingList[i]).find(".topping-name")[0].innerText;
+                let count = parseInt($(toppingList[i]).find("span.count")[0].innerText);
+                if (!isNan(count)&&count>0){
+                    if (toppings[toppingName]!=undefined||toppings[toppingName]!=null){
+                        price+=count*toppings[toppingName];
+                        topping[toppingName] = count;
+                    }
+                }
+            }
+            let options = {
+                topping:topping,
+                size:size,
+                img:foodItem.img
+            };
+            addToShoppingCar(dishName,options,price);
+
+        })
+
+        $.ajax(
+            {
+                type:"get",
+                url:"dish/get",
+                success:function (result){
+                    if (result==null||result==undefined){
+                        alertUtil.message("Load menu failed",dangerType,document.getElementById("messageContainer"));
+                        return;
+                    }
+                    if (result.total==null||result.total==undefined){
+                        alertUtil.message("Load menu failed",dangerType,document.getElementById("messageContainer"));
+                        return;
+                    }
+                    renderMenu(result);
+                },
+                error:function (){
+                    alertUtil.message("Load menu failed",dangerType,document.getElementById("messageContainer"));
+                }
+            }
+        )
+    })
+
+    function minPrice(obj){
+        if (obj==null||obj==undefined||typeof obj!="object"||obj.length<1){return 0;}
+        let min = obj[0]["price"];
+        for(let i=1;i<obj.length;i++){
+            if (obj[i]["price"]<min){
+                min = obj[i]["price"];
+            }
+        }
+        return typeof min=="number"?min:0;
+
+    }
+
+    function chooseSize(foodItem,element){
+        // 重复选择就取消
+        let $element = $(element);
+        let curActive = $element.siblings("a.yellow-active");
+        if (curActive.length<1){return;}
+        curActive.removeClass("yellow-active");
+        $element.addClass("yellow-active");
+        updateFoodOptionPrice(foodItem);
+    }
+
+    function popFoodOption(foodItem){
+        document.getElementById("dishName").value = foodItem.dishName;
+        let sizeHtmlPrefix = "<a class='btn btn-light'>"
+        let toppingPrefix = "<li class='list-group-item'>"
+        let toppingPostfix = "</li>";
+        let rightSpan = "<span style='float: right'>"
+        let container = $("#size-option");
+        let toppingContainer = $("#topping-list")
+        let sizePrice = foodItem["sizePrice"];
+        let topping = foodItem["topping"];
+        let price = 0;
+        for(let i=0;i<sizePrice.length;i++){
+            let a = $(sizeHtmlPrefix+sizePrice[i].size+"</a>");
+            a.click(function (){chooseSize(foodItem,this)});
+            if (i==0){
+                a.addClass("yellow-active");
+                price = sizePrice[i].price
+            }
+            container.append(a);
+        }
+
+        for(let i=0;i<topping.length;i++){
+            let liHtml = "<span class='topping-name'>"+topping[i]+"</span>"+rightSpan+"<span class='minus' style='cursor: pointer'><a><i class='bi bi-dash-circle'></i></a></span><span class='count'>0</span><span class='plus' style='cursor: pointer'><a><i class='bi bi-plus-circle'></i></a></span>"+"</span>";
+            toppingContainer.append($(toppingPrefix+liHtml+toppingPostfix));
+        }
+        toppingContainer.find("span.minus").click(function (){minusTopping(foodItem,this)})
+        toppingContainer.find("span.plus").click(function (){addTopping(foodItem,this)})
+        // 跳出选项之后渲染价格
+        updateFoodOptionPrice(foodItem);
+        $("#customizationContainer").modal("show");
+    }
+    function addTopping(foodItem,toppingElement){
+        let count = $(toppingElement).siblings("span.count");
+        let val = parseInt(count[0].innerText);
+        count[0].innerText = val+1;
+        // 刷新价格
+        updateFoodOptionPrice(foodItem);
+    }
+    function updateFoodOptionPrice(foodItem){
+        let container = $("#customizationContainer");
+        let price = 0;
+        let sizeChosen = container.find("a.yellow-active");
+        if (sizeChosen.length!=0){
+            for(let i in foodItem["sizePrice"]){
+                let val = foodItem["sizePrice"][i]["size"];
+                if (sizeChosen[0].innerText==val+""){
+                    price+=foodItem["sizePrice"][i]["price"];
+                }
+            }
+        }
+        let topping = container.find("span.count");
+        for(let i=0;i<topping.length;i++){
+            let count = parseInt(topping[i].innerText);
+            let parent = $(topping[i]).parent();
+            let toppingName = parent.siblings("span.topping-name");
+            let toppingPrice = toppings[toppingName[0].innerText];
+            if (toppingPrice!=null||toppingPrice!=undefined){
+                price+=count*parseInt(toppingPrice);
+            }
+        }
+        $("#cur-price")[0].innerText = "$ "+price;
+    }
+    function isNan(val){
+        return val!==val;
+    }
+    function minusTopping(foodItem,toppingElement){
+        let count = $(toppingElement).siblings("span.count");
+        let val = 0;
+        if (count.length==0){
+            val = 0;
+        }
+        else {
+            val = parseInt(count[0].innerText);
+        }
+        if (isNan(val)||val==0){count[0].innerText = 0;}
+        else {
+            count[0].innerText = val-1;
+        }
+        // 刷新价格
+        updateFoodOptionPrice(foodItem);
+    }
+
+
+
+    function renderMenu(data){
+        if (data.total==0){return;}
+        let toppingStr = ""
+        toppingStr = $("#toppings").val();
+        if (toppingStr==null||toppingStr==undefined||toppingStr==""){
+            toppingStr = "[]";
+        }
+        let toppingsAndPrice = JSON.parse(toppingStr);
+        for(let i=0;i<toppingsAndPrice.length;i++){
+            toppings[toppingsAndPrice[i]["toppingName"]] = toppingsAndPrice[i]["price"];
+        }
+        for(let i=0;i<data.total;i++){
+            data.rows[i]["sizePrice"] = JSON.parse(data.rows[i]["sizePrice"]);
+            data.rows[i]["topping"] = JSON.parse(data.rows[i]["topping"]);
+            food.push(data.rows[i]);
+            let html = "<div class=\"card\">\n" +
+                "                        <div class=\"card-body\">\n" +
+                "                            <div class=\"row\">\n" +
+                "                                <div class=\"col-3\">\n" +
+                "                                    <img src='"+data.rows[i].img+"' class=\"img-fluid\"/>\n" +
+                "                                </div>\n" +
+                "                                <div class=\"col-5\">\n" +
+                "                                    <h5 class = 'dishName'>\n" +data.rows[i].dishName+
+                "                                    </h5>\n" +
+                "                                    <h5 class=\"dishPrice\">$ " +minPrice(data.rows[i].sizePrice)+
+                "                                    </h5>\n" +
+                "                                    <h5>Description</h5>\n" +
+                "                                    <div class=\"dishRemark\" style=\"max-height: 35%;overflow-y: scroll\">\n" +data.rows[i].remark+
+                "                                    </div>\n" +
+                "                                    <span style=\"cursor: pointer;background: #FFCB62;\" class='buy'><a><i class=\"bi bi-plus-circle\"></i></a></span>\n" +
+                "                                </div>\n" +
+                "                            </div>\n" +
+                "                        </div>\n" +
+                "                </div>"
+            let $html = $(html);
+            let container = $("#c-"+data.rows[i].categoryName);
+            container.append($html);
+            $html.find("span.buy").click(function (){popFoodOption(data.rows[i]);})
+        }
+
+    }
+</script>
+
+
+</body>
+</html>

@@ -37,14 +37,14 @@
                 <h5 class="modal-title">New Category</h5>
             </div>
             <div class="modal-body">
-                <div>
-                    <form id="addForm">
-                        <input id="addCategoryInput" class="form-control" type="text" name="categoryName" placeholder="Input new category" oninput="$(this).siblings('div').hide();"/>
-                        <div id="categoryFeedback" class="invalid-feedback">Category cannot be empty</div>
-                    </form>
-                </div>
+                    <div>
+                        <form id="addForm">
+                            <input id="addCategoryInput" class="form-control" type="text" name="categoryName" placeholder="Input new category" oninput="$(this).siblings('div').hide();"/>
+                            <div id="categoryFeedback" class="invalid-feedback">Category cannot be empty</div>
+                        </form>
+                    </div>
             </div>
-            <div class="modal-footer" style="width: 100%">
+            <div class="modal-footer">
                 <button type="button" class="btn btn-secondary addBtn" onclick="$('#addContainer').modal('hide')">Close</button>
                 <button id="addBtn" type="button" class="btn btn-primary addBtn" onclick="addNewCategory(this)">Add</button>
             </div>

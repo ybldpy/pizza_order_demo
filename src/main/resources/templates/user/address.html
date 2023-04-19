@@ -30,6 +30,9 @@
          margin: auto;
          /*position: absolute; left: 50px; top: 5px;*/
      }
+     tbody{
+         word-wrap: anywhere;
+     }
 
      .btnadd{
          /*margin-top: ;*/
@@ -144,7 +147,10 @@
 
 
 </style>
-<body th:style="'background-size: 100% 100%;background-image: url('+@{img/loginBack.jpg}+');background-repeat: no-repeat;background-position: center;background-attachment: fixed'" style="background-size: 100% 100%;background-image: url('../static/img/loginBack.jpg');background-repeat: no-repeat;background-position: center;background-attachment: fixed">
+<body style="background-size: 100% 100%;background-image: url('img/loginBack.jpg');background-repeat: no-repeat;background-position: center;background-attachment: fixed">
+<div id="messageContainer" style="width: 30%;margin-top: 1%;position: fixed;z-index: 1055;margin-left: 35%;top: 0">
+
+</div>
 <div id="header" class="fixed-top" >
     <nav class="navbar navbar-expand-lg navbar-light color" style="height: 50px" >
         <a class="navbar-brand color" href="#">
@@ -213,33 +219,127 @@
 <div class="row" style="margin-top: 5%;width: 100%;">
     <h1>My delivery address</h1>
 </div>
-<div class="row"; style="margin-left: 60%">
-    <div class="col-7"><button type="button" class="btn btn-outline-info btnadd" onclick="add_addre()">Add address</button></div>
-    <div class="col-1"><button type="button" class="btn btn-outline-danger btndel">Delete</button></div>
+<!--<div class="row" style="margin-left: 60%">-->
+<!--    <div class="col-7"><button type="button" class="btn btn-outline-info btnadd" onclick="add_addre()">Add address</button></div>-->
+<!--    <div class="col-1"><button type="button" class="btn btn-outline-danger btndel">Delete</button></div>-->
+<!--</div>-->
+<div id="toolbar">
+    <button type="button" class="btn btn-outline-info" id="addAddressBtn">Add address</button>
+    <button type="button" class="btn btn-outline-danger" id="deleteAddressBtn">Delete</button>
 </div>
 
 
-<div class="main" style="margin-top: 3%; width: 80%; margin-left: 10%">
+<div class="main" style="width: 80%; margin-left: 10%">
 
     <div class="alert alert-info" role="alert">
         All address are selected—check it out!
     </div>
 
-    <form action="" method="post" name="formName">
-        <table>
-            <tr><td><input type="checkbox" name="running" class="form-control" value="" checked/></td> <td><div class="box white border" style="margin-left: 10%">name: shenzhuoyi<br>telephone: 19842732346<br>address: sodijfowijekjlaksdjfosiejfjlskdjfoiejf lasjdfjwiejlkalisjefiej lajjeijfaije</div></td> <td><button type="button" class="btn btn-primary" onclick="editpass()">Edit</button></td></tr>
-            <tr><td><input type="checkbox" name="running" class="form-control" value="" checked/></td> <td><div class="box white border" style="margin-left: 10%">name: shenzhuoyi<br>telephone: 19842732346<br>address: sodijfowijekjlaksdjfosiejfjlskdjfoiejf sljeifjaiewifij alsejfiojivjals</div></td> <td><button type="button" class="btn btn-primary" onclick="editpass()">Edit</button></td></tr>
-            <tr><td><input type="checkbox" name="running" class="form-control" value="" checked/></td> <td><div class="box white border" style="margin-left: 10%">name: shenzhuoyi<br>telephone: 19842732346<br>address: odijfowijekjlaksdjfosiejfjlskdjfoiejf ksheuoiajwei alsejfailjijvijlwjeifjaiwpeijilnsldfjwoiejofijaisjdfsd</div></td> <td><button type="button" class="btn btn-primary" onclick="editpass()">Edit</button></td></tr>
-            <tr><td><input type="checkbox" name="running" class="form-control" value="" checked/></td> <td><div class="box white border" style="margin-left: 10%">name: shenzhuoyi<br>telephone: 19842732346<br>address: sodijfowijekjlaksdjfosiejfjlskdjfoiejf sljeifjaiewifij alsejfiojivjals</div></td> <td><button type="button" class="btn btn-primary" onclick="editpass()">Edit</button></td></tr>
-            <tr><td><input type="checkbox" name="running" class="form-control" value="" checked/></td> <td><div class="box white border" style="margin-left: 10%">name: shenzhuoyi<br>telephone: 19842732346<br>address: odijfowijekjlaksdjfosiejfjlskdjfoiejf ksheuoiajwei alsejfailjijvijlwjeifjaiwpeijiln</div></td> <td><button type="button" class="btn btn-primary" onclick="editpass()">Edit</button></td></tr>
-            <tr><td><input type="checkbox" name="running" class="form-control" value="" checked/></td> <td><div class="box white border" style="margin-left: 10%">name: shenzhuoyi<br>telephone: 19842732346<br>address: sodijfowijekjlaksdjfosiejfjlskdjfoiejf sljeifjaiewifij alsejfiojivjals</div></td> <td><button type="button" class="btn btn-primary" onclick="editpass()">Edit</button></td></tr>
-            <tr><td><input type="checkbox" name="running" class="form-control" value="" checked/></td> <td><div class="box white border" style="margin-left: 10%">name: shenzhuoyi<br>telephone: 19842732346<br>address: odijfowijekjlaksdjfosiejfjlskdjfoiejf ksheuoiajwei alsejfailjijvijlwjeifjaiwpeijiln</div></td> <td><button type="button" class="btn btn-primary" onclick="editpass()">Edit</button></td></tr>
+        <table id="address-table">
+<!--            <tr><td><input type="checkbox" name="running" class="form-control" value="" checked/></td> <td><div class="box white border" style="margin-left: 10%">name: shenzhuoyi<br>telephone: 19842732346<br>address: sodijfowijekjlaksdjfosiejfjlskdjfoiejf lasjdfjwiejlkalisjefiej lajjeijfaije</div></td> <td><button type="button" class="btn btn-primary" onclick="editpass()">Edit</button></td></tr>-->
+<!--            <tr><td><input type="checkbox" name="running" class="form-control" value="" checked/></td> <td><div class="box white border" style="margin-left: 10%">name: shenzhuoyi<br>telephone: 19842732346<br>address: sodijfowijekjlaksdjfosiejfjlskdjfoiejf sljeifjaiewifij alsejfiojivjals</div></td> <td><button type="button" class="btn btn-primary" onclick="editpass()">Edit</button></td></tr>-->
+<!--            <tr><td><input type="checkbox" name="running" class="form-control" value="" checked/></td> <td><div class="box white border" style="margin-left: 10%">name: shenzhuoyi<br>telephone: 19842732346<br>address: odijfowijekjlaksdjfosiejfjlskdjfoiejf ksheuoiajwei alsejfailjijvijlwjeifjaiwpeijilnsldfjwoiejofijaisjdfsd</div></td> <td><button type="button" class="btn btn-primary" onclick="editpass()">Edit</button></td></tr>-->
+<!--            <tr><td><input type="checkbox" name="running" class="form-control" value="" checked/></td> <td><div class="box white border" style="margin-left: 10%">name: shenzhuoyi<br>telephone: 19842732346<br>address: sodijfowijekjlaksdjfosiejfjlskdjfoiejf sljeifjaiewifij alsejfiojivjals</div></td> <td><button type="button" class="btn btn-primary" onclick="editpass()">Edit</button></td></tr>-->
+<!--            <tr><td><input type="checkbox" name="running" class="form-control" value="" checked/></td> <td><div class="box white border" style="margin-left: 10%">name: shenzhuoyi<br>telephone: 19842732346<br>address: odijfowijekjlaksdjfosiejfjlskdjfoiejf ksheuoiajwei alsejfailjijvijlwjeifjaiwpeijiln</div></td> <td><button type="button" class="btn btn-primary" onclick="editpass()">Edit</button></td></tr>-->
+<!--            <tr><td><input type="checkbox" name="running" class="form-control" value="" checked/></td> <td><div class="box white border" style="margin-left: 10%">name: shenzhuoyi<br>telephone: 19842732346<br>address: sodijfowijekjlaksdjfosiejfjlskdjfoiejf sljeifjaiewifij alsejfiojivjals</div></td> <td><button type="button" class="btn btn-primary" onclick="editpass()">Edit</button></td></tr>-->
+<!--            <tr><td><input type="checkbox" name="running" class="form-control" value="" checked/></td> <td><div class="box white border" style="margin-left: 10%">name: shenzhuoyi<br>telephone: 19842732346<br>address: odijfowijekjlaksdjfosiejfjlskdjfoiejf ksheuoiajwei alsejfailjijvijlwjeifjaiwpeijiln</div></td> <td><button type="button" class="btn btn-primary" onclick="editpass()">Edit</button></td></tr>-->
         </table>
-    </form>
 
 </div>
 
 <script type="text/javascript">
+
+    function editFormatter(){
+        return "<button class='btn btn-primary'>edit</button>"
+    }
+    function deleteAddress(){
+        let $table = $("#address-table");
+        let selections = $table.bootstrapTable("getSelections");
+        let ids = [];
+        for(let i in selections){
+            ids.push(parseInt(selections[i].id));
+        }
+        $.ajax(
+            {
+                url:"user/address/delete",
+                type:"post",
+                data:JSON.stringify(ids),
+                beforeSend:function (){
+                    if (ids.length<1){
+                        alertUtil.message("You should choose at least one address to delete",warningType,document.getElementById("messageContainer"));
+                        return false;
+                    }
+                    return true;
+                },
+                success:function (result){
+                    if (result==null||result==undefined||result.code==undefined||result.code==null){
+                        alertUtil.message("Delete error",dangerType,document.getElementById("messageContainer"));
+                        return;
+                    }
+                    if (result.code!=1){
+                        alertUtil.message(result.message,dangerType,document.getElementById("messageContainer"));
+                        return;
+                    }
+                    alertUtil.message(result.message,successType,document.getElementById("messageContainer"));
+                    $table.bootstrapTable("refresh");
+                },
+                error:function (){
+                    alertUtil.message("Delete error",dangerType,document.getElementById("messageContainer"));
+                }
+
+            }
+        )
+    }
+
+
+    $(function (){
+
+
+        $("#addAddressBtn").click(add_addre);
+        $("#deleteAddressBtn").click(deleteAddress);
+
+        $("#address-table").bootstrapTable(
+            {
+                toolbar:"#toolbar",
+                cardView:true,
+                columns:[
+                    {
+                        checkbox:true
+                    },
+                    {
+                        field:"name",
+                        title:"Name"
+                    },
+                    {
+                        field:"phone",
+                        title:"Phone"
+                    },
+                    {
+                        field:"address",
+                        title:"Address",
+                    },
+                    {
+                        title:"operation",
+                        formatter:editFormatter
+                    }
+                ],
+                data:[
+                    {
+                        "name":123,
+                        "phone":"123456",
+                        "address":"11111111111111111111ss11111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111"
+                    },
+                    {
+                        "name":123,
+                        "phone":"123456",
+                        "address":"11111111111111111111ss11111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111"
+                    },
+
+                ]
+            }
+        )
+    })
+
     function add_addre(){
         var pop = document.getElementById("addadresspage");
         pop.style.display = "block";
@@ -268,44 +368,45 @@
     }
 </script>
 
-<div id="grey">
+<!--<div id="grey">-->
 
-</div>
+<!--</div>-->
 
 <div id="addadresspage">
     <button type="button" class="btn btn-secondary" style="margin-top: 2%; margin-left: 3%" onclick="exit()"><</button>
     <div id="qwe" style="position:absolute;left: 8%;top:4%;">
         <h3 style="color: #F7930F">Add address</h3>
     </div>
-
+    <form id="add-addresss-form">
     <div id="name" class="input-group mb-3">
         <div class="input-group-prepend">
-            <span class="input-group-text" id="inputGroup-sizing-default">name</span>
+            <span class="input-group-text" class="inputGroup-sizing-default">name</span>
         </div>
         <input type="text" class="form-control" aria-label="Default" aria-describedby="inputGroup-sizing-default">
     </div>
 
     <div id="mobile" class="input-group mb-3">
         <div class="input-group-prepend">
-            <span class="input-group-text" id="inputGroup-sizing-default">mobile phone number</span>
+            <span class="input-group-text" class="inputGroup-sizing-default">mobile phone number</span>
         </div>
         <input type="text" class="form-control" aria-label="Default" aria-describedby="inputGroup-sizing-default">
     </div>
 
     <div id="area" class="input-group mb-3">
         <div class="input-group-prepend">
-            <span class="input-group-text" id="inputGroup-sizing-default">local area</span>
+            <span class="input-group-text" classs="inputGroup-sizing-default">local area</span>
         </div>
         <input type="text" class="form-control" aria-label="Default" aria-describedby="inputGroup-sizing-default">
     </div>
 
     <div id="full" class="input-group mb-3">
         <div class="input-group-prepend">
-            <span class="input-group-text" id="inputGroup-sizing-default">full address</span>
+            <span class="input-group-text" class="inputGroup-sizing-default">full address</span>
         </div>
         <textarea type="text" class="form-control" aria-label="Default"
                   aria-describedby="inputGroup-sizing-default"></textarea>
     </div>
+    </form>
 
     <!-- Button trigger modal -->
     <button type="button" class="btn btn-primary" style="position: absolute; top: 90%; left: 50%" data-toggle="modal" data-target="#exampleModalCenter">
