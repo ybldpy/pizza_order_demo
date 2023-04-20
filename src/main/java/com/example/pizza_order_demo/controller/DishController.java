@@ -101,8 +101,8 @@ public class DishController {
             }
         }
         // 检查是否有size的合法性，没有size返回错误
-        List<Map<String,Integer>> sizePrice = (List<Map<String, Integer>>) map.get("sizePrice");
-        for(Map<String,Integer> e:sizePrice){
+        List<Map<String,Object>> sizePrice = (List<Map<String, Object>>) map.get("sizePrice");
+        for(Map<String,Object> e:sizePrice){
             if (e.size()!=2){return new Result(ResultConstant.CODE_FAILED,"illegal size and price",null);}
             if (e.get("size")==null||e.get("price")==null){return new Result(ResultConstant.CODE_FAILED,"size or price is missing",null);}
         }
@@ -120,7 +120,7 @@ public class DishController {
         if (ObjectUtils.isEmpty(dish)){
             return "404";
         }
-        List<Map<String,Integer>> sizePrice = null;
+        List<Map<String,Object>> sizePrice = null;
         CategoryExample categoryExample = new CategoryExample();
         categoryExample.or().andDeletedEqualTo(0);
         ToppingExample toppingExample = new ToppingExample();
@@ -190,8 +190,8 @@ public class DishController {
         }
         // 检查是否有size的合法性，没有size返回错误
         if (!newDish.getSizePrice().equals(oldDish.getSizePrice())){
-            List<Map<String,Integer>> sizePrice = (List<Map<String, Integer>>) map.get("sizePrice");
-            for(Map<String,Integer> e:sizePrice){
+            List<Map<String,Object>> sizePrice = (List<Map<String, Object>>) map.get("sizePrice");
+            for(Map<String,Object> e:sizePrice){
                 if (e.size()!=2){return new Result(ResultConstant.CODE_FAILED,"illegal size and price",null);}
                 if (e.get("size")==null||e.get("price")==null){return new Result(ResultConstant.CODE_FAILED,"size or price is missing",null);}
             }

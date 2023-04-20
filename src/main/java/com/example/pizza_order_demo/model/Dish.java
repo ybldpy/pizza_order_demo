@@ -323,7 +323,7 @@ public class Dish {
         else {
             dish.setTopping("[]");
         }
-        List<Map<String,Integer>> sizePrice = (List<Map<String, Integer>>) map.get("sizePrice");
+        List<Map<String,Object>> sizePrice = (List<Map<String, Object>>) map.get("sizePrice");
         if (!ObjectUtils.isEmpty(sizePrice)){
             String s = objectMapper.writeValueAsString(sizePrice);
             dish.setSizePrice(s);

@@ -18,6 +18,9 @@
     a.color:focus,a.color:hover,button.color:focus,button.color:hover{
         background-color:#DFB300!important
     }
+    table{
+        background-color: rgba(255,255,255,50%);
+    }
 
     /*.bigbox{*/
     /*    margin-top: 5%;*/
@@ -54,7 +57,17 @@
          background-color: rgba(255,255,255,0.7);
      }
 
-     #addadresspage{
+     /*#addadresspage{*/
+     /*    display: none;*/
+     /*    background-color: white;*/
+     /*    border-radius: 25px;*/
+     /*    width: 80%;*/
+     /*    height: 60%;*/
+     /*    position:fixed;*/
+     /*    top:20%;*/
+     /*    left:10%;*/
+     /*}*/
+     .pop-page{
          display: none;
          background-color: white;
          border-radius: 25px;
@@ -65,17 +78,17 @@
          left:10%;
      }
 
-    #editadresspage{
-        display: none;
-        outline-style: solid;
-        background-color: white;
-        border-radius: 25px;
-        width: 80%;
-        height: 80%;
-        position:fixed;
-        top:15%;
-        left:10%;
-    }
+    /*#editadresspage{*/
+    /*    display: none;*/
+    /*    outline-style: solid;*/
+    /*    background-color: white;*/
+    /*    border-radius: 25px;*/
+    /*    width: 80%;*/
+    /*    height: 80%;*/
+    /*    position:fixed;*/
+    /*    top:15%;*/
+    /*    left:10%;*/
+    /*}*/
 
      #grey{
          display: none;
@@ -87,14 +100,14 @@
          left:0%;
      }
 
-     #name{
+     .name{
          width: 80%;
          /*position: absolute;*/
          /*top: 20%;*/
          left: 8%;
      }
 
-    #mobile{
+    .mobile{
         width: 80%;
         /*position: absolute;*/
         /*top: 32%;*/
@@ -108,7 +121,7 @@
         left: 8%;
     }
 
-    #full{
+    .full{
         width: 80%;
         height: 100%;
         /*position: absolute;*/
@@ -116,34 +129,6 @@
         left: 8%;
     }
 
-    #name1{
-        width: 80%;
-        position: absolute;
-        top: 20%;
-        left: 8%;
-    }
-
-    #mobile1{
-        width: 80%;
-        position: absolute;
-        top: 32%;
-        left: 8%;
-    }
-
-    #area1{
-        width: 80%;
-        position: absolute;
-        top: 44%;
-        left: 8%;
-    }
-
-    #full1{
-        width: 80%;
-        height: 30%;
-        position: absolute;
-        top: 56%;
-        left: 8%;
-    }
 
 
 </style>
@@ -231,9 +216,9 @@
 
 <div class="main" style="width: 80%; margin-left: 10%">
 
-    <div class="alert alert-info" role="alert">
-        All address are selected—check it out!
-    </div>
+<!--    <div class="alert alert-info" role="alert">-->
+<!--        All address are selected—check it out!-->
+<!--    </div>-->
 
         <table id="address-table">
 <!--            <tr><td><input type="checkbox" name="running" class="form-control" value="" checked/></td> <td><div class="box white border" style="margin-left: 10%">name: shenzhuoyi<br>telephone: 19842732346<br>address: sodijfowijekjlaksdjfosiejfjlskdjfoiejf lasjdfjwiejlkalisjefiej lajjeijfaije</div></td> <td><button type="button" class="btn btn-primary" onclick="editpass()">Edit</button></td></tr>-->
@@ -249,8 +234,14 @@
 
 <script type="text/javascript">
 
-    function editFormatter(){
-        return "<button class='btn btn-primary'>edit</button>"
+    function editFormatter(value,row,index,field){
+        let id = row.id;
+        if (isBlank(id)){
+            id = -1;
+        }
+        let onclickStr = "editpass("+id+",this)";
+        let str = "<button class='btn btn-warning' onclick="+onclickStr+">edit</button>";
+        return str;
     }
     function deleteAddress(){
         let $table = $("#address-table");
@@ -263,6 +254,7 @@
             {
                 url:"user/address/delete",
                 type:"post",
+                contentType:"application/json",
                 data:JSON.stringify(ids),
                 beforeSend:function (){
                     if (ids.length<1){
@@ -291,8 +283,20 @@
         )
     }
 
+    function removeFormInput($form){
+        let inputs = $form.find("input");
+        for(let i in inputs){
+            inputs[i].value = "";
+        }
+        let location = $form.find("textarea");
+        for(let i in location){
+            location[i].value = "";
+        }
+    }
+
     function addAddress(){
         let $form = $("#add-addresss-form");
+        let $btn = $(this);
         $.ajax(
             {
                 type:"post",
@@ -308,14 +312,90 @@
                     let phone = $form.find("input[name='phone']");
                     if (isBlank(phone.val())){
                         canSend = false;
-                        contact.siblings("div.invalid-feedback").show();
+                        phone.siblings("div.invalid-feedback").show();
                     }
                     let location = $form.find("textarea[name='location']");
                     if (isBlank(location.val())){
                         canSend = false;
-                        contact.siblings("div.invalid-feedback").show();
+                        location.siblings("div.invalid-feedback").show();
+                    }
+                    if (canSend){
+                        enableLoadingVideo($btn);
                     }
                     return canSend;
+                },
+                success:function (result){
+                  disableLoadingVideo($btn,"Add");
+                    if (result==null||result==undefined||result.code==undefined||result.code==null){
+                        alertUtil.message("Delete error",dangerType,document.getElementById("messageContainer"));
+                        return;
+                    }
+                    if (result.code!=1){
+                        alertUtil.message(result.message,dangerType,document.getElementById("messageContainer"));
+                        return;
+                    }
+                    alertUtil.message(result.message,successType,document.getElementById("messageContainer"));
+                    $("#address-table").bootstrapTable("refresh");
+                    hidePopWin($("#addadresspage"),$("#grey"));
+                    removeFormInput($form);
+
+                },
+                error:function (){
+                    disableLoadingVideo($btn,"Add");
+                    alertUtil.message("Add failed",dangerType,document.getElementById("messageContainer"));
+                }
+            }
+        )
+    }
+
+    function editAddress(){
+        let $form = $("#edit-addresss-form");
+        let $btn = $(this);
+        $.ajax(
+            {
+                type:"post",
+                url:"user/address/edit",
+                data:$form.serialize(),
+                beforeSend:function (){
+                    let contact = $form.find("input[name='contact']");
+                    let canSend = true;
+                    if (isBlank(contact.val())){
+                        canSend = false;
+                        contact.siblings("div.invalid-feedback").show();
+                    }
+                    let phone = $form.find("input[name='phone']");
+                    if (isBlank(phone.val())){
+                        canSend = false;
+                        phone.siblings("div.invalid-feedback").show();
+                    }
+                    let location = $form.find("textarea[name='location']");
+                    if (isBlank(location.val())){
+                        canSend = false;
+                        location.siblings("div.invalid-feedback").show();
+                    }
+                    if (canSend){
+                        enableLoadingVideo($btn);
+                    }
+                    return canSend;
+                },
+                success:function (result){
+                    disableLoadingVideo($btn,"Add");
+                    if (result==null||result==undefined||result.code==undefined||result.code==null){
+                        alertUtil.message("Delete error",dangerType,document.getElementById("messageContainer"));
+                        return;
+                    }
+                    if (result.code!=1){
+                        alertUtil.message(result.message,dangerType,document.getElementById("messageContainer"));
+                        return;
+                    }
+                    alertUtil.message(result.message,successType,document.getElementById("messageContainer"));
+                    $("#address-table").bootstrapTable("refresh");
+                    hidePopWin($("#editadresspage"),$("#grey"));
+                    removeFormInput($form);
+                },
+                error:function (){
+                    disableLoadingVideo($btn,"Add");
+                    alertUtil.message("Add failed",dangerType,document.getElementById("messageContainer"));
                 }
             }
         )
@@ -328,26 +408,40 @@
         $("#addContainer").click(add_addre);
         $("#deleteAddressBtn").click(deleteAddress);
         $("#addAddressBtn").click(addAddress);
-
-
+        $("#address-edit-btn").click(editAddress);
+        let $form = $("#add-addresss-form");
+        $form.find("input").on("input",function (){
+            $(this).siblings("div.invalid-feedback").hide();
+        })
+        $form.find("textarea[name='location']").on("input",function (){
+            $(this).siblings("div.invalid-feedback").hide();
+        })
+        $form = $("#edit-addresss-form");
+        $form.find("input").on("input",function (){
+            $(this).siblings("div.invalid-feedback").hide();
+        })
+        $form.find("textarea[name='location']").on("input",function (){
+            $(this).siblings("div.invalid-feedback").hide();
+        })
         $("#address-table").bootstrapTable(
             {
                 toolbar:"#toolbar",
                 cardView:true,
+                url:"user/address/query",
                 columns:[
                     {
                         checkbox:true
                     },
                     {
-                        field:"name",
-                        title:"Name"
+                        field:"contact",
+                        title:"Contact"
                     },
                     {
                         field:"phone",
                         title:"Phone"
                     },
                     {
-                        field:"address",
+                        field:"location",
                         title:"Address",
                     },
                     {
@@ -355,22 +449,10 @@
                         formatter:editFormatter
                     }
                 ],
-                data:[
-                    {
-                        "name":123,
-                        "phone":"123456",
-                        "address":"11111111111111111111ss11111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111"
-                    },
-                    {
-                        "name":123,
-                        "phone":"123456",
-                        "address":"11111111111111111111ss11111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111"
-                    },
-
-                ]
             }
         )
     })
+
 
     function add_addre(){
         var pop = document.getElementById("addadresspage");
@@ -379,17 +461,28 @@
         pop1.style.display = "block";
     }
 
-    function editpass(){
-        var pop = document.getElementById("editadresspage");
-        pop.style.display = "block";
-        var pop1 = document.getElementById("grey");
-        pop1.style.display = "block";
+    function editpass(id,btn){
+        let $form = $("#edit-addresss-form");
+        let $btn = $(btn);
+        let $parent = $($btn.parents("div.card-views")[0]);
+        let $divs = $parent.children("div.card-view");
+        $form.find("input[name='contact']").val($($divs[1]).children("span.card-view-value").text());
+        $form.find("input[name='phone']").val($($divs[2]).children("span.card-view-value").text());
+        $form.find("textarea[name='location']").val($($divs[3]).children("span.card-view-value").text());
+        $form.find("input[name='id']").val(id);
+        $("#grey").show();
+        $("#editadresspage").show();
     }
     function exit(){
         var exit = document.getElementById("addadresspage");
         exit.style.display = "none"
         var exit1 = document.getElementById("grey");
         exit1.style.display = "none";
+    }
+
+    function hidePopWin($element,$background){
+        $element.hide();
+        $background.hide();
     }
 
     function exit1(){
@@ -404,25 +497,25 @@
 
 </div>
 
-<div id="addadresspage">
+<div id="addadresspage" class="pop-page">
     <div style="margin-top: 2%; margin-left: 3%;display: flex">
-        <div style="margin-right: 2%"><button type="button" class="btn btn-secondary" onclick="exit()"><</button></div>
+        <div style="margin-right: 2%"><button type="button" class="btn btn-secondary" onclick="hidePopWin($('#addadresspage'),$('#grey'));removeFormInput($('#add-addresss-form'))"><</button></div>
         <div id="qwe">
             <h3 style="color: #F7930F">Add address</h3>
         </div>
     </div>
     <form id="add-addresss-form" style="margin-top: 4%">
-    <div id="name" class="input-group mb-3">
+    <div class="input-group mb-3 name">
         <div class="input-group-prepend">
-            <span class="input-group-text" class="inputGroup-sizing-default">Contact</span>
+            <span class="input-group-text" >Contact</span>
         </div>
         <input type="text" name='contact' class="form-control" aria-label="Default" aria-describedby="inputGroup-sizing-default">
         <div class="invalid-feedback">You must input contact name</div>
     </div>
 
-    <div id="mobile" class="input-group mb-3">
+    <div id="mobile" class="input-group mb-3 mobile">
         <div class="input-group-prepend">
-            <span class="input-group-text" class="inputGroup-sizing-default">Mobile phone number</span>
+            <span class="input-group-text">Mobile phone number</span>
         </div>
         <input type="text" name="phone" class="form-control" aria-label="Default" aria-describedby="inputGroup-sizing-default">
         <div class="invalid-feedback">You must input a phone</div>
@@ -434,16 +527,16 @@
 <!--        </div>-->
 <!--        <input type="text" class="form-control" aria-label="Default" aria-describedby="inputGroup-sizing-default">-->
 <!--    </div>-->
-    <div id="full" class="input-group mb-3">
+    <div class="input-group mb-3 full">
         <div class="input-group-prepend">
-            <span class="input-group-text" class="inputGroup-sizing-default">full address</span>
+            <span class="input-group-text">full address</span>
         </div>
         <textarea type="text" name="location" class="form-control" aria-label="Default"
                   aria-describedby="inputGroup-sizing-default"></textarea>
         <div class="invalid-feedback">You must input a addresss</div>
     </div>
 
-        <button type="button" id="addAddressBtn" class="btn btn-primary" style="width: 15%;margin-left:42.5%;margin-top: 2%">
+        <button type="button" id="addAddressBtn" class="btn btn-warning" style="width: 15%;margin-left:42.5%;margin-top: 2%">
             Add
         </button>
     </form>
@@ -451,87 +544,92 @@
     <!-- Button trigger modal -->
 
     <!-- Modal -->
-    <div class="modal fade" id="exampleModalCenter" style="position: absolute; top: 30%;" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered" role="document">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="exampleModalCenterTitle">Check!</h5>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
-                </div>
-                <div class="modal-body">
-                    These address information will be saved!
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                    <button type="button" class="btn btn-primary">Save changes</button>
-                </div>
-            </div>
-        </div>
-    </div>
+<!--    <div class="modal fade" id="exampleModalCenter" style="position: absolute; top: 30%;" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">-->
+<!--        <div class="modal-dialog modal-dialog-centered" role="document">-->
+<!--            <div class="modal-content">-->
+<!--                <div class="modal-header">-->
+<!--                    <h5 class="modal-title" id="exampleModalCenterTitle">Check!</h5>-->
+<!--                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">-->
+<!--                        <span aria-hidden="true">&times;</span>-->
+<!--                    </button>-->
+<!--                </div>-->
+<!--                <div class="modal-body">-->
+<!--                    These address information will be saved!-->
+<!--                </div>-->
+<!--                <div class="modal-footer">-->
+<!--                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>-->
+<!--                    <button type="button" class="btn btn-primary">Save changes</button>-->
+<!--                </div>-->
+<!--            </div>-->
+<!--        </div>-->
+<!--    </div>-->
 </div>
 
-<div id="editadresspage">
-    <button type="button" class="btn btn-secondary" style="margin-top: 2%; margin-left: 3%" onclick="exit1()"><</button>
-    <div id="qwe1" style="position:absolute;left: 8%;top:4%;">
-        <h3 style="color: #F7930F">Edit address</h3>
-    </div>
-
-    <div id="name1" class="input-group mb-3">
-        <div class="input-group-prepend">
-            <span class="input-group-text" class="inputGroup-sizing-default">name</span>
+<div id="editadresspage" class="pop-page">
+    <div style="margin-top: 2%; margin-left: 3%;display: flex">
+        <div style="margin-right: 2%"><button type="button" class="btn btn-secondary" onclick="hidePopWin($('#editadresspage'),$('#grey'));removeFormInput($('#edit-addresss-form'))"><</button></div>
+        <div>
+            <h3 style="color: #F7930F">Edit address</h3>
         </div>
-        <input type="text" class="form-control" aria-label="Default" aria-describedby="inputGroup-sizing-default">
     </div>
-
-    <div id="mobile1" class="input-group mb-3">
-        <div class="input-group-prepend">
-            <span class="input-group-text" classs="inputGroup-sizing-default">mobile phone number</span>
+    <form id="edit-addresss-form" style="margin-top: 4%">
+        <input name="id" type="number" hidden>
+        <div class="input-group mb-3 name">
+            <div class="input-group-prepend">
+                <span class="input-group-text" >Contact</span>
+            </div>
+            <input type="text" name='contact' class="form-control" aria-label="Default" aria-describedby="inputGroup-sizing-default">
+            <div class="invalid-feedback">You must input contact name</div>
         </div>
-        <input type="text" class="form-control" aria-label="Default" aria-describedby="inputGroup-sizing-default">
-    </div>
 
-    <div id="area1" class="input-group mb-3">
-        <div class="input-group-prepend">
-            <span class="input-group-text" class="inputGroup-sizing-default">local area</span>
+        <div class="input-group mb-3 mobile">
+            <div class="input-group-prepend">
+                <span class="input-group-text">Mobile phone number</span>
+            </div>
+            <input type="text" name="phone" class="form-control" aria-label="Default" aria-describedby="inputGroup-sizing-default">
+            <div class="invalid-feedback">You must input a phone</div>
         </div>
-        <input type="text" class="form-control" aria-label="Default" aria-describedby="inputGroup-sizing-default">
-    </div>
 
-    <div id="full1" class="input-group mb-3">
-        <div class="input-group-prepend">
-            <span class="input-group-text" class="inputGroup-sizing-default">full address</span>
+        <!--    <div id="area" class="input-group mb-3">-->
+        <!--        <div class="input-group-prepend">-->
+        <!--            <span class="input-group-text" classs="inputGroup-sizing-default">Address</span>-->
+        <!--        </div>-->
+        <!--        <input type="text" class="form-control" aria-label="Default" aria-describedby="inputGroup-sizing-default">-->
+        <!--    </div>-->
+        <div class="input-group mb-3 full">
+            <div class="input-group-prepend">
+                <span class="input-group-text">full address</span>
+            </div>
+            <textarea type="text" name="location" class="form-control" aria-label="Default"
+                      aria-describedby="inputGroup-sizing-default"></textarea>
+            <div class="invalid-feedback">You must input a addresss</div>
         </div>
-        <textarea type="text" class="form-control" aria-label="Default" aria-describedby="inputGroup-sizing-default"></textarea>
-    </div>
 
-
-    <!-- Button trigger modal -->
-    <button type="button" class="btn btn-primary" style="position: absolute; top: 90%; left: 50%" data-toggle="modal" data-target="#exampleModalCenter1">
-        save
-    </button>
+        <button type="button" id="address-edit-btn" class="btn btn-warning" style="width: 15%;margin-left:42.5%;margin-top: 2%">
+            Edit
+        </button>
+    </form>
 
     <!-- Modal -->
-    <div class="modal fade" id="exampleModalCenter1" style="position: absolute; top: 30%;" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle1" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered" role="document">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="exampleModalCenterTitle1">Check!</h5>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
-                </div>
-                <div class="modal-body">
-                    These address information will be saved!
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                    <button type="button" class="btn btn-primary">Save changes</button>
-                </div>
-            </div>
-        </div>
-    </div>
+<!--    <div class="modal fade" id="exampleModalCenter1" style="position: absolute; top: 30%;" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle1" aria-hidden="true">-->
+<!--        <div class="modal-dialog modal-dialog-centered" role="document">-->
+<!--            <div class="modal-content">-->
+<!--                <div class="modal-header">-->
+<!--                    <h5 class="modal-title" id="exampleModalCenterTitle1">Check!</h5>-->
+<!--                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">-->
+<!--                        <span aria-hidden="true">&times;</span>-->
+<!--                    </button>-->
+<!--                </div>-->
+<!--                <div class="modal-body">-->
+<!--                    These address information will be saved!-->
+<!--                </div>-->
+<!--                <div class="modal-footer">-->
+<!--                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>-->
+<!--                    <button type="button" class="btn btn-primary">Save changes</button>-->
+<!--                </div>-->
+<!--            </div>-->
+<!--        </div>-->
+<!--    </div>-->
 </div>
 
 
