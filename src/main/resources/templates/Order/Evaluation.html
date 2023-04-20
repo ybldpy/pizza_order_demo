@@ -350,13 +350,13 @@
           <div class="q">
             <i class="bi bi-pencil-square iconcolor"></i>  &nbsp;&nbsp;Question 1:
             <p class="qu">Apart from the above, do you have any questions? If so, please describe it in detail.</p>
-            <textarea class="qu textq1" style="width: 80%;max-height: 100px;"></textarea>
+            <textarea class="qu textq1" type="text" style="width: 80%;max-height: 100px;"></textarea>
           </div>
         </div>
       </div>
     </div>
   </div>
-  <a class="btn  btn-warning" href="#" role="button" style="float: right;margin-top: 20px; font-size: 20px;margin-bottom: 20px">Next</a>
+  <a class="btn  btn-warning"  role="button" style="float: right;margin-top: 20px; font-size: 20px;margin-bottom: 20px" href="#">Next</a>
 
 </div>
 </body>
@@ -374,26 +374,26 @@
     event.relatedTarget // previous active tab
   })
 
-  function dataLoad(){
-    let data = {
-      single:["A","B","C","D","C"],
-      Multiple:[["A","C"],["B","C","D"],["B","C","D",{"G":true,"text":"asddddddddddddddd"}],["B","C","D"],["B","C","D"]],
-      Short:["aaabfhdg"],
+    let qData = {
+      orderid: 1, //orderID
+      remark:[["A","B","C","D","C"],[["A","C"],["B","C","D"],["B","C","D",{"G":true,"text":"asddddddddddddddd"}],["B","C","D"],["B","C","D"]],["aaabfhdg"]],
     }
-    for (let i = 0;i<data.single.length;i++){
+
+    // alert(qData.remark[0][1])
+    for (let i = 0;i<qData.remark[0].length;i++){
       let question = $("#RadioQuestion"+(i+1));
-      let item = question.find("input[value='"+data.single[i]+"']")
+      let item = question.find("input[value='"+qData.remark[0][i]+"']")
       item.attr("checked",true)
     }
 
 
-    for (let i = 0;i<data.Multiple.length;i++){
+    for (let i = 0;i<qData.remark[1].length;i++){
       let question = $("#CheckQuestion"+(i+1));
-      for (let j=0;j<data.Multiple[i].length;j++){
+      for (let j=0;j<qData.remark[1][i].length;j++){
         // alert(data.Multiple[i][j].substring(0,1))
-        let item = data.Multiple[i][j];
+        let item = qData.remark[1][i][j];
         if (typeof item=="string"){
-          let item = question.find("input[value='"+data.Multiple[i][j]+"']")
+          let item = question.find("input[value='"+qData.remark[1][i][j]+"']")
           // alert(item[0].name)
           item.attr("checked",true)
         }
@@ -404,7 +404,7 @@
             item.attr("checked",true)
             let item1 = $('#q3Gi')
             item1[0].style.display = "block"
-            item1[0].innerText = data.Multiple[2][j]["text"]
+            item1[0].innerText = qData.remark[1][2][j]["text"]
           }
         }
       }
@@ -412,10 +412,9 @@
 
 
 
-    let item = $('.text1');
-    // alert(data.Short[0])
-    item[0].innerText=data.Short[0]
-  }
+    let item = $('.textq1');
+    // alert(qData.remark[2])
+    item[0].innerText = qData.remark[2]
 
 
 
