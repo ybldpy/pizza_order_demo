@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <base href="../../static/" th:href="@{/}">
+    <meta charset="UTF-8">
+    <title>Payment Page</title>
+  <script src="js/header.js"></script>
+  <script src="js/footer.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+</head>
+
+<style>
+    .color{
+        background-color: #FFBF3D !important;
+    }
+
+    a.color:focus,a.color:hover,button.color:focus,button.color:hover{
+        background-color:#DFB300!important
+    }
+
+    #recommendationSection{
+        background-color: #FFFFFF;
+        border-radius: 25px;
+        opacity: 0.8;
+        width: 42.5%;
+        height: 45%;
+        position: absolute;
+        left: 5%;
+        top: 10%;
+    }
+
+    #timeSection{
+        background-color: #FFFFFF;
+        border-radius: 25px;
+        opacity: 0.8;
+        width: 42.5%;
+        height: 10%;
+        position: absolute;
+        left: 5%;
+        top: 60%;
+    }
+
+    #couponSection{
+        background-color: #FFFFFF;
+        border-radius: 25px;
+        opacity: 0.8;
+        width: 42.5%;
+        height: 20%;
+        position: absolute;
+        left: 5%;
+        top: 75%;
+    }
+
+    #paymentDetailSection {
+        background-color: #FFFFFF;
+        border-radius: 25px;
+        opacity: 0.8;
+        width: 42.5%;
+        height: 85%;
+        position: absolute;
+        right: 5%;
+        top: 10%;
+    }
+
+    #recommendationPage {
+        display: none;
+        background-color: #5785ff;
+        border-radius: 25px;
+        width: 60%;
+        height: 80%;
+        position: absolute;
+        right: 20%;
+        top: 12.5%;
+    }
+
+    #timePage {
+        display: none;
+        background-color: #FFFFFF;
+        border-radius: 25px;
+        width: 40%;
+        height: 80%;
+        position: absolute;
+        right: 30%;
+        top: 12.5%;
+    }
+
+    #timePageMu {
+        display: none;
+        background-color: #000000;
+        opacity: 0.5;
+        width: 100%;
+        height: 100%;
+        position: absolute;
+        right: 0%;
+        top: 0%;
+    }
+
+    #functionMore{
+        width: 10%;
+        height: 10%;
+        position: absolute;
+        left: 45%;
+        top: 85%;
+    }
+
+    #functionTime{
+        width: 10%;
+        height: 10%;
+        font-size: 25px;
+        position: absolute;
+        left: 75%;
+        top: 15%;
+    }
+
+    #functionCloserp{
+        border-radius: 25px;
+        width: 10%;
+        height: 10%;
+        position: absolute;
+        left: 85%;
+        top: 5%;
+    }
+
+    #functionClosetp{
+        border-radius: 25px;
+        width: 10%;
+        height: 10%;
+        position: absolute;
+        left: 85%;
+        top: 5%;
+    }
+
+
+</style>
+
+
+
+<body th:style="'background-size: 100% 100%;background-image: url('+@{img/loginBack.jpg}+');background-repeat: no-repeat;background-position: center;background-attachment: fixed'" style="background-size: 100% 100%;background-image: url('img/loginBack.jpg');background-repeat: no-repeat;background-position: center;background-attachment: fixed">
+
+<script type="text/javascript">
+    function popRecommendationPage(){
+        var poprp = document.getElementById("recommendationPage");
+        poprp.style.display = "block";
+    }
+
+    function closeRecommendationPage(){
+        var closerp = document.getElementById("recommendationPage")
+        closerp.style.display = "none";
+    }
+
+    function popTimePage(){
+        var poptp = document.getElementById("timePage");
+        var poptpm = document.getElementById("timePageMu");
+        poptp.style.display = "block";
+        poptpm.style.display = "block";
+    }
+
+    function closeTimePage(){
+        var poptp = document.getElementById("timePage");
+        var poptpm = document.getElementById("timePageMu");
+        poptp.style.display = "none";
+        poptpm.style.display = "none";
+    }
+
+    function popcheck1(){
+        var check11 = document.getElementById("check1");
+        var check12 = document.getElementById("check2");
+        var check13 = document.getElementById("check3");
+        check11.style.display = "block";
+        check12.style.display = "none";
+        check13.style.display = "none";
+    }
+
+    function popcheck2(){
+        var check21 = document.getElementById("check1");
+        var check22 = document.getElementById("check2");
+        var check23 = document.getElementById("check3");
+        check21.style.display = "none";
+        check22.style.display = "block";
+        check23.style.display = "none";
+    }
+
+    function popcheck3(){
+        var check31 = document.getElementById("check1");
+        var check32 = document.getElementById("check2");
+        var check33 = document.getElementById("check3");
+        check31.style.display = "none";
+        check32.style.display = "none";
+        check33.style.display = "block";
+    }
+
+
+</script>
+
+<div id="header" class="fixed-top" >
+    <nav class="navbar navbar-expand-lg navbar-light color" style="height: 50px" >
+        <a class="navbar-brand color" href="#">
+            <img src="img/logo.png" alt="logo" style="height: 40px">
+        </a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarScroll" aria-controls="navbarScroll" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarScroll">
+            <ul class="navbar-nav mr-auto my-2 my-lg-0 navbar-nav-scroll" style="max-height: 100px;">
+                <li class="nav-item active">
+                    <a class="nav-link" href="#">Home <span class="sr-only">(current)</span></a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#">Link</a>
+                </li>
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" role="button" data-toggle="dropdown" aria-expanded="false">
+                        Link
+                    </a>
+                    <ul class="dropdown-menu">
+                        <li><a class="dropdown-item" href="#">Action</a></li>
+                        <li><a class="dropdown-item" href="#">Another action</a></li>
+                        <li><hr class="dropdown-divider"></li>
+                        <li><a class="dropdown-item" href="#">Something else here</a></li>
+                    </ul>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link disabled">Link</a>
+                </li>
+            </ul>
+            <form class="d-flex">
+                <input class="form-control mr-2" type="search" placeholder="Search" aria-label="Search">
+                <button class="btn btn-outline-success" type="submit">Search</button>
+            </form>
+            <div style="">
+                <ul class="navbar-nav mr-auto my-2 my-lg-0 navbar-nav-scroll" style="max-height: 100px;">
+                    <li class="nav-item dropdown" style="">
+                        <a class="nav-link dropdown-toggle" href="#" role="button" data-toggle="dropdown" aria-expanded="false">
+                            Username
+                        </a>
+                        <ul class="dropdown-menu" >
+                            <li><a class="dropdown-item" href="#">
+                                <i class="bi bi-list">&nbsp&nbsp</i>
+                                Order</a></li>
+                            <li><a class="dropdown-item" href="#">
+                                <i class="bi bi-person-lines-fill">&nbsp&nbsp</i>
+                                Profile</a></li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li><a class="dropdown-item" href="#">
+                                <i class="bi bi-box-arrow-right">&nbsp&nbsp</i>
+                                Log out</a></li>
+                        </ul>
+                    </li>
+                    <div class="brand" href="#" style="width: 40px;height: 40px;overflow: hidden;border-radius: 50%;float:right;box-shadow: 0 4px 8px rgba(0,0,0,.05);z-index: 1;">
+                        <img src="img/defaultAvatar.png" alt="Default avatar" style="width: 40px;height: 40px;" >
+                    </div>
+
+                </ul>
+            </div>
+
+
+        </div>
+    </nav>
+
+
+
+</div>
+
+<div id="recommendationSection">
+   <div id="recommendationText" style="margin-top:20px;margin-left: 30px;">
+       <h5>Recommendations</h5>
+   </div>
+    <button type="button" id="functionMore" class="btn btn-link" style="font-size:25px;" onclick="popRecommendationPage()">
+        More
+    </button>
+</div>
+
+<div id="paymentDetailSection">
+    <div id="total" style="background-color: #2a2a2a; border-radius: 50px;width:100%;height:10%;position:absolute;top:90%;">
+        <h4 id="totalText" style="color:white;position: absolute;left:5%;top:25%;">Total:</h4>
+    </div>
+    <div id="confirm" style="background-color: #e7ad18; border-radius: 50px;width:25%;height:10%;position:absolute;top:90%;left:75%">
+     <h4 id="confirmText" style="position:absolute;left:25%;top:25%">Confirm</h4>
+    </div>
+</div>
+
+<div id="timeSection">
+    <div id="timeText" style="margin-top:25px;margin-left: 30px;color:#000000;">
+        <h5>Meal pick-up time</h5>
+    </div>
+    <button id="functionTime" class="btn btn-link" onclick="popTimePage()">
+        Now
+    </button>
+</div>
+
+<div id="couponSection">
+    <div id="couponText" style="margin-top:40px;margin-left: 30px;color:#000000;">
+        <h5>Discount coupons</h5>
+    </div>
+    <div id="couponsNumber" style="background-color: red;color: #FFFFFF;width:40%;position: absolute;left:4%;top:55%;">
+        <h5 id="couponsNumberText">Two coupons can be used</h5>
+    </div>
+</div>
+
+
+
+<div id="recommendationPage">
+    <button id="functionCloserp" type="button" class="btn btn-outline-dark" onclick="closeRecommendationPage()">
+        Back
+    </button>
+    <div id="rpRecommendations" style="margin-top:2%;margin-left: 3%;">
+        <h2>Recommendations</h2>
+    </div>
+</div>
+
+<div id="timePageMu"></div>
+
+<div id="timePage">
+    <div id="tpSelect" style="margin-top:2%;margin-left: 10%;">
+        <h2>Select time to pick up your meal</h2>
+    </div>
+    <div id="timeSelection" style="background-color:#FFFFFF;width:80%;height:64%;position:absolute;left:12.5%;top:10%">
+        <div id="now" style="position:absolute;left:10%;top:10%;">
+            <h2>Now</h2>
+        </div>
+        <i class="bi bi-circle" style="font-size:40px;position:absolute;left:75%;top:8%;cursor: pointer" onclick="popcheck1()"></i>
+        <i id="check1" class="bi bi-check-lg" style="display:none;font-size: 40px;position:absolute;left:74.5%;top:8%"></i>
+        <div id="line1" style="background-color:grey;width: 95%;height: 0.5%;position: absolute;left:0%;top:28%;"></div>
+
+        <div id="10" style="position:absolute;left:10%;top:35%;">
+            <h2>10 minutes later</h2>
+        </div>
+        <i class="bi bi-circle" style="font-size:40px;position:absolute;left:75%;top:33%;cursor: pointer" onclick="popcheck2()"></i>
+        <i id="check2" class="bi bi-check-lg" style="display:none;font-size: 40px;position:absolute;left:74.5%;top:33%"></i>
+        <div id="line2" style="background-color:grey;width: 95%;height: 0.5%;position: absolute;left:0%;top:53%;"></div>
+
+        <div id="20" style="position:absolute;left:10%;top:60%;">
+            <h2>20 minutes later</h2>
+        </div>
+        <i class="bi bi-circle" style="font-size:40px;position:absolute;left:75%;top:58%;cursor: pointer" onclick="popcheck3()"></i>
+        <i id="check3" class="bi bi-check-lg" style="display:none;font-size: 40px;position:absolute;left:74.5%;top:58%"></i>
+        <div id="line3" style="background-color:grey;width: 95%;height: 0.5%;position: absolute;left:0%;top:78%;"></div>
+
+        <div id="or" style="position:absolute;left:10%;top:85%;">
+            <h2>Or enter</h2>
+        </div>
+            <input id="enterTime" type="text" time="t" style="position:absolute;left:40%;top:87%">
+    </div>
+
+    <div id="timeConfirm" style="background-color: #e7ad18;border-radius:25px;width:30%;height: 10%;position:absolute;left: 35%;top:80%;cursor: pointer;" onclick="closeTimePage()">
+        <div id="timeConfirmText" style="position:absolute;left:25%;top:25%">
+            <h4>Confirm</h4>
+        </div>
+    </div>
+</div>
+
+
+
+</body>
+
+</html>

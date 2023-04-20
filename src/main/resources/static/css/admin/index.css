@@ -240,11 +240,11 @@
   border-radius: 0 21px 21px 0 !important;
 }
 .el-menu .el-menu-item:hover {
-  color: #ffffff !important;
+  color: #D55C00 !important;
   background-color: transparent !important;
 }
 .el-menu .el-menu-item:hover span {
-  color: #ffffff !important;
+  color: #D55C00 !important;
 }
 
 .el-menu .el-menu-item:active {
@@ -295,7 +295,7 @@
   visibility: hidden;
 }
 .el-icon-arrow-down:before {
-  color: #fff;
+  color: #D55C00;
 }
 .el-submenu__title {
   font-size: 16px !important;
