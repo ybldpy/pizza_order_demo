@@ -26,7 +26,7 @@
 </head>
 <body style="background-size: 100% 100%;background-image: url('img/loginBack.jpg');background-repeat: no-repeat;background-position: center;background-attachment: fixed">
 <textarea id="toppings" type="text" style="display: none">[(${toppings})]</textarea>
-<input type="number" th:value="${deliveryType}" hidden/>
+<input type="number" id="deliveryType" th:value="${deliveryType}" hidden/>
 <div id="messageContainer" style="width: 30%;margin-top: 1%;position: fixed;z-index: 1055;margin-left: 35%;top: 0">
 </div>
 <div id="header" class="fixed-top">
@@ -156,28 +156,28 @@
     <div class="col-7">
         <div class="tab-content" id="nav-tabContent">
             <div class="tab-pane fade" id="te" th:each="category:${categories}" th:id="'c-'+${category.categoryName}" role="tabpanel">
-                <div class="card">
-                        <div class="card-body">
-                            <div class="row">
-                                <div class="col-3">
-                                    <img src="img/titlelogo1.png" class="img-fluid"/>
-                                </div>
-                                <div class="col-5">
-                                    <h5 class = 'dishName'>
-<!--                                        名字-->1111
-                                    </h5>
-                                    <h5 class="dishPrice">
-<!--                                        $ 333-->111
-                                    </h5>
-                                    <h5>Description</h5>
-                                    <div class="dishRemark" style="overflow-y: scroll;max-height: 35%">
-                                    </div>
-                                    <span style="cursor: pointer;"><a><i class="bi bi-plus-circle" style="background: #FFCB62;"></i></a></span>
-                                </div>
-                            </div>
+<!--                <div class="card">-->
+<!--                        <div class="card-body">-->
+<!--                            <div class="row">-->
+<!--                                <div class="col-3">-->
+<!--                                    <img src="img/titlelogo1.png" class="img-fluid"/>-->
+<!--                                </div>-->
+<!--                                <div class="col-5">-->
+<!--                                    <h5 class = 'dishName'>-->
+<!--&lt;!&ndash;                                        名字&ndash;&gt;1111-->
+<!--                                    </h5>-->
+<!--                                    <h5 class="dishPrice">-->
+<!--&lt;!&ndash;                                        $ 333&ndash;&gt;111-->
+<!--                                    </h5>-->
+<!--                                    <h5>Description</h5>-->
+<!--                                    <div class="dishRemark" style="overflow-y: scroll;max-height: 35%">-->
+<!--                                    </div>-->
+<!--                                    <span style="cursor: pointer;"><a><i class="bi bi-plus-circle" style="background: #FFCB62;"></i></a></span>-->
+<!--                                </div>-->
+<!--                            </div>-->
 
-                        </div>
-                </div>
+<!--                        </div>-->
+<!--                </div>-->
             </div>
         </div>
     </div>
@@ -196,6 +196,10 @@
 
 
 <script>
+
+
+
+
 
     function getJsonLen(obj){
         if (typeof obj!="object"||obj==null){return 0;}
@@ -319,9 +323,6 @@
                 }
                 if (flag){
                     item.count = item.count-1;
-                    if (item.count<=0){
-                        shoppingCar.slice(i,1);
-                    }
                     updatePriceBar();
                     return;
                 }
@@ -330,16 +331,34 @@
     }
 
 
+    function payment(){
+
+        if (shoppingCar.length<1){return;}
+        let form = document.createElement("form");
+        form.method = "post";
+        form.action = "order/payment";
+        form.style = "display: none";
+        let shoppingCarItem = document.createElement("input");
+        shoppingCarItem.type = "text";
+        shoppingCarItem.value = JSON.stringify(shoppingCar);
+        shoppingCarItem.name = "shoppingCar";
+        let deliveryType = document.createElement("input");
+        deliveryType.type = "number";
+        deliveryType.name = "deliveryType";
+        deliveryType.value = $("#deliveryType").val();
+        form.appendChild(shoppingCarItem);
+        form.appendChild(deliveryType);
+        document.body.appendChild(form);
+        form.submit();
+    }
+
+
     let shoppingCar = [];
     const food = [];
     let toppings = {};
     $(function (){
 
-
-        $("#paymentBtn").click(function (){
-
-        })
-
+        $("#paymentBtn").click(payment);
         $("#shopping-car-container").on("hidden.bs.modal",function (){
             $("#bought-list")[0].innerHTML = "";
 
@@ -377,7 +396,7 @@
             for(let i=0;i<toppingList.length;i++){
                 let toppingName = $(toppingList[i]).find(".topping-name")[0].innerText;
                 let count = parseInt($(toppingList[i]).find("span.count")[0].innerText);
-                if (!isNan(count)&&count>0){
+                if (!isNaN(count)&&count>0){
                     if (toppings[toppingName]!=undefined||toppings[toppingName]!=null){
                         price+=count*toppings[toppingName];
                         topping[toppingName] = count;
@@ -512,7 +531,7 @@
         else {
             val = parseInt(count[0].innerText);
         }
-        if (isNan(val)||val==0){count[0].innerText = 0;}
+        if (isNaN(val)||val==0){count[0].innerText = 0;}
         else {
             count[0].innerText = val-1;
         }

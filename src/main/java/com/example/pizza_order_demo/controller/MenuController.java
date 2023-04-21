@@ -25,6 +25,9 @@ public class MenuController {
 
     @GetMapping("/menu")
     public String getMenu(Model model,int deliveryType) throws JsonProcessingException {
+        if (deliveryType!=0&&deliveryType!=1){
+            return "415";
+        }
         CategoryExample categoryExample = new CategoryExample();
         categoryExample.or().andDeletedEqualTo(0);
         List<Category> categoryList = categoryService.selectByExample(categoryExample);

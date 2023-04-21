@@ -6,7 +6,7 @@
     <title>Payment Page</title>
   <script src="js/header.js"></script>
   <script src="js/footer.js"></script>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="font/fonts.css">
 </head>
 
 <style>
@@ -38,6 +38,7 @@
         position: absolute;
         left: 5%;
         top: 60%;
+        display: block;
     }
 
     #couponSection{
@@ -49,6 +50,11 @@
         position: absolute;
         left: 5%;
         top: 75%;
+    }
+    .divider{
+        width: 100%;
+        border: solid;
+        margin-top: 5%;
     }
 
     #paymentDetailSection {
@@ -68,7 +74,7 @@
         border-radius: 25px;
         width: 60%;
         height: 80%;
-        position: absolute;
+        position: relative;
         right: 20%;
         top: 12.5%;
     }
@@ -103,14 +109,6 @@
         top: 85%;
     }
 
-    #functionTime{
-        width: 10%;
-        height: 10%;
-        font-size: 25px;
-        position: absolute;
-        left: 75%;
-        top: 15%;
-    }
 
     #functionCloserp{
         border-radius: 25px;
@@ -121,14 +119,6 @@
         top: 5%;
     }
 
-    #functionClosetp{
-        border-radius: 25px;
-        width: 10%;
-        height: 10%;
-        position: absolute;
-        left: 85%;
-        top: 5%;
-    }
 
 
 </style>
@@ -137,6 +127,67 @@
 
 <body th:style="'background-size: 100% 100%;background-image: url('+@{img/loginBack.jpg}+');background-repeat: no-repeat;background-position: center;background-attachment: fixed'" style="background-size: 100% 100%;background-image: url('img/loginBack.jpg');background-repeat: no-repeat;background-position: center;background-attachment: fixed">
 
+
+<div id="messageContainer" style="width: 30%;margin-top: 1%;position: fixed;z-index: 1055;margin-left: 35%;top: 0">
+</div>
+<div class="modal" id="addressContainer">
+    <input type="number" id="deliveryType" th:value="${deliveryType}" hidden>
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="modal-title">Choose address</div>
+            </div>
+            <div class="modal-body">
+                    <ul id="address-list" class="list-group" style="height: 90%;overflow-y: scroll;word-wrap: anywhere">
+                        <li class="list-group-item list-group-item-action" th:each="address:${addressList}" >
+                            <textarea class="address-id" hidden>[(${address.id})]</textarea>
+                            <h5>Contact: [(${address.contact})]</h5>
+                            <h5>Phone: [(${address.contact})]</h5>
+                            <h5>Address: [(${address.contact})]</h5>
+                        </li>
+                        <li class="list-group-item list-group-item-action" th:each="address:${addressList}">
+                            <textarea class="address-id" hidden>[(${address.id})]</textarea>
+                            <h5>Contact: [(${address.contact})]</h5>
+                            <h5>Phone: [(${address.contact})]</h5>
+                            <h5>Address: [(${address.contact})]</h5>
+                        </li>
+                        <li class="list-group-item list-group-item-action" th:each="address:${addressList}">
+                            <textarea class="address-id" hidden>[(${address.id})]</textarea>
+                            <h5>Contact: [(${address.contact})]</h5>
+                            <h5>Phone: [(${address.contact})]</h5>
+                            <h5>Address: [(${address.contact})]</h5>
+                        </li>
+                        <li class="list-group-item list-group-item-action" th:each="address:${addressList}" onclick="$(this).tab('show')">
+                            <textarea class="address-id" hidden>[(${address.id})]</textarea>
+                            <h5>Contact: [(${address.contact})]</h5>
+                            <h5>Phone: [(${address.contact})]</h5>
+                            <h5>Address: [(${address.contact})]</h5>
+                        </li>
+                        <li class="list-group-item list-group-item-action" th:each="address:${addressList}" onclick="$(this).tab('show')">
+                            <textarea class="address-id" hidden>[(${address.id})]</textarea>
+                            <h5>Contact: [(${address.contact})]</h5>
+                            <h5>Phone: [(${address.contact})]</h5>
+                            <h5>Address: [(${address.contact})]</h5>
+                        </li>
+                        <li class="list-group-item list-group-item-action" th:each="address:${addressList}" onclick="$(this).tab('show')">
+                            <textarea class="address-id" hidden>[(${address.id})]</textarea>
+                            <h5>Contact: [(${address.contact})]</h5>
+                            <h5>Phone: [(${address.contact})]</h5>
+                            <h5>Address: [(${address.contact})]</h5>
+                        </li>
+
+                    </ul>
+
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="$('#address-list').children('li').removeClass('active');$('#addressContainer').modal('hide')">Close</button>
+                <button class="btn btn-warning" onclick="$('#addressContainer').modal('hide')">Select</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<textarea id="shopping-car-str" hidden>[(${shoppingCar})]</textarea>
 <script type="text/javascript">
     function popRecommendationPage(){
         var poprp = document.getElementById("recommendationPage");
@@ -149,10 +200,8 @@
     }
 
     function popTimePage(){
-        var poptp = document.getElementById("timePage");
-        var poptpm = document.getElementById("timePageMu");
-        poptp.style.display = "block";
-        poptpm.style.display = "block";
+        $("#timePage").show();
+        $("#timePageMu").show();
     }
 
     function closeTimePage(){
@@ -162,32 +211,6 @@
         poptpm.style.display = "none";
     }
 
-    function popcheck1(){
-        var check11 = document.getElementById("check1");
-        var check12 = document.getElementById("check2");
-        var check13 = document.getElementById("check3");
-        check11.style.display = "block";
-        check12.style.display = "none";
-        check13.style.display = "none";
-    }
-
-    function popcheck2(){
-        var check21 = document.getElementById("check1");
-        var check22 = document.getElementById("check2");
-        var check23 = document.getElementById("check3");
-        check21.style.display = "none";
-        check22.style.display = "block";
-        check23.style.display = "none";
-    }
-
-    function popcheck3(){
-        var check31 = document.getElementById("check1");
-        var check32 = document.getElementById("check2");
-        var check33 = document.getElementById("check3");
-        check31.style.display = "none";
-        check32.style.display = "none";
-        check33.style.display = "block";
-    }
 
 
 </script>
@@ -252,8 +275,6 @@
 
                 </ul>
             </div>
-
-
         </div>
     </nav>
 
@@ -271,21 +292,56 @@
 </div>
 
 <div id="paymentDetailSection">
-    <div id="total" style="background-color: #2a2a2a; border-radius: 50px;width:100%;height:10%;position:absolute;top:90%;">
-        <h4 id="totalText" style="color:white;position: absolute;left:5%;top:25%;">Total:</h4>
+    <div id="shopping-car-items" style="width: 100%;height: 85%;overflow-y: scroll">
+        <ul id="shopping-car-item-list" class="list-group">
+            <li class="list-group-item">
+                <div class="row">
+                    <div class="col-sm-4">
+                        <img style="max-width: 100%;max-height: 100%"/>
+                    </div>
+                    <div class="col-sm-4 item-info">
+                        <h5>1</h5>
+                        <div>size: </div>
+                        <div>111</div>
+                        <h5 class="item-price">$ </h5>
+                    </div>
+                    <div class="col-sm-4 operationContainer">
+                    <span style="top:40%;position: absolute;left: 35%">
+                        <a class="minus" style="cursor: pointer">
+                            <i class="bi bi-dash-circle"></i>
+                        </a>
+                        <span class="count">1</span>
+                        <a class="plus" style="cursor: pointer">
+                            <i class="bi bi-plus-circle"></i>
+                        </a>
+                    </span>
+                    </div>
+                </div>
+            </li>
+        </ul>
     </div>
-    <div id="confirm" style="background-color: #e7ad18; border-radius: 50px;width:25%;height:10%;position:absolute;top:90%;left:75%">
-     <h4 id="confirmText" style="position:absolute;left:25%;top:25%">Confirm</h4>
-    </div>
+    <span style="width: 100%;background-color: #000000;border-radius: 25px;display: block;margin-top: 10%">
+        <span class="btn" style="color: white;cursor: auto;" id="total-price">$ 0</span>
+        <span style="float: right">
+            <a style="border-radius:25px;float: right" class="btn btn-warning" id="payBtn">Check out</a>
+        </span>
+    </span>
 </div>
 
 <div id="timeSection">
-    <div id="timeText" style="margin-top:25px;margin-left: 30px;color:#000000;">
-        <h5>Meal pick-up time</h5>
+<!--    <div id="timeText" class="row" style="margin-top:3%;margin-left: 30px;color:#000000;">-->
+<!--        -->
+<!--    </div>-->
+    <div class="row" style="left: 5%;height: 100%;">
+        <div class="col-4" style="top: 10%">
+            <h5 class="btn-lg" style="display: inline-block">
+                Meal pick-up time
+            </h5>
+        </div>
+        <div class="col-8" style="top: 10%">
+            <button id="selectedPickup" class="btn btn-lg btn-link" onclick="popTimePage()">Now</button>
+        </div>
     </div>
-    <button id="functionTime" class="btn btn-link" onclick="popTimePage()">
-        Now
-    </button>
 </div>
 
 <div id="couponSection">
@@ -300,7 +356,8 @@
 
 
 <div id="recommendationPage">
-    <button id="functionCloserp" type="button" class="btn btn-outline-dark" onclick="closeRecommendationPage()">
+    <button id="functionCloserp" type="button" class="btn bpolkm;
+    0p ghbn-bnhg-yughbtn-outline-dark" onclick="closeRecommendationPage()">
         Back
     </button>
     <div id="rpRecommendations" style="margin-top:2%;margin-left: 3%;">
@@ -309,40 +366,49 @@
 </div>
 
 <div id="timePageMu"></div>
-
 <div id="timePage">
     <div id="tpSelect" style="margin-top:2%;margin-left: 10%;">
         <h2>Select time to pick up your meal</h2>
     </div>
     <div id="timeSelection" style="background-color:#FFFFFF;width:80%;height:64%;position:absolute;left:12.5%;top:10%">
-        <div id="now" style="position:absolute;left:10%;top:10%;">
-            <h2>Now</h2>
-        </div>
-        <i class="bi bi-circle" style="font-size:40px;position:absolute;left:75%;top:8%;cursor: pointer" onclick="popcheck1()"></i>
-        <i id="check1" class="bi bi-check-lg" style="display:none;font-size: 40px;position:absolute;left:74.5%;top:8%"></i>
-        <div id="line1" style="background-color:grey;width: 95%;height: 0.5%;position: absolute;left:0%;top:28%;"></div>
 
-        <div id="10" style="position:absolute;left:10%;top:35%;">
-            <h2>10 minutes later</h2>
+        <div class="row" style="margin-top: 10%">
+            <div class="col-8">
+                <h2 style="display: inline-block">Now</h2>
+            </div>
+            <div class="col-4">
+                <i class="bi bi-circle pickup-clicker" style="font-size:40px;position:absolute;left:75%;cursor: pointer"></i>
+                <i class="bi bi-check-lg pickup-checker" style="display:block;font-size: 40px;position:absolute;left:74.5%;"></i>
+                <input type="number" value="0" class="pickup-time" hidden>
+            </div>
         </div>
-        <i class="bi bi-circle" style="font-size:40px;position:absolute;left:75%;top:33%;cursor: pointer" onclick="popcheck2()"></i>
-        <i id="check2" class="bi bi-check-lg" style="display:none;font-size: 40px;position:absolute;left:74.5%;top:33%"></i>
-        <div id="line2" style="background-color:grey;width: 95%;height: 0.5%;position: absolute;left:0%;top:53%;"></div>
 
-        <div id="20" style="position:absolute;left:10%;top:60%;">
-            <h2>20 minutes later</h2>
+        <div class="divider"></div>
+        <div class="row" style="margin-top: 10%">
+            <div class="col-8">
+                <h2 style="display: inline-block">30 minutes later</h2>
+            </div>
+            <div class="col-4">
+                <i class="bi bi-circle pickup-clicker" style="font-size:40px;position:absolute;left:75%;cursor: pointer" ></i>
+                <i class="bi bi-check-lg pickup-checker" style="display:none;font-size: 40px;position:absolute;left:74.5%;"></i>
+                <input type="number" value="30" class="pickup-time" hidden>
+            </div>
         </div>
-        <i class="bi bi-circle" style="font-size:40px;position:absolute;left:75%;top:58%;cursor: pointer" onclick="popcheck3()"></i>
-        <i id="check3" class="bi bi-check-lg" style="display:none;font-size: 40px;position:absolute;left:74.5%;top:58%"></i>
-        <div id="line3" style="background-color:grey;width: 95%;height: 0.5%;position: absolute;left:0%;top:78%;"></div>
+        <div class="divider"></div>
+        <div class="row" style="margin-top: 10%">
+            <div class="col-8">
+                <h2 style="display: inline-block">1 Hour later</h2>
+            </div>
+            <div class="col-4">
+                <i class="bi bi-circle pickup-clicker" style="font-size:40px;position:absolute;left:75%;top:8%;cursor: pointer"></i>
+                <i class="bi bi-check-lg pickup-checker" style="display:none;font-size: 40px;position:absolute;left:74.5%;top:8%"></i>
+                <input type="number" class="pickup-time" value="60" hidden>
+            </div>
+        </div>
 
-        <div id="or" style="position:absolute;left:10%;top:85%;">
-            <h2>Or enter</h2>
-        </div>
-            <input id="enterTime" type="text" time="t" style="position:absolute;left:40%;top:87%">
     </div>
 
-    <div id="timeConfirm" style="background-color: #e7ad18;border-radius:25px;width:30%;height: 10%;position:absolute;left: 35%;top:80%;cursor: pointer;" onclick="closeTimePage()">
+    <div id="timeConfirm" style="background-color: #e7ad18;border-radius:25px;width:30%;height: 10%;position:absolute;left: 35%;top:80%;cursor: pointer;" onclick="closeTimePage();confirmPickup()">
         <div id="timeConfirmText" style="position:absolute;left:25%;top:25%">
             <h4>Confirm</h4>
         </div>
@@ -350,6 +416,217 @@
 </div>
 
 
+
+<script>
+
+    function confirmPickup(){
+        let $container = $("#timeSelection");
+        let $times = $container.find(".pickup-checker");
+        for(let i in $times){
+            if ($times[i].style.display !="none"){
+                let str = $($times[i]).parent().siblings("div.col-8").children("h2").text();
+                $("#selectedPickup").text(str);
+                return;
+            }
+        }
+    }
+
+    function choosePickupTime(){
+        $("#timeSelection").find(".pickup-checker").hide();
+        let $this = $(this);
+        let i = $this.siblings("i");
+        i.show();
+    }
+
+
+    function getToppingStr(topping){
+        if (typeof topping!="object"){return "";}
+        let strList = [];
+        for(let i in topping){
+            strList.push(i+" X"+topping[i]);
+        }
+        return strList.join(", ");
+    }
+    function removeShoppingCarItem(foodItem,$btn,i){
+        let countContainer = $($btn.siblings("span.count")[0]);
+        let val = parseInt(countContainer.text());
+        if (isNaN(val)){
+            alertUtil.message("remove failed, try to refresh or remove again",warningType,document.getElementById("messageContainer"));
+            return;
+        }
+        foodItem.count--;
+        countContainer.text(foodItem.count);
+        countContainer.parents("div.operationContainer").siblings("div.item-info").children("h5.item-price").text("$ "+foodItem.count*foodItem.singlePrice);
+        if (foodItem.count<=0){
+            renderShoppingCar();
+        }
+        updatePriceBar();
+    }
+    function updatePriceBar(){
+        let price = 0;
+        for(let i in shoppingCar){
+            price += shoppingCar[i].count*shoppingCar[i].singlePrice;
+        }
+
+        $("#total-price").text("$ "+price);
+    }
+
+    function addShoppingCarItem(foodItem,$btn){
+        let countContainer = $($btn.siblings("span.count")[0]);
+        let val = parseInt(countContainer.text());
+        if (isNaN(val)){
+            alertUtil.message("remove failed, try to refresh or remove again",warningType,document.getElementById("messageContainer"));
+            return;
+        }
+        foodItem.count++;
+        countContainer.text(foodItem.count);
+        countContainer.parents("div.operationContainer").siblings("div.item-info").children("h5.item-price").text("$ "+foodItem.count*foodItem.singlePrice);
+        updatePriceBar();
+
+    }
+
+    function renderShoppingCar(){
+        let $container = $("#shopping-car-item-list");
+        $container.children("li").remove();
+        $("#total-price").text("$ 0");
+        let liPrefix = "<li class='list-group-item'>"
+        let liPostfix = "</li>";
+        for(let i in shoppingCar){
+            if (shoppingCar[i].count<1){continue;}
+
+            let html = "<div class=\"row\">\n" +
+                "                    <div class=\"col-sm-4\">\n" +
+                "                        <img src='"+shoppingCar[i].img+"' style=\"max-width: 100%;max-height: 100%\"/>\n" +
+                "                    </div>\n" +
+                "                    <div class=\"col-sm-4 item-info\">\n" +
+                "                        <h5>"+shoppingCar[i].dishName+"</h5>\n" +
+                "                        <div>size: "+shoppingCar[i].size+"</div>\n" +
+                "                        <div>"+getToppingStr(shoppingCar[i].topping)+"</div>\n" +
+                "                        <h5 class=\"item-price\">$ "+shoppingCar[i].singlePrice*shoppingCar[i].count+"</h5>\n" +
+                "                    </div>\n" +
+                "                    <div class=\"col-sm-4 operationContainer\">\n" +
+                "                    <span style=\"top:40%;position: absolute;left: 35%\">\n" +
+                "                        <a class=\"minus\" style=\"cursor: pointer\">\n" +
+                "                            <i class=\"bi bi-dash-circle\"></i>\n" +
+                "                        </a>\n" +
+                "                        <span class=\"count\">"+shoppingCar[i].count+"</span>\n" +
+                "                        <a class=\"plus\" style=\"cursor: pointer\">\n" +
+                "                            <i class=\"bi bi-plus-circle\"></i>\n" +
+                "                        </a>\n" +
+                "                    </span>\n" +
+                "                    </div>\n" +
+                "                </div>"
+            let $html = $(liPrefix+html+liPostfix);
+            $container.append($html);
+            $html.find("a.minus").click(function (){
+                removeShoppingCarItem(shoppingCar[i],$(this),i);
+            })
+            $html.find("a.plus").click(function (){
+                addShoppingCarItem(shoppingCar[i],$(this),i);
+            })
+        }
+        updatePriceBar();
+    }
+
+    let shoppingCar = [];
+
+    function selectAddress(){
+        $("#addressContainer").modal({backdrop:false});
+    }
+
+    function pay(){
+        let nonEmptyShoppingCar = [];
+        for(let i in shoppingCar){
+            if(shoppingCar[i].count<1){
+                continue;
+            }
+            alert(JSON.stringify(shoppingCar[i]))
+            nonEmptyShoppingCar.push(shoppingCar[i]);
+        }
+        let $selected = $(".pickup-checker");
+        let selectedVal = 0;
+        for(let i =0;i<$selected.length;i++){
+            if ($selected[i].style.display !="none"){
+                selectedVal = parseInt($($selected[i]).siblings("input").val());
+            }
+        }
+        let deliveryType = parseInt($("#deliveryType").val());
+        let addressId = -1;
+        if (!isNaN(deliveryType)&&deliveryType==1){
+            let address = $("#address-list").children("li.active").children("textarea.address-id").text();
+            if (isBlank(address)){selectAddress();return;}
+            else {
+                addressId = parseInt(address);
+            }
+        }
+        let data = {
+            pickupTime:isNaN(selectedVal)?0:selectedVal,
+            shoppingCar:nonEmptyShoppingCar,
+            addressId:isNaN(addressId)?-1:addressId,
+            deliveryType:isNaN(deliveryType)?-1:deliveryType
+        };
+        let $btn = $(this);
+        let html = this.innerHTML;
+        $.ajax(
+            {
+                type:"post",
+                url:"order/create",
+                contentType:"application/json",
+                data:JSON.stringify(data),
+                beforeSend:function (){
+                    if (data.shoppingCar.length<1){
+                        alertUtil.message("Shopping car is empty",warningType,document.getElementById("messageContainer"));
+                        return false;
+                    }
+                    if (data.deliveryType<0){
+                        alertUtil.message("address error",warningType,document.getElementById("messageContainer"));
+                        return false;
+                    }
+                    if (data.deliveryType==1&&addressId<1){
+                        alertUtil.message("address error",warningType,document.getElementById("messageContainer"));
+                        return false;
+                    }
+                    enableLoadingVideo();
+                    return true;
+                },
+                success:function (result) {
+                    disableLoadingVideo($btn,html);
+                    if (result==undefined||result==null){
+                        alertUtil.message("create order failed",dangerType,document.getElementById("messageContainer"));
+                        return;
+                    }
+                    if (result.code!=1){
+                        alertUtil.message(result.message,dangerType,document.getElementById("messageContainer"));
+                        return;
+                    }
+                },
+                error:function (){
+                    disableLoadingVideo($btn,html);
+                    alertUtil.message("create order failed",dangerType,document.getElementById("messageContainer"));
+                }
+            }
+        )
+
+    }
+    $(function (){
+
+        $("#address-list").children("li").click(function (){
+            let $this = $(this);
+            $this.siblings("li").removeClass("active");
+            $this.removeClass("active");
+            $this.addClass("active");
+        })
+
+        $(".pickup-clicker").click(choosePickupTime);
+        $("#payBtn").click(pay);
+        let shoppingCarStr = $("#shopping-car-str").val();
+        if (shoppingCarStr==undefined||shoppingCarStr==null||shoppingCarStr==""){
+            return;
+        }
+        shoppingCar = JSON.parse(shoppingCarStr);
+        renderShoppingCar();
+    })
+</script>
 
 </body>
 

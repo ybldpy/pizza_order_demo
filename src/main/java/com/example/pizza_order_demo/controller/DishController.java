@@ -57,6 +57,8 @@ public class DishController {
         return resultMap;
     }
 
+
+
     @GetMapping("/dish/management")
     public String manageDish(){
         return "admin/dishTable";

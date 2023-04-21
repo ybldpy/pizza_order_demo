@@ -42,12 +42,12 @@
 <!--        <table tableName="t_topping" domainObjectName="Topping" ><generatedKey column="id" sqlStatement="Mysql" identity="true"/></table>-->
 <!--        <table tableName="t_inventory" domainObjectName="Inventory" ><generatedKey column="id" sqlStatement="Mysql" identity="true"/></table>-->
 <!--        <table tableName="t_log" domainObjectName="Log" ><generatedKey column="id" sqlStatement="Mysql" identity="true"/></table>-->
-<!--        <table tableName="t_order" domainObjectName="Order" ><generatedKey column="id" sqlStatement="Mysql" identity="true"/></table>-->
+        <table tableName="t_order" domainObjectName="Order" ><generatedKey column="id" sqlStatement="Mysql" identity="true"/></table>
 <!--        <table tableName="t_order_detail" domainObjectName="OrderDetail" ><generatedKey column="id" sqlStatement="Mysql" identity="true"/></table>-->
 <!--        <table tableName="t_plan" domainObjectName="Plan" ><generatedKey column="id" sqlStatement="Mysql" identity="true"/></table>-->
 <!--        <table tableName="t_role" domainObjectName="Role" ><generatedKey column="id" sqlStatement="Mysql" identity="true"/></table>-->
 <!--        <table tableName="t_turnover" domainObjectName="Turnover" ><generatedKey column="id" sqlStatement="Mysql" identity="true"/></table>-->
-        <table tableName="t_user_address" domainObjectName="UserAddress" ><generatedKey column="id" sqlStatement="Mysql" identity="true"/></table>
+<!--        <table tableName="t_user_address" domainObjectName="UserAddress" ><generatedKey column="id" sqlStatement="Mysql" identity="true"/></table>-->
 <!--        <table tableName="t_user_role" domainObjectName="UserRole" ><generatedKey column="id" sqlStatement="Mysql" identity="true"/></table>-->
 <!--        <table tableName="t_wallet" domainObjectName="Wallet" ><generatedKey column="id" sqlStatement="Mysql" identity="true"/></table>-->
 <!--        <table tableName="shopping_record" domainObjectName="ShoppingRecord" ><generatedKey column="id" sqlStatement="Mysql" identity="true"/></table>-->
