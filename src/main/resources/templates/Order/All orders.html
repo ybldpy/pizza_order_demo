@@ -124,62 +124,16 @@
     <div class="col-8 contentsize">
       <div class="tab-content " id="nav-tabContent" style="padding: 20px 20px">
         <div class="tab-pane fade show active" id="list-AllOrders" role="tabpanel" aria-labelledby="list-AllOrders-list">
-          <div class="card order1" style="width: 90%;position: relative;margin-bottom: 20px">
-            <div class="dishPhoto card-img-top" style="width: 51%;padding: 10px 10px">
-              <div class="dishPhoto1 float-left img-thumbnail" style="width: 42%; margin-right: 2%">
-                <img src="img/defaultAvatar.png" style="width: 90%;">
-                <p class="text-center" style="margin-top: 7px">Dish1</p>
-              </div>
-
-              <div class="dishPhoto2 float-left img-thumbnail" style="width: 42%;">
-                <img src="img/defaultAvatar.png" style="width: 90%;">
-                <p class="text-center" style="margin-top: 7px">Dish2</p>
-              </div>
-              <div class="float-right" style="margin-top: 20%;margin-left: 2%">
-                <i class="bi bi-dot"></i><i class="bi bi-dot"></i><i class="bi bi-dot"></i>
-              </div>
-
-            </div>
-
-            <div class="card-body" style="position: absolute;left: 53%">
-              <h5 class="card-title">OrderID</h5>
-              <p class="card-text"> Time:2022/2/13</p>
-              <p class="card-text"> Total Quantity</p>
-              <p class="card-text"> Total Price</p>
-            </div>
-            <a class="btn  btn-warning finishbtn" onclick="questionData()" role="button" style="position: absolute;left: 83%;bottom: 5%; font-size: 17px;width:15%">Order Detail</a>
-          </div>
-          <div class="card order1" style="width: 90%;position: relative;margin-bottom: 20px">
-            <div class="dishPhoto card-img-top" style="width: 51%;padding: 10px 10px">
-              <div class="dishPhoto1 float-left img-thumbnail" style="width: 42%; margin-right: 2%">
-                <img src="img/defaultAvatar.png" style="width: 90%;">
-                <p class="text-center" style="margin-top: 7px">Dish1</p>
-              </div>
-
-              <div class="dishPhoto2 float-left img-thumbnail" style="width: 42%;">
-                <img src="img/defaultAvatar.png" style="width: 90%;">
-                <p class="text-center" style="margin-top: 7px">Dish2</p>
-              </div>
-              <div class="float-right" style="margin-top: 20%;margin-left: 2%">
-                <i class="bi bi-dot"></i><i class="bi bi-dot"></i><i class="bi bi-dot"></i>
-              </div>
-
-            </div>
-
-            <div class="card-body" style="position: absolute;left: 53%">
-              <h5 class="card-title">OrderID</h5>
-              <p class="card-text"> Time:2022/2/13</p>
-              <p class="card-text"> Total Quantity</p>
-              <p class="card-text"> Total Price</p>
-            </div>
-            <a class="btn  btn-warning finishbtn" onclick="questionData()" role="button" style="position: absolute;left: 83%;bottom: 5%; font-size: 17px;width:15%">Order Detail</a>
-          </div>
+          <div id="all"></div>
         </div>
-        <div class="tab-pane fade" id="list-InProgress" role="tabpanel" aria-labelledby="list-InProgress-list">...</div>
+        <div class="tab-pane fade" id="list-InProgress" role="tabpanel" aria-labelledby="list-InProgress-list"> <div id="inProgress"></div></div>
        </div>
     </div>
   </div>
 
+  <button type="button" class="btn btn-warning" data-dismiss="modal" onclick="load1()"
+          style="float: right; margin-top: 10px;margin-right: 10px">Check
+  </button>
 
 </div>
 
@@ -198,6 +152,164 @@
     event.target // newly activated tab
     event.relatedTarget // previous active tab
   })
+
+  // result = {
+  //   total: 3,
+  //   rows: [{
+  //     "id": 123,
+  //     "username": "",
+  //     "userAddressId": 123,
+  //     "state": 1,
+  //     "deliverymanId": 12,
+  //     "createTime": 1594966733594,
+  //     "pickupTime": 1594966733594,
+  //     "img":[null,],
+  //     "quantity":2,
+  //     "totalPrice":123,
+  //     "pickupTimeStr":"",
+  //   },{
+  //     "id": 123,
+  //     "username": "",
+  //     "userAddressId": 123,
+  //     "state": 1,
+  //     "deliverymanId": 12,
+  //     "createTime": 1594966733594,
+  //     "pickupTime": 1594966733594,
+  //     "img":["","img/defaultAvatar.png"],
+  //     "quantity":2,
+  //     "totalPrice":123,
+  //     "pickupTimeStr":"",
+  //   },{
+  //     "id": 123,
+  //     "username": "",
+  //     "userAddressId": 123,
+  //     "state": 0,
+  //     "deliverymanId": 12,
+  //     "createTime": 1594966733594,
+  //     "pickupTime": 1594966733594,
+  //     "img":["",""],
+  //     "quantity":2,
+  //     "totalPrice":123,
+  //     "pickupTimeStr":"",
+  //   }]
+  // }
+  function load(){
+      $.ajax({
+          type: "get",
+          url:"order/get",
+          contentType:"application/json",
+          success:function (result){
+            load1(result)
+          }
+      })
+  }
+
+  function load1(result){
+    let inProgress ="#inProgress";
+    let all = "#all";
+    for (let i=0;i<result.total;i++){
+      if (result.rows[i].state===1) orders(result.rows[i],all);
+      else orders(result.rows[i],inProgress);
+    }
+    alert("finish")
+
+  }
+  function orders(row,type){
+    let imgnum = row.img.length;
+    let img1="";
+    let img2="";
+    let img1Name="";
+    let img2Name="";
+    if ((row.img[0]===null||row.img[0]==="")&&(row.img[1]===null||row.img[1]==="")){
+      $(`<div class="card order1" style="width: 90%;position: relative;margin-bottom: 20px">
+                   <div class="dishPhoto card-img-top" style="width: 51%;padding: 10px 10px;height: 230px"></div>
+
+                   <div class="card-body" style="position: absolute;left: 53%">
+                   <h5 class="card-title">${row.id}</h5>
+                   <p class="card-text"> Time: ${row.time}</p>
+                   <p class="card-text"> Total Quantity: ${row.quantity}</p>
+                   <p class="card-text"> Total Price: ${row.totalPrice}</p>
+                   </div>
+                   <a class="btn  btn-warning finishbtn" herf="" role="button" style="position: absolute;left: 83%;bottom: 5%; font-size: 17px;width:15%">Order Detail</a>
+                   </div>`).insertBefore(type);
+    }else if ((row.img[1]===null||row.img[1]==="")&&(row.img[0]!==null||row.img[0]!=="")) {
+      img1 = row.img[0];
+      img1Name = "Dish1";
+      $(`<div class="card order1" style="width: 90%;position: relative;margin-bottom: 20px">
+                   <div class="dishPhoto card-img-top" style="width: 51%;padding: 10px 10px;height: 230px">
+                   <div class="dishPhoto1 float-left img-thumbnail" style="width: 42%; margin-right: 2%;height: 95%">
+                       <img src=${img1} style="width: 90%;height: 80%" >
+                       <p class="text-center" style="margin-top: 7px">${img1Name}</p>
+                   </div>
+                   </div>
+
+                   <div class="card-body" style="position: absolute;left: 53%">
+                   <h5 class="card-title">${row.id}</h5>
+                   <p class="card-text"> Time: ${row.time}</p>
+                   <p class="card-text"> Total Quantity: ${row.quantity}</p>
+                   <p class="card-text"> Total Price: ${row.totalPrice}</p>
+                   </div>
+                   <a class="btn  btn-warning finishbtn" herf="" role="button" style="position: absolute;left: 83%;bottom: 5%; font-size: 17px;width:15%">Order Detail</a>
+                   </div>`).insertBefore(type);
+
+    }
+    else if ((row.img[0]===null||row.img[0]==="")&&(row.img[1]!==null||row.img[1]!=="")) {
+        img1 = row.img[1];
+        img1Name = "Dish1";
+        $(`<div class="card order1" style="width: 90%;position: relative;margin-bottom: 20px">
+                   <div class="dishPhoto card-img-top" style="width: 51%;padding: 10px 10px;height: 230px">
+                   <div class="dishPhoto1 float-left img-thumbnail" style="width: 42%; margin-right: 2%;height: 95%">
+                       <img src=${img1} style="width: 90%;height: 80%" >
+                       <p class="text-center" style="margin-top: 7px">${img1Name}</p>
+                   </div>
+                   </div>
+
+                   <div class="card-body" style="position: absolute;left: 53%">
+                   <h5 class="card-title">${row.id}</h5>
+                   <p class="card-text"> Time: ${row.time}</p>
+                   <p class="card-text"> Total Quantity: ${row.quantity}</p>
+                   <p class="card-text"> Total Price: ${row.totalPrice}</p>
+                   </div>
+                   <a class="btn  btn-warning finishbtn" herf="" role="button" style="position: absolute;left: 83%;bottom: 5%; font-size: 17px;width:15%">Order Detail</a>
+                   </div>`).insertBefore(type);
+    }else {
+      img1 =row.img[0];
+      img1Name = "Dish1";
+      img2 = row.img[1];
+      img2Name = "Dish2";
+      $(`<div class="card order1" style="width: 90%;position: relative;margin-bottom: 20px">
+                   <div class="dishPhoto card-img-top" style="width: 51%;padding: 10px 10px;height: 250px">
+                   <div class="dishPhoto1 float-left img-thumbnail" style="width: 42%; margin-right: 2%;height: 90%">
+                       <img src=${img1} style="width: 90%;height: 80%" >
+                       <p class="text-center" style="margin-top: 7px">${img1Name}</p>
+                   </div>
+
+                   <div class="dishPhoto2 float-left img-thumbnail" style="width: 42%;height: 90%">
+                   <img src=${img2} style="width: 90%;height: 80%" >
+                   <p class="text-center" style="margin-top: 7px">${img2Name}</p>
+                   </div>
+                   <div class="float-right" style="margin-top: 20%;margin-left: 2%">
+                   <i class="bi bi-dot"></i><i class="bi bi-dot"></i><i class="bi bi-dot"></i>
+                   </div>
+                   </div>
+
+                   <div class="card-body" style="position: absolute;left: 53%">
+                   <h5 class="card-title">${row.id}</h5>
+                   <p class="card-text"> Time: ${row.time}</p>
+                   <p class="card-text"> Total Quantity: ${row.quantity}</p>
+                   <p class="card-text"> Total Price: ${row.totalPrice}</p>
+                   </div>
+                   <a class="btn  btn-warning finishbtn" herf="" role="button" style="position: absolute;left: 83%;bottom: 5%; font-size: 17px;width:15%">Order Detail</a>
+                   </div>`).insertBefore(type);
+    }
+
+  }
+
+  document.onload = function (){
+    setInterval(load,60000);
+  }
+
+
 </script>
 
 </html>
