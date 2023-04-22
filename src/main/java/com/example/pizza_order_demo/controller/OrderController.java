@@ -6,10 +6,9 @@ import com.example.pizza_order_demo.commons.constant.ErrorConstant;
 import com.example.pizza_order_demo.commons.constant.ResultConstant;
 import com.example.pizza_order_demo.exception.CURDException;
 import com.example.pizza_order_demo.model.*;
-import com.example.pizza_order_demo.service.DeliverymanService;
-import com.example.pizza_order_demo.service.OrderDetailService;
-import com.example.pizza_order_demo.service.OrderService;
-import com.example.pizza_order_demo.service.UserAddressService;
+import com.example.pizza_order_demo.service.*;
+import com.example.pizza_order_demo.utils.OrderUtil;
+import com.example.pizza_order_demo.utils.TimeUtils;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.lang3.ObjectUtils;
@@ -23,6 +22,8 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -40,9 +41,103 @@ public class OrderController {
     @Autowired
     private UserAddressService userAddressService;
 
+    @Autowired
+    private DishService dishService;
+
+
+    @GetMapping("/order/getOne")
+    @ResponseBody
+    public Result getOrder(int orderId){
+        if (orderId<0){
+            return new Result(ResultConstant.CODE_FAILED,"param is wrong",null);
+        }
+
+        Order order = orderService.selectByPrimaryKey(orderId);
+        if (ObjectUtils.isEmpty(order)){
+            return new Result(ResultConstant.CODE_FAILED,"order doesn't exist",null);
+        }
+        Result result = new Result(ResultConstant.CODE_SUCCESS,ResultConstant.MESSAGE_SUCCESS,order);
+        return result;
+    }
 
 
 
+    @GetMapping("/order/get")
+    @ResponseBody
+    public Object getOrder(){
+        String curUser = (String) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        OrderExample orderExample = new OrderExample();
+        orderExample.or().andUserNameEqualTo(curUser);
+        Map<String,Object> resultMap = new HashMap<>();
+        List<Order> orders = orderService.selectByExample(orderExample);
+        List<Integer> orderIds = null;
+        if (!ObjectUtils.isEmpty(orders)||orders.isEmpty()){
+            orderIds = OrderUtil.getIds(orders);
+        }
+        else {
+            resultMap.put("total",0);
+            return resultMap;
+        }
+
+        OrderDetailExample orderDetailExample = new OrderDetailExample();
+        orderDetailExample.or().andOrderIdIn(orderIds);
+        List<OrderDetail> orderDetailList = orderDetailService.selectByExample(orderDetailExample);
+        if (ObjectUtils.isEmpty(orderDetailList)||orderDetailList.isEmpty()){
+            resultMap.put("total",0);
+            return resultMap;
+        }
+        List<OrderDTO> orderDTOList = new ArrayList<>(orders.size());
+        for(int i=0;i<orders.size();i++){
+            int price = 0;
+            int quantity = 0;
+            OrderDTO orderDTO = new OrderDTO(orders.get(i));
+            String[] imgs = new String[2];
+            int count = 0;
+            for(int u=0;u<orderDetailList.size();u++){
+                if (orderDetailList.get(u).getOrderId()!=orders.get(i).getId()){continue;}
+                price+=orderDetailList.get(u).getTotalPrice();
+                quantity+=orderDetailList.get(u).getAmount();
+                if (count<2){
+                    imgs[count++] = orderDetailList.get(u).getImgs();
+                }
+            }
+            orderDTO.setPrice(price);
+            orderDTO.setQuantity(quantity);
+            orderDTO.setImgs(imgs);
+            orderDTO.setCreateTimeStr(TimeUtils.translateTimeToString(orderDTO.getCreateTime()));
+            orderDTO.setPickupTimeStr(TimeUtils.translateTimeToString(orderDTO.getPickupTime()));
+            if (!ObjectUtils.isEmpty(orderDTO.getFinishedTime())){
+                TimeUtils.translateTimeToString(orderDTO.getFinishedTime());
+            }
+            orderDTOList.add(orderDTO);
+        }
+
+        resultMap.put("total",orderDTOList.size());
+        resultMap.put("rows",orderDTOList);
+        return resultMap;
+    }
+
+    @GetMapping("/order/detail/get")
+    @ResponseBody
+    public Result getOrderDetail(int orderId){
+        if (orderId<0){
+            return new Result(ResultConstant.CODE_FAILED,"param is wrong",null);
+        }
+        OrderExample orderExample = new OrderExample();
+        orderExample.or().andIdEqualTo(orderId);
+        int count = orderService.countByExample(orderExample);
+        if (count<1){return new Result(ResultConstant.CODE_FAILED,"order not exist",null);}
+        OrderDetailExample orderDetailExample = new OrderDetailExample();
+        orderDetailExample.or().andOrderIdEqualTo(orderId);
+        List<OrderDetail> orderDetailList = orderDetailService.selectByExample(orderDetailExample);
+        if (ObjectUtils.isEmpty(orderDetailList)||orderDetailList.isEmpty()){
+            return new Result(ResultConstant.CODE_FAILED,"there is nothing in order",null);
+        }
+        Result result = new Result(ResultConstant.CODE_SUCCESS,ResultConstant.MESSAGE_SUCCESS,null);
+        result.setData(orderDetailList);
+        return result;
+
+    }
 
 
     @PostMapping("/order/create")
@@ -94,6 +189,7 @@ public class OrderController {
             orderDetail.setTopping(objectMapper.writeValueAsString(carItem.get("topping")));
             orderDetail.setTotalPrice((Integer) carItem.get("count")*(Integer) carItem.get("singlePrice"));
             orderDetail.setAmount((Integer) carItem.get("count"));
+            orderDetail.setImgs((String) carItem.get("img"));
             if (orderDetailService.insert(orderDetail)<1){
                 throw new CURDException();
             }

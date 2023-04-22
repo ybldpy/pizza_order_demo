@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <base href="../../static/" th:href="@{/}">
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <script src="js/header.js"></script>
+    <script src="js/footer.js"></script>
+    <script src="plugins/echarts.min.js"></script>
+</head>
+<style>
+    .chart-container {
+        width: 45%;
+        height: 40%;
+        margin-top: 2%;
+        position: absolute;
+        display: inline-block;
+    }
+</style>
+<body>
+
+<div id="messageContainer" style="width: 30%;margin-top: 1%;position: fixed;z-index: 1055;margin-left: 35%;top: 0">
+</div>
+<div class="chart-container">
+    <h5 style="margin-left: 3%">Cost chart</h5>
+    <div style="margin-left: 77%"><a class="btn-link btn">Download historical cost</a></div>
+    <div id="cost-chart" style="width: 100%;height: 100%;position: relative"></div>
+</div>
+<div class="chart-container" style="margin-left: 45%">
+    <h5 style="margin-left: 3%">Profit chart</h5>
+    <div style="margin-left: 77%"><a class="btn-link btn">Download historical profit</a></div>
+    <div id="profit-chart" style="width: 100%;height: 100%;position: relative;"></div>
+</div>
+<div class="chart-container" style="margin-top: 30%;width: 100%;height: 60%">
+    <h5 style="margin-left: 2%">Most popular food</h5>
+    <div id="food-chart" style="width: 100%;height: 100%;position: relative;">
+    </div>
+</div>
+
+
+<script>
+
+    function initCostContainer(chart){
+        let option = {
+            xAxis: {
+                name:"day",
+                data: ['Mon','Thue','Wes','Thur','Fri','Sat','Sun']
+            },
+            yAxis:{
+                name:"cost"
+            },
+            series: [
+                {
+                    data:[5000,3900,4500,6000,5500,6789,5642],
+                    type:"line",
+                    label:{
+                        show:true
+                    }
+                }
+            ]
+        };
+        chart.setOption(option);
+    }
+
+
+    function renderProfitChart(chart,data){
+
+        let x = [];
+        let y = [];
+        for(let i in data.data){
+            x.push(data.data[i].key);
+            y.push(data.data[i].value);
+        }
+        let option = {
+            xAxis: {
+                name:"day",
+                data:x
+            },
+            yAxis: {
+                name:"profit",
+            },
+            series: {
+                data:y,
+                type:"line",
+                label:{
+                    show:true
+                }
+            }
+        }
+        chart.setOption(option);
+    }
+    function initProfitChart(chart){
+        chart.showLoading();
+        $.ajax(
+            {
+                type:"get",
+                url:"statistic/profit", // 此接口只获取过去七天的订单数据
+                success:function (result){
+                    if (result==null||result==undefined){
+                        alertUtil.message("get profit data failed",dangerType,document.getElementById("messageContainer"));
+                        return;
+                    }
+                    chart.hideLoading();
+                    renderProfitChart(chart,result.data);
+                },
+                error:function (){
+                    chart.hideLoading();
+                    alertUtil.message("get profit data failed",dangerType,document.getElementById("messageContainer"));
+                }
+            }
+        )
+    }
+
+    function initChart(chart,url,renderFunc){
+        chart.showLoading();
+        $.ajax(
+            {
+                type:"get",
+                url:url,
+                success:function (result){
+                    if (result==null||result==undefined){
+                        alertUtil.message("get statistic data failed",dangerType,document.getElementById("messageContainer"));
+                        return;
+                    }
+                    chart.hideLoading();
+                    renderFunc(chart,result);
+                },
+                error:function (){
+                    chart.hideLoading();
+                    alertUtil.message("get profit data failed",dangerType,document.getElementById("messageContainer"));
+                }
+
+            }
+        )
+
+    }
+
+    function renderFoodChart(chart,data){
+        let x = [];
+        let y = [];
+        for(let i in data){
+            x.push(data[i].key);
+            y.push(data[i].value);
+        }
+        let option = {
+            xAxis:{
+                name:"food",
+                data:x
+            },
+            yAxis:{
+                name:"bought"
+            },
+            series:{
+                data:y,
+                type:"bar",
+                label:{
+                    show:true
+                }
+            }
+        }
+
+        chart.setOption(option);
+
+    }
+
+
+    $(function (){
+        let costChart = echarts.init(document.getElementById("cost-chart"));
+        let profitChar = echarts.init(document.getElementById("profit-chart"));
+        let foodChart = echarts.init(document.getElementById("food-chart"));
+        window.onresize = function (){
+            costChart.resize();
+            profitChar.resize();
+            foodChart.resize();
+        }
+        initCostContainer(costChart);
+        initChart(profitChar,"statistic/profit",renderProfitChart);
+        initChart(foodChart,"statistic/popularFood",renderFoodChart);
+
+
+    })
+</script>
+</body>
+</html>

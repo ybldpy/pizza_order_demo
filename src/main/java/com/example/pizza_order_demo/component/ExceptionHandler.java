@@ -22,6 +22,7 @@ public class ExceptionHandler {
     @org.springframework.web.bind.annotation.ExceptionHandler(value = CURDException.class)
     @ResponseBody
     public Result handleInternalException(Exception e){
+        e.printStackTrace();
         return new Result(ResultConstant.CODE_FAILED,e.getMessage(),null);
     }
 
