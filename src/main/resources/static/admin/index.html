@@ -162,18 +162,24 @@
                     },
                     {
                         id: '3',
-                        name: '订单明细',
-                        // url: 'order',
+                        name: 'Order management',
+                        url:"order/management/all",
                         children:[
                             {
                                 id:"4",
-                                name:"未处理订单",
+                                name:"Order to do",
                                 url:"order/todo"
                             },
                             {
+                                id:"10",
+                                name:"Order to delivery",
+                                url:"order/toDelivery"
+                            },
+
+                            {
                                 id:"5",
-                                name:"history order",
-                                url:"order/done"
+                                name:"History order",
+                                url:"order/history"
                             }
                         ],
                         icon: 'icon-order'
@@ -181,7 +187,7 @@
                     //   ],
                     // },
                 ],
-                // iframeUrl: 'page/member/list.html',
+                iframeUrl: 'admin/statistic',
                 headTitle: 'dashboard',
                 goBackFlag: false,
                 loading: true,

@@ -12,6 +12,7 @@ import com.example.pizza_order_demo.utils.TimeUtils;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.lang3.ObjectUtils;
+import org.apache.ibatis.javassist.NotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
@@ -60,7 +61,289 @@ public class OrderController {
         return result;
     }
 
+    @GetMapping("/order/confirmDelivery")
+    @ResponseBody
+    public Result ConfirmOrderDelivery(int orderId) throws NotFoundException {
 
+        Order order = orderService.selectByPrimaryKey(orderId);
+        if (ObjectUtils.isEmpty(order)){
+            throw new NotFoundException("order not find");
+        }
+
+        if (order.getType()!=1){
+            return new Result(ResultConstant.CODE_FAILED,"this order is not delivery",null);
+        }
+        if (order.getState()<1){
+            return new Result(ResultConstant.CODE_FAILED,"order hasn't finished yet",null);
+        }
+        order.setState(2);
+        int res = orderService.updateByPrimaryKey(order);
+        if (res<1){
+            return new Result(ResultConstant.CODE_FAILED,ResultConstant.MESSAGE_FAILED,null);
+        }
+        return new Result(ResultConstant.CODE_SUCCESS,ResultConstant.MESSAGE_SUCCESS,null);
+
+
+    }
+
+    @GetMapping("/order/todo")
+    public String orderTodo(){
+        return "admin/orderTodo";
+    }
+    @GetMapping("/order/toDelivery")
+    public String orderToDelivery(){
+        return "admin/orderToDelivery";
+    }
+    @GetMapping("/order/history")
+    public String orderHistory(){
+        return "admin/orderHistory";
+    }
+
+
+
+    @GetMapping("/order/detail/finish")
+    @ResponseBody
+    @Transactional(rollbackFor = Exception.class)
+    public Result finishDetail(int orderDetailId) throws NotFoundException {
+        OrderDetail orderDetail = orderDetailService.selectByPrimaryKey(orderDetailId);
+        if (ObjectUtils.isEmpty(orderDetail)){
+            return new Result(ResultConstant.CODE_FAILED,"order detail doesn't find",null);
+        }
+
+        orderDetail.setState(1);
+        int res = orderDetailService.updateByPrimaryKey(orderDetail);
+        if (res<1){
+            return new Result(ResultConstant.CODE_FAILED,"Finish failed",null);
+        }
+        OrderDetailExample orderDetailExample = new OrderDetailExample();
+        orderDetailExample.or().andOrderIdEqualTo(orderDetail.getOrderId());
+        List<OrderDetail> orderDetailList = orderDetailService.selectByExample(orderDetailExample);
+        boolean flag = true;
+        for(OrderDetail e:orderDetailList){
+            if (e.getState()!=1){
+                flag = false;
+                break;
+            }
+        }
+        Order order = orderService.selectByPrimaryKey(orderDetail.getOrderId());
+        if (ObjectUtils.isEmpty(order)){
+            throw new NotFoundException("order not find");
+        }
+        if (flag){
+            order.setId(orderDetail.getOrderId());
+            order.setState(1);
+            if (order.getType()==0){
+                order.setFinishedTime(System.currentTimeMillis());
+            }
+            res = orderService.updateByPrimaryKey(order);
+            if (res<1){
+                throw new CURDException();
+            }
+        }
+        return new Result(ResultConstant.CODE_SUCCESS,ResultConstant.MESSAGE_SUCCESS,null);
+    }
+
+    @GetMapping("/order/management/all")
+    public String getAllManagedOrder(){
+        return "admin/orders";
+    }
+
+    @GetMapping("/order/toDelivery/orders")
+    @ResponseBody
+    public Object toDeliveryOrders(){
+        OrderExample orderExample = new OrderExample();
+        orderExample.or().andStateEqualTo(1).andTypeEqualTo(1);
+        Map<String,Object> resultMap = new HashMap<>();
+        List<Order> orders = orderService.selectByExample(orderExample);
+        List<Integer> orderIds = null;
+        if (!ObjectUtils.isEmpty(orders)||orders.isEmpty()){
+            orderIds = OrderUtil.getIds(orders);
+        }
+        else {
+            resultMap.put("total",0);
+            return resultMap;
+        }
+
+        OrderDetailExample orderDetailExample = new OrderDetailExample();
+        orderDetailExample.or().andOrderIdIn(orderIds);
+        List<OrderDetail> orderDetailList = orderDetailService.selectByExample(orderDetailExample);
+        if (ObjectUtils.isEmpty(orderDetailList)||orderDetailList.isEmpty()){
+            resultMap.put("total",0);
+            return resultMap;
+        }
+        List<OrderDTO> orderDTOList = new ArrayList<>(orders.size());
+        for(int i=0;i<orders.size();i++){
+            int price = 0;
+            int quantity = 0;
+            OrderDTO orderDTO = new OrderDTO(orders.get(i));
+            if (!ObjectUtils.isEmpty(orderDTO.getDeliverymanId())){
+                orderDTO.setDeliveryman(deliverymanService.selectByPrimaryKey(orderDTO.getDeliverymanId()));
+            }
+            if (!ObjectUtils.isEmpty(orderDTO.getUserAddressId())){
+                orderDTO.setUserAddress(userAddressService.selectByPrimaryKey(orderDTO.getUserAddressId()));
+            }
+            orderDTO.setPrice(price);
+            orderDTO.setQuantity(quantity);
+            orderDTO.setCreateTimeStr(TimeUtils.translateTimeToString(orderDTO.getCreateTime()));
+            orderDTO.setPickupTimeStr(TimeUtils.translateTimeToString(orderDTO.getPickupTime()));
+            if (!ObjectUtils.isEmpty(orderDTO.getFinishedTime())){
+                orderDTO.setFinishedTimeStr(TimeUtils.translateTimeToString(orderDTO.getFinishedTime()));
+            }
+            orderDTOList.add(orderDTO);
+        }
+
+        resultMap.put("total",orderDTOList.size());
+        resultMap.put("rows",orderDTOList);
+        return resultMap;
+    }
+
+
+    @GetMapping("/order/history/orders")
+    @ResponseBody
+    public Object historyOrders(){
+        OrderExample orderExample = new OrderExample();
+        orderExample.or().andStateEqualTo(1).andTypeEqualTo(0);
+        orderExample.or().andStateEqualTo(2).andTypeEqualTo(1);
+        Map<String,Object> resultMap = new HashMap<>();
+        List<Order> orders = orderService.selectByExample(orderExample);
+        List<Integer> orderIds = null;
+        if (!ObjectUtils.isEmpty(orders)||orders.isEmpty()){
+            orderIds = OrderUtil.getIds(orders);
+        }
+        else {
+            resultMap.put("total",0);
+            return resultMap;
+        }
+
+        OrderDetailExample orderDetailExample = new OrderDetailExample();
+        orderDetailExample.or().andOrderIdIn(orderIds);
+        List<OrderDetail> orderDetailList = orderDetailService.selectByExample(orderDetailExample);
+        if (ObjectUtils.isEmpty(orderDetailList)||orderDetailList.isEmpty()){
+            resultMap.put("total",0);
+            return resultMap;
+        }
+        List<OrderDTO> orderDTOList = new ArrayList<>(orders.size());
+        for(int i=0;i<orders.size();i++){
+            int price = 0;
+            int quantity = 0;
+            OrderDTO orderDTO = new OrderDTO(orders.get(i));
+            if (!ObjectUtils.isEmpty(orderDTO.getDeliverymanId())){
+                orderDTO.setDeliveryman(deliverymanService.selectByPrimaryKey(orderDTO.getDeliverymanId()));
+            }
+            if (!ObjectUtils.isEmpty(orderDTO.getUserAddressId())){
+                orderDTO.setUserAddress(userAddressService.selectByPrimaryKey(orderDTO.getUserAddressId()));
+            }
+            orderDTO.setPrice(price);
+            orderDTO.setQuantity(quantity);
+            orderDTO.setCreateTimeStr(TimeUtils.translateTimeToString(orderDTO.getCreateTime()));
+            orderDTO.setPickupTimeStr(TimeUtils.translateTimeToString(orderDTO.getPickupTime()));
+            if (!ObjectUtils.isEmpty(orderDTO.getFinishedTime())){
+                orderDTO.setFinishedTimeStr(TimeUtils.translateTimeToString(orderDTO.getFinishedTime()));
+            }
+            orderDTOList.add(orderDTO);
+        }
+
+        resultMap.put("total",orderDTOList.size());
+        resultMap.put("rows",orderDTOList);
+        return resultMap;
+    }
+
+    @GetMapping("/order/todo/orders")
+    @ResponseBody
+    public Object todoOrders(){
+        OrderExample orderExample = new OrderExample();
+        orderExample.or().andStateEqualTo(0);
+        Map<String,Object> resultMap = new HashMap<>();
+        List<Order> orders = orderService.selectByExample(orderExample);
+        List<Integer> orderIds = null;
+        if (!ObjectUtils.isEmpty(orders)||orders.isEmpty()){
+            orderIds = OrderUtil.getIds(orders);
+        }
+        else {
+            resultMap.put("total",0);
+            return resultMap;
+        }
+
+        OrderDetailExample orderDetailExample = new OrderDetailExample();
+        orderDetailExample.or().andOrderIdIn(orderIds);
+        List<OrderDetail> orderDetailList = orderDetailService.selectByExample(orderDetailExample);
+        if (ObjectUtils.isEmpty(orderDetailList)||orderDetailList.isEmpty()){
+            resultMap.put("total",0);
+            return resultMap;
+        }
+        List<OrderDTO> orderDTOList = new ArrayList<>(orders.size());
+        for(int i=0;i<orders.size();i++){
+            int price = 0;
+            int quantity = 0;
+            OrderDTO orderDTO = new OrderDTO(orders.get(i));
+            if (!ObjectUtils.isEmpty(orderDTO.getDeliverymanId())){
+                orderDTO.setDeliveryman(deliverymanService.selectByPrimaryKey(orderDTO.getDeliverymanId()));
+            }
+            if (!ObjectUtils.isEmpty(orderDTO.getUserAddressId())){
+                orderDTO.setUserAddress(userAddressService.selectByPrimaryKey(orderDTO.getUserAddressId()));
+            }
+            orderDTO.setPrice(price);
+            orderDTO.setQuantity(quantity);
+            orderDTO.setCreateTimeStr(TimeUtils.translateTimeToString(orderDTO.getCreateTime()));
+            orderDTO.setPickupTimeStr(TimeUtils.translateTimeToString(orderDTO.getPickupTime()));
+            if (!ObjectUtils.isEmpty(orderDTO.getFinishedTime())){
+                orderDTO.setFinishedTimeStr(TimeUtils.translateTimeToString(orderDTO.getFinishedTime()));
+            }
+            orderDTOList.add(orderDTO);
+        }
+
+        resultMap.put("total",orderDTOList.size());
+        resultMap.put("rows",orderDTOList);
+        return resultMap;
+    }
+
+    @GetMapping("/order/management/get")
+    @ResponseBody
+    public Object manageOrders(){
+        OrderExample orderExample = new OrderExample();
+        Map<String,Object> resultMap = new HashMap<>();
+        List<Order> orders = orderService.selectByExample(orderExample);
+        List<Integer> orderIds = null;
+        if (!ObjectUtils.isEmpty(orders)||orders.isEmpty()){
+            orderIds = OrderUtil.getIds(orders);
+        }
+        else {
+            resultMap.put("total",0);
+            return resultMap;
+        }
+
+        OrderDetailExample orderDetailExample = new OrderDetailExample();
+        orderDetailExample.or().andOrderIdIn(orderIds);
+        List<OrderDetail> orderDetailList = orderDetailService.selectByExample(orderDetailExample);
+        if (ObjectUtils.isEmpty(orderDetailList)||orderDetailList.isEmpty()){
+            resultMap.put("total",0);
+            return resultMap;
+        }
+        List<OrderDTO> orderDTOList = new ArrayList<>(orders.size());
+        for(int i=0;i<orders.size();i++){
+            int price = 0;
+            int quantity = 0;
+            OrderDTO orderDTO = new OrderDTO(orders.get(i));
+            if (!ObjectUtils.isEmpty(orderDTO.getDeliverymanId())){
+                orderDTO.setDeliveryman(deliverymanService.selectByPrimaryKey(orderDTO.getDeliverymanId()));
+            }
+            if (!ObjectUtils.isEmpty(orderDTO.getUserAddressId())){
+                orderDTO.setUserAddress(userAddressService.selectByPrimaryKey(orderDTO.getUserAddressId()));
+            }
+            orderDTO.setPrice(price);
+            orderDTO.setQuantity(quantity);
+            orderDTO.setCreateTimeStr(TimeUtils.translateTimeToString(orderDTO.getCreateTime()));
+            orderDTO.setPickupTimeStr(TimeUtils.translateTimeToString(orderDTO.getPickupTime()));
+            if (!ObjectUtils.isEmpty(orderDTO.getFinishedTime())){
+                orderDTO.setFinishedTimeStr(TimeUtils.translateTimeToString(orderDTO.getFinishedTime()));
+            }
+            orderDTOList.add(orderDTO);
+        }
+
+        resultMap.put("total",orderDTOList.size());
+        resultMap.put("rows",orderDTOList);
+        return resultMap;
+    }
 
     @GetMapping("/order/get")
     @ResponseBody
@@ -91,8 +374,12 @@ public class OrderController {
             int price = 0;
             int quantity = 0;
             OrderDTO orderDTO = new OrderDTO(orders.get(i));
+            if (!ObjectUtils.isEmpty(orderDTO.getDeliverymanId())){
+                orderDTO.setDeliveryman(deliverymanService.selectByPrimaryKey(orderDTO.getDeliverymanId()));
+            }
             String[] imgs = new String[2];
             int count = 0;
+            // 获取前两张图片
             for(int u=0;u<orderDetailList.size();u++){
                 if (orderDetailList.get(u).getOrderId()!=orders.get(i).getId()){continue;}
                 price+=orderDetailList.get(u).getTotalPrice();
@@ -169,10 +456,11 @@ public class OrderController {
             if (!ObjectUtils.isEmpty(deliverymanList)&&!deliverymanList.isEmpty()){
                 Deliveryman deliveryman = deliverymanList.get((int)(System.currentTimeMillis())/deliverymanList.size());
                 newOrder.setDeliverymanId(deliveryman.getId());
-                newOrder.setType(1);
             }
+            newOrder.setType(1);
+            newOrder.setUserAddressId(addressId);
         }
-        else {newOrder.setType(1);}
+        else {newOrder.setType(0);}
         newOrder.setUserName((String) SecurityContextHolder.getContext().getAuthentication().getPrincipal());
         newOrder.setState(0);
         newOrder.setPaid(0);
@@ -202,8 +490,13 @@ public class OrderController {
         if (deliveryType!=0&&deliveryType!=1){
             return "415";
         }
+        String curUser = (String) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         model.addAttribute("shoppingCar",shoppingCar);
         model.addAttribute("deliveryType",deliveryType);
+
+        UserAddressExample userAddressExample = new UserAddressExample();
+        userAddressExample.or().andUserNameEqualTo(curUser);
+        model.addAttribute("addressList",userAddressService.selectByExample(userAddressExample));
         return "Payment/paymentpage";
     }
 }

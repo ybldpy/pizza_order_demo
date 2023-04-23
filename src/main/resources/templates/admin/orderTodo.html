@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <base href="../../static/" th:href="@{/}">
+    <meta charset="UTF-8">
+    <title>Order to do</title>
+    <script src="js/header.js"></script>
+    <link href="plugins/bootstrap-table/bootstrap-table.min.css" rel="stylesheet"/>
+    <link rel="stylesheet" href="font/fonts.css">
+    <script src="js/footer.js"></script>
+    <script src="plugins/bootstrap-table/bootstrap-table.min.js"></script>
+</head>
+<style type="text/css">
+    td{
+        word-break: break-all;
+        word-wrap: break-word;
+    }
+</style>
+<body>
+<div id="messageContainer" style="width: 30%;margin-top: 1%;position: fixed;z-index: 1055;margin-left: 35%;top: 0">
+
+</div>
+<div id="detail-container" class="modal" tabindex="-1" >
+
+    <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Order detail</h5>
+            </div>
+            <div class="modal-body">
+                <ul id="detail-list" class="list-group">
+
+                </ul>
+            </div>
+            <div class="modal-footer" style="width: 100%">
+                <button type="button" class="btn btn-secondary" onclick="$('#detail-container').modal('hide')">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<div style="margin-top: 5%;width: 95%;margin-left: 2.5%">
+    <!--    <div id="toolbar">-->
+    <!--        <span>-->
+    <!--            <button class="btn btn-danger" id="deleteBtn"><i class="bi bi-trash"></i>Delete</button>-->
+    <!--        </span>-->
+    <!--        <span><button class="btn btn-warning" id="stateBtn"><i class="bi bi-pen"></i> Change state</button></span>-->
+    <!--    </div>-->
+    <table id="orderTable"></table>
+</div>
+
+<script>
+
+    function getToppingStr(topping){
+        if (topping==null||topping==undefined||typeof topping!="object"){return "";}
+        let strList = [];
+        for(let key in topping){
+            strList.push(key+"x "+topping[key]);
+        }
+        return strList.join();
+    }
+
+    function finishOrderDetail($btn,row,data){
+        let html = $btn.text();
+        $.ajax(
+            {
+                url:"order/detail/finish?orderDetailId="+row.id,
+                type:"get",
+                beforeSend:function (){
+                    enableLoadingVideo($btn);
+                },
+                success:function (result){
+                    disableLoadingVideo($btn,html);
+                    if (result==null||result==undefined){
+                        alertUtil.message("Finish failed",dangerType,document.getElementById("messageContainer"));
+                        return;
+                    }
+                    if (result.code!=1){
+                        alertUtil.message(result.message==null||result.message==undefined?"Finish failed":result.message,dangerType,document.getElementById("messageContainer"));
+                        return;
+                    }
+                    $btn.parentsUntil("li").addClass("disabled");
+                    row["state"] = 1;
+                    $("#orderTable").bootstrapTable("refresh");
+                    renderOrderDetail(data);
+                },
+                error:function (){
+                    disableLoadingVideo($btn,html);
+                    alertUtil.message("Finish failed",dangerType,document.getElementById("messageContainer"));
+                }
+            }
+        )
+    }
+
+    function renderOrderDetail(data){
+        let $ul = $("#detail-list");
+        $ul.children("li").remove();
+        let rows = data
+        if (rows==null||rows==undefined){
+            return;
+        }
+        for(let i in rows){
+            let disabled = rows[i].state==1?"disabled":"";
+            let state = rows[i].state==0?"Cooking":"Finished";
+            let html = "<li class=\"list-group-item "+disabled+"\">\n" +
+                "                <div class=\"row\">\n" +
+                "                    <div class=\"col-sm-4 item-info\">\n" +
+                "                        <h5>Name: "+rows[i].dishName+"</h5>\n" +
+                "                        <div>Size: "+rows[i].size+"</div>\n" +
+                "                        <div>"+getToppingStr(rows[i].topping)+"</div>\n" +
+                "                        <h5>Quantity: "+rows[i].amount+"</h5>\n" +
+                "<div>State: "+state+"</div>\n"+
+                "                    </div>\n" +
+                "                    <div class=\"col-sm-8 operationContainer\">\n" +
+                "                    <span style=\"top:40%;position: absolute;left: 75%\">\n" +
+                "<button class='btn btn-warning finish-btn' "+(rows[i].state==0?"":"disabled")+">Finish</button>\n"+
+                "                    </span>\n" +
+                "                    </div>\n" +
+                "                </div>\n" +
+                "            </li>";
+            let $li = $(html);
+            $ul.append($li);
+            $li.find("button.finish-btn").on("click",function (){
+                finishOrderDetail($(this),rows[i],data);
+            })
+        }
+
+        $("#detail-container").modal({backdrop:false});
+    }
+
+    function checkOrderDetail(orderId){
+        if (detailList[orderId]!=undefined){renderOrderDetail(detailList[orderId]);return}
+
+        $.ajax(
+            {
+                type:"get",
+                url:"order/detail/get?orderId="+orderId,
+                success:function (result){
+                    if (result==null||result==undefined){
+                        alertUtil.message("Load detail failed",dangerType,document.getElementById("messageContainer"));
+                        return;
+                    }
+                    if (result.code!=1){
+                        alertUtil.message(result.message==null||result.message==undefined?"Load detail failed":result.message,dangerType,document.getElementById("messageContainer"));
+                    }
+                    for(let i in result.data){
+                        detailList[result.data[i].id] = result.data[i];
+                    }
+                    renderOrderDetail(result.data);
+                },
+                error:function (){
+                    alertUtil.message("Load detail failed",dangerType,document.getElementById("messageContainer"));
+                }
+            }
+        )
+    }
+
+    let detailList = {};
+
+    $(function (){
+
+        $("#detail-container").on("hide.bs.modal",function (){
+            $("#detail-list").children("li").remove();
+        })
+
+        $("#orderTable").bootstrapTable({
+            search:true,
+            url:"order/todo/orders",
+            columns:[
+                {
+                    field:"id",
+                    title:"Order id",
+                    searchable:true
+                },
+                {
+                    title:"Type",
+                    field:"type",
+                    formatter:function (value,row,index,field){
+                        if (value==1){
+                            return "delivery"
+                        }
+                        return "Dine-in"
+                    }
+                },
+                {
+                    title:"Create time",
+                    field: "createTimeStr",
+                },
+                {
+                    title: "Check detail",
+                    formatter:function (value,row,index,field){
+                        return "<button type='button' class='btn btn-warning' onclick='checkOrderDetail("+row.id+")'>check detail</button>"
+                    },
+                }
+            ]
+
+        });
+    });
+
+
+
+</script>
+</body>
+</html>

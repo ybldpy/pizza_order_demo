@@ -142,40 +142,9 @@
                         <li class="list-group-item list-group-item-action" th:each="address:${addressList}" >
                             <textarea class="address-id" hidden>[(${address.id})]</textarea>
                             <h5>Contact: [(${address.contact})]</h5>
-                            <h5>Phone: [(${address.contact})]</h5>
-                            <h5>Address: [(${address.contact})]</h5>
+                            <h5>Phone: [(${address.phone})]</h5>
+                            <h5>Address: [(${address.location})]</h5>
                         </li>
-                        <li class="list-group-item list-group-item-action" th:each="address:${addressList}">
-                            <textarea class="address-id" hidden>[(${address.id})]</textarea>
-                            <h5>Contact: [(${address.contact})]</h5>
-                            <h5>Phone: [(${address.contact})]</h5>
-                            <h5>Address: [(${address.contact})]</h5>
-                        </li>
-                        <li class="list-group-item list-group-item-action" th:each="address:${addressList}">
-                            <textarea class="address-id" hidden>[(${address.id})]</textarea>
-                            <h5>Contact: [(${address.contact})]</h5>
-                            <h5>Phone: [(${address.contact})]</h5>
-                            <h5>Address: [(${address.contact})]</h5>
-                        </li>
-                        <li class="list-group-item list-group-item-action" th:each="address:${addressList}" onclick="$(this).tab('show')">
-                            <textarea class="address-id" hidden>[(${address.id})]</textarea>
-                            <h5>Contact: [(${address.contact})]</h5>
-                            <h5>Phone: [(${address.contact})]</h5>
-                            <h5>Address: [(${address.contact})]</h5>
-                        </li>
-                        <li class="list-group-item list-group-item-action" th:each="address:${addressList}" onclick="$(this).tab('show')">
-                            <textarea class="address-id" hidden>[(${address.id})]</textarea>
-                            <h5>Contact: [(${address.contact})]</h5>
-                            <h5>Phone: [(${address.contact})]</h5>
-                            <h5>Address: [(${address.contact})]</h5>
-                        </li>
-                        <li class="list-group-item list-group-item-action" th:each="address:${addressList}" onclick="$(this).tab('show')">
-                            <textarea class="address-id" hidden>[(${address.id})]</textarea>
-                            <h5>Contact: [(${address.contact})]</h5>
-                            <h5>Phone: [(${address.contact})]</h5>
-                            <h5>Address: [(${address.contact})]</h5>
-                        </li>
-
                     </ul>
 
             </div>
@@ -586,7 +555,7 @@
                         alertUtil.message("address error",warningType,document.getElementById("messageContainer"));
                         return false;
                     }
-                    enableLoadingVideo();
+                    enableLoadingVideo($btn);
                     return true;
                 },
                 success:function (result) {

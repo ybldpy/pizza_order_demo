@@ -5,6 +5,7 @@ import com.example.pizza_order_demo.service.OrderDetailService;
 import com.example.pizza_order_demo.service.OrderService;
 import com.example.pizza_order_demo.service.PaymentService;
 import com.example.pizza_order_demo.utils.OrderUtil;
+import com.example.pizza_order_demo.utils.TimeUtils;
 import javafx.util.Pair;
 import org.apache.commons.lang3.ObjectUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -47,13 +48,8 @@ public class StatisticController {
     @GetMapping("/statistic/popularFood")
     @ResponseBody
     public Object getPopularFood(){
-        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
-        long cur = System.currentTimeMillis();
-        String curStr = simpleDateFormat.format(cur);
-        cur = Date.valueOf(curStr).getTime();
-        long severnDaysAgo = cur-7*24*60*60*1000;
+
         OrderExample orderExample = new OrderExample();
-        orderExample.or().andCreateTimeBetween(severnDaysAgo,cur+7*24*60*60*1000);
         List<Order> orderList = orderService.selectByExample(orderExample);
         List<Pair<String,Integer>> pairList = new ArrayList<>();
         if (ObjectUtils.isEmpty(orderList)||orderList.isEmpty()){
@@ -85,9 +81,8 @@ public class StatisticController {
     @GetMapping("/statistic/profit")
     @ResponseBody
     public Object getProfit() {
-        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
         long cur = System.currentTimeMillis();
-        String curStr = simpleDateFormat.format(cur);
+        String curStr = TimeUtils.translateTimeToString(cur,"yyyy-MM-dd");
         cur = Date.valueOf(curStr).getTime();
         long severnDaysAgo = cur-7*24*60*60*1000;
         long day = 24*60*60*1000;
@@ -112,7 +107,7 @@ public class StatisticController {
                     count+=p.getPrice();
                 }
             }
-            dateAndProfitList.add(new Pair<>(simpleDateFormat.format(severnDaysAgo+i*day),count));
+            dateAndProfitList.add(new Pair<>(TimeUtils.translateTimeToString(severnDaysAgo+i*day,"yyyy-MM-dd"),count));
         }
         resultMap.put("total",7);
         resultMap.put("data",dateAndProfitList);
