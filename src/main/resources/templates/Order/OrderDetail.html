@@ -239,6 +239,8 @@
                 <div id="States" style="margin-left: 10%">
                     <span class="orderState1 " id="making">In the making</span>
                     <span class="orderState1 order_active" id="finished">The meal is finished</span>
+                    <span class="orderState1 order_active" id="deliveryStateM">Under distribution</span>
+                    <span class="orderState1 order_active" id="deliveryStateC">Completed distribution</span>
                 </div>
 
                 <div class="orderList" id="item-3">
@@ -357,66 +359,76 @@
 
     let iorderId = -1;
     function check() {
-        // result = {
-        //     "code": 1,
-        //     "message": "OK",
-        //     data: {
-        //         "id": 123,
-        //         "userId": 123,
-        //         "user_address_id": 123,
-        //         "state": 1,
-        //         "deliverymanId": 12,
-        //         "createTime": 1594966733594,
-        //         "pickupTime": 1594966733594
-        //     }
-        // }
-        //
-        // orderDetail = [{
-        //     "orderId": 1,
-        //     "dishName": "pizza1",
-        //     "img": "1111111",
-        //     "size": "10",
-        //     "topping": {"a": 2},
-        //     "count": 2,
-        //     "singlePrice": 12,
-        //     "state":1
-        // },
-        //     {
-        //         "orderId": 2,
-        //         "dishName": "pizza2",
-        //         "img": "1111111",
-        //         "size": "10",
-        //         "topping": {"a": 2},
-        //         "count": 2,
-        //         "singlePrice": 12,
-        //         "state":0,
-        //     },
-        //     {
-        //         "orderId": 1,
-        //         "dishName": "pizza3",
-        //         "img": "1111111",
-        //         "size": "10",
-        //         "topping": {"a": 2},
-        //         "count": 2,
-        //         "singlePrice": 12,
-        //         "state":1
-        //     },
-        // ]
-        //
-        // deliveryman = {
-        //     "id":12,
-        //     "name": "Tom",
-        //     "phone": "13323434567"
-        // }
+        let result = {
+            "code": 1,
+            "message": "OK",
+            data: {
+                "id": 123,
+                "userId": 123,
+                "user_address_id": 123,
+                "state": 0,
+                "type": 1,
+                "deliverymanId": 12,
+                "createTime": 1594966733594,
+                "pickupTime": 1594966733594,
+                "paid":1,
+            }
+        }
+
+        let orderDetail = {
+            "code": 1,
+            "message": "OK",
+            data: [{
+                "orderId": 1,
+                "dishName": "pizza1",
+                "img": "1111111",
+                "size": "10",
+                "topping": {"a": 2},
+                "amount": 2,
+                "singlePrice": 12,
+                "state": 0
+            },
+                {
+                    "orderId": 2,
+                    "dishName": "pizza2",
+                    "img": "1111111",
+                    "size": "10",
+                    "topping": {"a": 2},
+                    "amount": 2,
+                    "singlePrice": 12,
+                    "state": 1,
+                },
+                {
+                    "orderId": 1,
+                    "dishName": "pizza3",
+                    "img": "1111111",
+                    "size": "10",
+                    "topping": {"a": 2},
+                    "amount": 2,
+                    "singlePrice": 12,
+                    "state": 1,
+                    "userAddress":"",
+                },
+            ],
+        }
+
+        let deliveryman = {
+            "code": 1,
+            "message": "OK",
+            data:{
+            "id":12,
+            "name": "Tom",
+            "phone": "13323434567"
+        }}
 
 
 
-        $.ajax({
-            type: "get",
-            url:"order/get?orderId="+isNaN(iorderId)?-1:iorderId,
-            contentType:"application/json",
-            success:function (result){
-                result = JSON.parse(result);
+        // $.ajax({
+        //     type: "get",
+        //     url:"order/get?orderId="+isNaN(iorderId)?-1:iorderId,
+        //     contentType:"application/json",
+        //     success:function (result){
+                // result = JSON.parse(result);
                 if (result === undefined||result===null){
                     alertUtil.message("server error","danger",$("#messageContainer"));
                 }
@@ -427,8 +439,8 @@
                     $("#QRcode2")[0].innerText = orderId;
 
                     let pay = $("#paid");
-                    if (result.data.paid === 0) pay.toggle("order_active")
-                    else pay.toggle("order_active")
+                    if (result.data.paid === 0) pay.removeClass("order_active")
+                    else pay.addClass("order_active")
 
                     let estimatedTime = $("#estimatedTime")
                     let time;
@@ -452,11 +464,11 @@
                         <li class="list-group-item" id="deliverymanPhone">Phone Number:</li>
                     </ul>
                 </div>`).insertAfter("#orderList")
-                        $.ajax({
-                            type: "get",
-                            url: "deliveryman/get?delivertmanId="+deliverymanID,
-                            success: function (deliveryman) {
-                                deliveryman = JSON.parse(deliveryman)
+                        // $.ajax({
+                        //     type: "get",
+                        //     url: "deliveryman/get?delivertmanId="+deliverymanID,
+                        //     success: function (deliveryman) {
+                                // deliveryman = JSON.parse(deliveryman)
                                 if (deliveryman === undefined || deliveryman === null) {
                                     alertUtil.message("server error", "danger", $("#messageContainer"));
                                 } else if (deliveryman.code !== 1) {
@@ -466,17 +478,18 @@
                                     deliverymanName.innerText = "Name : " + deliveryman.data.name
                                     let deliverymanPhone = $("#deliverymanPhone")[0]
                                     deliverymanPhone.innerText = "Phone Number:  " + deliveryman.data.phone
+
                                 }
-                            }
-                        });
+                            // }
+                        // });
                     }
 
 
-                   $.ajax({
-                        type:"get",
-                        url:"order/detail/get?orderId="+orderId,
-                        success: function (orderDetail){
-                            orderDetail = JSON.parse(orderDetail)
+                   // $.ajax({
+                   //      type:"get",
+                   //      url:"order/detail/get?orderId="+orderId,
+                   //      success: function (orderDetail){
+                            // orderDetail = JSON.parse(orderDetail)
                             if (orderDetail === undefined||orderDetail===null){
                                 alertUtil.message("server error","danger",$("#messageContainer"));
                             }
@@ -492,6 +505,7 @@
                                         count--;
                                         progressBar.style.width = Number(progressBar.style.width.substring(0,progressBar.style.width.indexOf("%")))+num+"%";
                                     }
+                                    totalPrice += orderDetail.data[i].singlePrice*orderDetail.data[i].amount;
                                     $(`<tr>
                                        <th scope="row">${i}</th>
                                        <td>${orderDetail.data[i].dishName}</td>
@@ -505,19 +519,34 @@
                                    <th scope="row"> </th>
                                    <td colspan="3"></td>
                                    <td ><strong>Total Price</strong></td>
-                                   <td ><strong>${orderDetail.data[i].totalPrice}</strong></td>
+                                   <td ><strong>${totalPrice}</strong></td>
                                    </tr>`).insertAfter("tbody");
 
-                                if (count === 0) {
-                                    $("#making").toggle("order_active");
-                                    $("#finished").toggle("order_active");
+
+                                if (orderType === 1 && count==0){
+                                    if (result.data.state===1){
+                                        $("#making").addClass("order_active");
+                                        $("#deliveryStateM").removeClass("order_active");
+                                    }
+                                    if (result.data.state===2){
+                                        $("#making").addClass("order_active");
+                                        $("#deliveryStateM").addClass("order_active");
+                                        $("#deliveryStateC").removeClass("order_active");
+                                    }
                                 }
+                                if (orderType === 0){
+                                    if (result.data.state===1 && count==0){
+                                        $("#making").addClass("order_active");
+                                        $("#finished").removeClass("order_active");
+                                    }
+                                }
+
                             }
                         }
-                    })
-                }
-            }
-        })
+        //             })
+        //         }
+        //     }
+        // })
     }
 
     document.onload = function (){
