@@ -289,9 +289,9 @@
                     <div style="height: 80px"></div>
                 </div>
 
-                <button type="button" class="btn btn-warning" data-dismiss="modal" onclick="check()"
-                        style="float: right; margin-top: 10px;margin-right: 10px">Check
-                </button>
+<!--                <button type="button" class="btn btn-warning" data-dismiss="modal" onclick="check()"-->
+<!--                        style="float: right; margin-top: 10px;margin-right: 10px">Check-->
+<!--                </button>-->
 
 
                 <div class="modal" tabindex="-1">
@@ -359,76 +359,76 @@
 
     let iorderId = -1;
     function check() {
-        let result = {
-            "code": 1,
-            "message": "OK",
-            data: {
-                "id": 123,
-                "userId": 123,
-                "user_address_id": 123,
-                "state": 0,
-                "type": 1,
-                "deliverymanId": 12,
-                "createTime": 1594966733594,
-                "pickupTime": 1594966733594,
-                "paid":1,
-            }
-        }
+        // let result = {
+        //     "code": 1,
+        //     "message": "OK",
+        //     data: {
+        //         "id": 123,
+        //         "userId": 123,
+        //         "user_address_id": 123,
+        //         "state": 0,
+        //         "type": 1,
+        //         "deliverymanId": 12,
+        //         "createTime": 1594966733594,
+        //         "pickupTime": 1594966733594,
+        //         "paid":1,
+        //     }
+        // }
+        //
+        // let orderDetail = {
+        //     "code": 1,
+        //     "message": "OK",
+        //     data: [{
+        //         "orderId": 1,
+        //         "dishName": "pizza1",
+        //         "img": "1111111",
+        //         "size": "10",
+        //         "topping": {"a": 2},
+        //         "amount": 2,
+        //         "singlePrice": 12,
+        //         "state": 0
+        //     },
+        //         {
+        //             "orderId": 2,
+        //             "dishName": "pizza2",
+        //             "img": "1111111",
+        //             "size": "10",
+        //             "topping": {"a": 2},
+        //             "amount": 2,
+        //             "singlePrice": 12,
+        //             "state": 1,
+        //         },
+        //         {
+        //             "orderId": 1,
+        //             "dishName": "pizza3",
+        //             "img": "1111111",
+        //             "size": "10",
+        //             "topping": {"a": 2},
+        //             "amount": 2,
+        //             "singlePrice": 12,
+        //             "state": 1,
+        //             "userAddress":"",
+        //         },
+        //     ],
+        // }
+        //
+        // let deliveryman = {
+        //     "code": 1,
+        //     "message": "OK",
+        //     data:{
+        //     "id":12,
+        //     "name": "Tom",
+        //     "phone": "13323434567"
+        // }}
 
-        let orderDetail = {
-            "code": 1,
-            "message": "OK",
-            data: [{
-                "orderId": 1,
-                "dishName": "pizza1",
-                "img": "1111111",
-                "size": "10",
-                "topping": {"a": 2},
-                "amount": 2,
-                "singlePrice": 12,
-                "state": 0
-            },
-                {
-                    "orderId": 2,
-                    "dishName": "pizza2",
-                    "img": "1111111",
-                    "size": "10",
-                    "topping": {"a": 2},
-                    "amount": 2,
-                    "singlePrice": 12,
-                    "state": 1,
-                },
-                {
-                    "orderId": 1,
-                    "dishName": "pizza3",
-                    "img": "1111111",
-                    "size": "10",
-                    "topping": {"a": 2},
-                    "amount": 2,
-                    "singlePrice": 12,
-                    "state": 1,
-                    "userAddress":"",
-                },
-            ],
-        }
-
-        let deliveryman = {
-            "code": 1,
-            "message": "OK",
-            data:{
-            "id":12,
-            "name": "Tom",
-            "phone": "13323434567"
-        }}
 
 
-
-        // $.ajax({
-        //     type: "get",
-        //     url:"order/get?orderId="+isNaN(iorderId)?-1:iorderId,
-        //     contentType:"application/json",
-        //     success:function (result){
-                // result = JSON.parse(result);
+        $.ajax({
+            type: "get",
+            url:"order/get?orderId="+isNaN(iorderId)?-1:iorderId,
+            contentType:"application/json",
+            success:function (result){
+                result = JSON.parse(result);
                 if (result === undefined||result===null){
                     alertUtil.message("server error","danger",$("#messageContainer"));
                 }
@@ -464,11 +464,11 @@
                         <li class="list-group-item" id="deliverymanPhone">Phone Number:</li>
                     </ul>
                 </div>`).insertAfter("#orderList")
-                        // $.ajax({
-                        //     type: "get",
-                        //     url: "deliveryman/get?delivertmanId="+deliverymanID,
-                        //     success: function (deliveryman) {
-                                // deliveryman = JSON.parse(deliveryman)
+                        $.ajax({
+                            type: "get",
+                            url: "deliveryman/get?delivertmanId="+deliverymanID,
+                            success: function (deliveryman) {
+                                deliveryman = JSON.parse(deliveryman)
                                 if (deliveryman === undefined || deliveryman === null) {
                                     alertUtil.message("server error", "danger", $("#messageContainer"));
                                 } else if (deliveryman.code !== 1) {
@@ -480,16 +480,16 @@
                                     deliverymanPhone.innerText = "Phone Number:  " + deliveryman.data.phone
 
                                 }
-                            // }
-                        // });
+                            }
+                        });
                     }
 
 
-                   // $.ajax({
-                   //      type:"get",
-                   //      url:"order/detail/get?orderId="+orderId,
-                   //      success: function (orderDetail){
-                            // orderDetail = JSON.parse(orderDetail)
+                   $.ajax({
+                        type:"get",
+                        url:"order/detail/get?orderId="+orderId,
+                        success: function (orderDetail){
+                            orderDetail = JSON.parse(orderDetail)
                             if (orderDetail === undefined||orderDetail===null){
                                 alertUtil.message("server error","danger",$("#messageContainer"));
                             }
@@ -543,10 +543,10 @@
 
                             }
                         }
-        //             })
-        //         }
-        //     }
-        // })
+                    })
+                }
+            }
+        })
     }
 
     document.onload = function (){
