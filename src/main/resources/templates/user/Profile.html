@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <base href="../../static/" th:href="@{/}">
+  <meta charset="UTF-8">
+  <title>Profile</title>
+  <script src="js/header.js"></script>
+  <link href="plugins/bootstrap-table/bootstrap-table.min.css" rel="stylesheet"/>
+  <link href="font/fonts.css" rel="stylesheet"/>
+  <script src="js/footer.js"></script>
+  <script src="plugins/bootstrap-table/bootstrap-table.min.js"></script>
+
+</head>
+<style>
+  body {
+    position: relative;
+  }
+
+  .color {
+    background-color: #FFBF3D !important;
+  }
+
+  a.color:focus, a.color:hover, button.color:focus, button.color:hover {
+    background-color: #DFB300 !important
+  }
+
+  .Big {
+    width: 95%;
+    margin-left: 2.5%;
+    margin-top: 80px;
+  }
+
+  #changeNamePage {
+    display: none;
+    background-color: white;
+    border-radius: 25px;
+    width: 50%;
+    height: 80%;
+    position: absolute;
+    right: 25%;
+    top: 10%;
+    border: 2px solid #FFBF3D;
+  }
+
+
+
+</style>
+<body th:style="'background-size: 100% 100%;background-image: url('+@{img/loginBack.jpg}+');background-repeat: no-repeat;background-position: center;background-attachment: fixed'"
+      style="background-size: 100% 100%;background-image: url('../../static/img/loginBack.jpg');background-repeat: no-repeat;background-position: center;background-attachment: fixed">
+<div id="header" class="fixed-top" >
+  <nav class="navbar navbar-expand-lg navbar-light color" style="max-height: 100px" >
+    <a class="navbar-brand color" href="#" style="height: 100%;padding: 0 0 ">
+      <img src="img/logo.png" alt="logo"  style="height: 40px;">
+    </a>
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarScroll" aria-controls="navbarScroll" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarScroll">
+      <ul class="navbar-nav mr-auto my-2 my-lg-0 navbar-nav-scroll" style="max-height: 100px;">
+        <li class="nav-item active">
+          <a class="nav-link" href="#">Home <span class="sr-only">(current)</span></a>
+        </li>
+        <li class="nav-item ">
+          <a class="nav-link" href="#">Menu</a>
+        </li>
+        <!--        <li class="nav-item dropdown">-->
+        <!--          <a class="nav-link dropdown-toggle" href="#" role="button" data-toggle="dropdown" aria-expanded="false">-->
+        <!--            Link-->
+        <!--          </a>-->
+        <!--          <ul class="dropdown-menu">-->
+        <!--            <li><a class="dropdown-item" href="#">Action</a></li>-->
+        <!--            <li><a class="dropdown-item" href="#">Another action</a></li>-->
+        <!--            <li><hr class="dropdown-divider"></li>-->
+        <!--            <li><a class="dropdown-item" href="#">Something else here</a></li>-->
+        <!--          </ul>-->
+        <!--        </li>-->
+        <!--        <li class="nav-item">-->
+        <!--          <a class="nav-link disabled">Link</a>-->
+        <!--        </li>-->
+      </ul>
+      <form class="d-flex" >
+        <input class="form-control mr-2" type="search" placeholder="Search" aria-label="Search">
+        <button class="btn btn-outline-secondary" type="submit" style="width: 130px"><i class="bi bi-search">&nbsp;Search</i> </button>
+      </form>
+      <div style="">
+        <ul class="navbar-nav mr-auto my-2 my-lg-0 navbar-nav-scroll" style="max-height: 100px;">
+          <li class="nav-item dropdown" style="">
+            <a class="nav-link dropdown-toggle" href="#" role="button" data-toggle="dropdown" aria-expanded="false">
+              Username
+            </a>
+            <ul class="dropdown-menu" >
+              <li><a class="dropdown-item" href="Order/All orders.html" th:href="@{Order/All orders.html}">
+                <i class="bi bi-list">&nbsp&nbsp</i>
+                All Orders</a></li>
+              <li><a class="dropdown-item" href="user/Profile.html" th:herf="@{user/Profile.html}">
+                <i class="bi bi-person-lines-fill">&nbsp&nbsp</i>
+                Profile</a></li>
+              <li><hr class="dropdown-divider"></li>
+              <li><a class="dropdown-item" href="#">
+                <i class="bi bi-box-arrow-right">&nbsp&nbsp</i>
+                Log out</a></li>
+            </ul>
+          </li>
+          <div class="brand" href="#" style="width: 40px;height: 40px;overflow: hidden;border-radius: 50%;float:right;box-shadow: 0 4px 8px rgba(0,0,0,.05);z-index: 1;">
+            <img src="img/defaultAvatar.png" alt="Default avatar" style="width: 40px;height: 40px;" >
+          </div>
+
+        </ul>
+      </div>
+
+
+    </div>
+  </nav>
+</div>
+<input type="number" id="orderId" th:value="${orderId}" hidden>
+<div class="Big">
+  <section class="individual">
+    <div class="card">
+      <div class="card-header"><h3>Personal information</h3></div>
+      <div class="card-body">
+        <blockquote class="blockquote mb-0">
+          <div class="float-left " style="width: 20%;">
+            <div class="brand" href="#" style="width: 80%;overflow: hidden;border-radius: 50%;box-shadow: 0 40px 80px rgba(0,0,0,.05);z-index: 1;margin: 20px 10% ">
+              <img src="img/defaultAvatar.png" alt="Default avatar" style="width: 100%;" >
+            </div>
+          </div>
+          <div class="float-right" style="width: 77%">
+            <ul class="list-group list-group-flush" style="font-size: 20px">
+              <li class="list-group-item" id="username" >
+                <div class="input-group mb-3">
+                  <div class="input-group-prepend">
+                    <span class="input-group-text" id="basic-addon1" style="font-size: 20px">Username</span>
+                  </div>
+                  <span type="text" class="form-control" placeholder="Username" aria-label="Username" aria-describedby="basic-addon1" style="font-size: 20px"></span>
+                </div>
+              </li>
+
+              <li class="list-group-item" id="email" >
+                <div class="input-group mb-3">
+                  <div class="input-group-prepend">
+                    <span class="input-group-text" id="basic-addon2" style="font-size: 20px">Email</span>
+                  </div>
+                  <span type="text" class="form-control" placeholder="email" aria-label="email" aria-describedby="basic-addon2" style="font-size: 20px"></span>
+                </div>
+              </li>
+
+              <li class="list-group-item" id="phoneNumber" >
+                <div class="input-group mb-3">
+                  <div class="input-group-prepend">
+                    <span class="input-group-text" id="basic-addon3" style="font-size: 20px">Phone Number</span>
+                  </div>
+                  <span type="text" class="form-control" placeholder="phoneNumber" aria-label="phoneNumber" aria-describedby="basic-addon3" style="font-size: 20px"></span>
+                </div>
+              </li>
+
+              <li class="list-group-item" id="wallet" >
+                <div class="input-group mb-3">
+                  <div class="input-group-prepend">
+                    <span class="input-group-text" id="basic-addon4" style="font-size: 20px">Wallet Amount</span>
+                  </div>
+                  <div class="input-group-prepend">
+                    <span class="input-group-text">$</span>
+                  </div>
+                  <span type="text" class="form-control" aria-label="Amount (to the nearest dollar)" style="font-size: 20px"></span>
+                  <div class="input-group-append">
+                    <span class="input-group-text">.00</span>
+                  </div>
+                </div>
+              </li>
+
+              <li class="list-group-item" id="address" >
+                <div class="input-group mb-3">
+                  <button class="btn btn-outline-secondary" type="button" id="button-addon1" style="font-size: 20px" href="#">Delivery Address</button>
+                </div>
+              </li>
+
+            </ul>
+          </div>
+        </blockquote>
+      </div>
+    </div>
+  </section>
+</div>
+
+
+
+</body>
+
+<script>
+
+
+
+
+</script>
+</html>
