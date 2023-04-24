@@ -14,6 +14,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.lang3.ObjectUtils;
 import org.apache.ibatis.javassist.NotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.transaction.annotation.Transactional;
@@ -23,6 +24,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import java.security.Principal;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -357,7 +359,8 @@ public class OrderController {
     @GetMapping("/order/get")
     @ResponseBody
     public Object getOrder(){
-        String curUser = (String) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        String curUser = principal instanceof String?"anonymousUser":((UserDetailsImpl)principal).getUsername();
         OrderExample orderExample = new OrderExample();
         orderExample.or().andUserNameEqualTo(curUser);
         Map<String,Object> resultMap = new HashMap<>();
@@ -498,7 +501,8 @@ public class OrderController {
         if (deliveryType!=0&&deliveryType!=1){
             return "415";
         }
-        String curUser = (String) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        String curUser = principal instanceof String?"anonymousUser":((UserDetailsImpl)principal).getUsername();
         model.addAttribute("shoppingCar",shoppingCar);
         model.addAttribute("deliveryType",deliveryType);
 

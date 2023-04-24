@@ -163,10 +163,10 @@
         let size_price = [];
         let items = $("#sizeAndPrice").find(".group-item");
         for(let i=0;i<items.length;i++){
-            let inputs = items.find("input");
+            let inputs = $(items[i]).find("input");
             let jsonObj = {};
-            jsonObj["size"] = inputs[i].value;
-            jsonObj["price"] = parseInt(inputs[i].value);
+            jsonObj["size"] = inputs[0].value;
+            jsonObj["price"] = parseInt(inputs[1].value);
             size_price.push(jsonObj);
         }
         dish["sizePrice"] = size_price;

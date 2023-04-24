@@ -3,10 +3,7 @@ package com.example.pizza_order_demo.controller;
 import com.example.pizza_order_demo.commons.constant.ErrorConstant;
 import com.example.pizza_order_demo.commons.constant.ResultConstant;
 import com.example.pizza_order_demo.exception.CURDException;
-import com.example.pizza_order_demo.model.User;
-import com.example.pizza_order_demo.model.UserAddress;
-import com.example.pizza_order_demo.model.UserAddressExample;
-import com.example.pizza_order_demo.model.UserExample;
+import com.example.pizza_order_demo.model.*;
 import com.example.pizza_order_demo.service.UserAddressService;
 import com.example.pizza_order_demo.service.UserService;
 import org.apache.commons.lang3.ObjectUtils;
@@ -40,7 +37,8 @@ public class UserAddressController {
     @ResponseBody
     public Result addAddress(UserAddress userAddress){
         if (StringUtils.isAnyBlank(userAddress.getLocation(),userAddress.getPhone(),userAddress.getContact())){return new Result(ResultConstant.CODE_FAILED,ErrorConstant.PARAM_MISSING,null);}
-        String curUser = (String) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        String curUser = principal instanceof String?"anonymousUser":((UserDetailsImpl)principal).getUsername();
         userAddress.setUserName(curUser);
         userAddress.setDeleted(0);
         int res = userAddressService.insert(userAddress);
@@ -72,7 +70,8 @@ public class UserAddressController {
     @GetMapping("/user/address/query")
     @ResponseBody
     public Object queryUserAddress(){
-        String curUser = (String) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        String curUser = principal instanceof String?"anonymousUser":((UserDetailsImpl)principal).getUsername();
         UserAddressExample userAddressExample = new UserAddressExample();
         userAddressExample.or().andDeletedEqualTo(0).andUserNameEqualTo(curUser);
         List<UserAddress> userAddresses = userAddressService.selectByExample(userAddressExample);
