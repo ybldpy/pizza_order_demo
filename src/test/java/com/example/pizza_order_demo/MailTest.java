@@ -14,9 +14,11 @@ import java.util.ArrayList;
 public class MailTest {
 
 
-
     @Test
-    public void testMail(){
+    public void testMail() {
 
     }
+
+
 }
+

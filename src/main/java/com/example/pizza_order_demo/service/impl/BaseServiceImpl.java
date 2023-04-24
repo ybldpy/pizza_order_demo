@@ -7,6 +7,9 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.ibatis.annotations.Param;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.SpringBootConfiguration;
+import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Service;
 
 import java.lang.reflect.InvocationTargetException;
@@ -21,6 +24,9 @@ public abstract class BaseServiceImpl<Mapper, Record, Example> implements BaseSe
     private Example EMPTY_EXAMPLE;
 
     public Mapper mapper;
+
+    @Autowired
+    private ApplicationContext applicationContext;
 
 
 
@@ -384,8 +390,9 @@ public abstract class BaseServiceImpl<Mapper, Record, Example> implements BaseSe
     @Override
     public void initMapper() {
         if (this.mapper == null) {
-            this.mapper = PizzaOrderDemoApplication.app.getBean(getMapperClass());
+            this.mapper = applicationContext.getBean(getMapperClass());
         }
+
     }
 
     /**
