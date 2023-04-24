@@ -98,6 +98,15 @@ public class OrderController {
     public String orderHistory(){
         return "admin/orderHistory";
     }
+    @GetMapping("/order/info")
+    public String orderInfo(int orderId,Model model){
+        model.addAttribute("orderId",orderId);
+        return "Order/OrderDetail";
+    }
+    @GetMapping("/order/all")
+    public String allOrder(){
+        return "Order/All orders";
+    }
 
 
 
@@ -423,7 +432,6 @@ public class OrderController {
         Result result = new Result(ResultConstant.CODE_SUCCESS,ResultConstant.MESSAGE_SUCCESS,null);
         result.setData(orderDetailList);
         return result;
-
     }
 
 

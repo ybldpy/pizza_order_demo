@@ -172,8 +172,8 @@
                             Username
                         </a>
                         <ul class="dropdown-menu">
-                            <li><a class="dropdown-item" href="../templates/OrderDetail/All orders.html"
-                                   th:href="@{/templates/Order/All orders.html}"">
+                            <li><a class="dropdown-item" href="OrderDetail/All orders.html"
+                                   th:href="@{/Order/All orders.html}">
                                 <i class="bi bi-list">&nbsp&nbsp</i>
                                 All Orders</a></li>
                             <li><a class="dropdown-item" href="#">
@@ -238,9 +238,9 @@
                 <div style="height: 30px"></div>
                 <div id="States" style="margin-left: 10%">
                     <span class="orderState1 " id="making">In the making</span>
-                    <span class="orderState1 order_active" id="finished">The meal is finished</span>
-                    <span class="orderState1 order_active" id="deliveryStateM">Under distribution</span>
-                    <span class="orderState1 order_active" id="deliveryStateC">Completed distribution</span>
+                    <span class="orderState1" style="display: none" id="finished">The cooking is finished</span>
+                    <span class="orderState1" style="display: none" id="deliveryStateM">Under distribution</span>
+                    <span class="orderState1" style="display: none" id="deliveryStateC">Completed distribution</span>
                 </div>
 
                 <div class="orderList" id="item-3">
@@ -266,7 +266,6 @@
 <!--                            <td>@mdo</td>-->
 <!--                            <td>@mdo</td>-->
 <!--                        </tr>-->
-
                         </tbody>
                     </table>
                 </div>
@@ -282,7 +281,7 @@
 
                 <div style="width: 110%; margin-top: 50px" id="item-4">
                     <button id="Postprandialbtn" type="button" class="btn btn-outline-warning"
-                            style="float:right;margin-top: 3%;font-size: 23px;">
+                            style="float:right;margin-top: 3%;font-size: 23px;" onclick="doComment()">
                         <i class="bi bi-card-text" style="font-size: 23px"></i>
                         &nbsp;Postprandial evaluation
                     </button>
@@ -339,6 +338,10 @@
         // popup1.style.display="block";
     }
 
+    function doComment(){
+        window.location.href = "comment/postprandialEvaluation?orderId="+$("#orderId").val()
+    }
+
     function QRcodePageclose() {
         var popup = document.getElementById("QRcodepage")
         // var popup1 = document.getElementById("QRcodepagemu")
@@ -358,6 +361,198 @@
 
 
     let iorderId = -1;
+
+    function renderOrderInfo(result){
+        let orderId = result.data.id;
+        $("#QRcode2")[0].innerText = orderId;
+
+        let pay = $("#paid");
+        if (result.data.paid === 0) pay.removeClass("order_active")
+        else pay.addClass("order_active")
+
+        let estimatedTime = $("#estimatedTime")
+        let time;
+        if (result.data.pickupTime!==result.data.createTime) time = result.data.pickupTime;
+        else time = result.data.createTime;
+        let totalSeconds = (time + 1200000)/1000;
+        let currentSeconds = totalSeconds % 60;
+        let currentMinutes = (totalSeconds / 60) % 60;
+        let currentHours = ((totalSeconds / 60) / 60 + 8) % 24;
+        let finalTime = parseInt(currentHours)+" : "+parseInt(currentMinutes)+" : "+parseInt(currentSeconds);
+        estimatedTime[0].innerText= finalTime;
+
+        let orderType = result.data.type;
+        let deliverymanID = result.data.deliverymanId;
+        if (orderType === 1){
+            $(` <div id="deliveryman" style="margin-top: 40px">
+                    <span style="font-size: 30px"><strong>Deliveryman</strong></span>
+                    <div style="height: 10px"></div>
+                    <ul class="list-group list-group-flush">
+                        <li class="list-group-item" id="deliverymanName">Name:</li>
+                        <li class="list-group-item" id="deliverymanPhone">Phone Number:</li>
+                    </ul>
+                </div>`).insertAfter("#orderList")
+            $.ajax({
+                type: "get",
+                url: "deliveryman/get?delivertmanId="+deliverymanID,
+                success: function (deliveryman) {
+                    deliveryman = JSON.parse(deliveryman)
+                    if (deliveryman === undefined || deliveryman === null) {
+                        alertUtil.message("server error", "danger", $("#messageContainer"));
+                    } else if (deliveryman.code !== 1) {
+                        alertUtil.message(deliveryman.message, "warning", $("#messageContainer"));
+                    } else {
+                        let deliverymanName = $("#deliverymanName")[0]
+                        deliverymanName.innerText = "Name : " + deliveryman.data.name
+                        let deliverymanPhone = $("#deliverymanPhone")[0]
+                        deliverymanPhone.innerText = "Phone Number:  " + deliveryman.data.phone
+                    }
+                }
+            });
+        }
+
+    }
+
+
+    function initOrder(){
+        $.ajax({
+            type: "get",
+            url:"order/getOne?orderId="+(isNaN(iorderId)?-1:iorderId),
+            contentType:"application/json",
+            success:function (result){
+                if (result === undefined||result===null){
+                    alertUtil.message("server error","danger",$("#messageContainer"));
+                    return;
+                }
+                else if (result.code!==1){
+                    alertUtil.message(result.message,"warning",$("#messageContainer"));
+                    return;
+                }
+            }
+        })
+    }
+
+    function updateOrderState(orderId){
+        $.ajax({
+            type: "get",
+            url:"order/getOne?orderId="+(isNaN(iorderId)?-1:iorderId),
+            contentType:"application/json",
+            success:function (result){
+                if (result === undefined||result===null){
+                    alertUtil.message("server error","danger",$("#messageContainer"));
+                    return;
+                }
+                else if (result.code!==1){
+                    alertUtil.message(result.message,"warning",$("#messageContainer"));
+                    return;
+                }
+                if ((result.data.state == 1&&result.data.type == 0)){
+                    $("#making").hide();
+                    $("#finished").show();
+                    if (updatePromise!=null){clearInterval(updatePromise);}
+                }
+                else if (result.data.state==1&&result.data.type ==1){
+                    if (updatePromise!=null){return;}
+                    $("#making").hide();
+                    $("#deliveryStateM").show();
+                    updatePromise = setInterval(function (){updateOrderState(orderId)},6000);
+                }
+                else if (result.data.state==2){
+                    $("#deliveryStateM").hide();
+                    $("#making").hide();
+                    $("#deliveryStateC").show();
+                    if (updatePromise!=null){clearInterval(updatePromise);}
+                }
+
+            }
+        })
+    }
+
+    function finished(orderDetail){
+        let count = 0;
+        for(let i in orderDetail.data){
+            if (orderDetail.data[i].state == 1){
+                count++;
+            }
+        }
+        return count==orderDetail.data.length;
+    }
+
+    function updateOrderInfo(orderId,result){
+        $.ajax({
+            type:"get",
+            url:"order/detail/get?orderId="+orderId,
+            success: function (orderDetail){
+                if (orderDetail === undefined||orderDetail===null){
+                    alertUtil.message("server error","danger",$("#messageContainer"));
+                }
+                else if (orderDetail.code!==1){
+                    alertUtil.message(orderDetail.message,"warning",$("#messageContainer"));
+                }else {
+                    if (finished(orderDetail)){
+                        if (updatePromise!=null){
+
+                            clearInterval(updatePromise)
+                            updatePromise = null;
+                            updateOrderState(orderId);
+                        }
+                    }
+                    let count = orderDetail.data.length;
+                    let num = 100 / count;
+                    let progressBar = $("#progressBar")[0]
+                    let totalPrice = 0;
+                    $("#orderList").find(".food-item").remove();
+                    for (let i = 0; i < orderDetail.data.length; i++) {
+
+                        if (orderDetail.data[i].state === 1) {
+                            count--;
+                            progressBar.style.width = Number(progressBar.style.width.substring(0,progressBar.style.width.indexOf("%")))+num+"%";
+                        }
+                        let itemPrice = orderDetail.data[i].totalPrice;
+                        totalPrice+=itemPrice;
+                        // totalPrice += orderDetail.data[i].singlePrice*orderDetail.data[i].amount;
+                        $(`<tr class="food-item">
+                                       <th scope="row">${i}</th>
+                                       <td>${orderDetail.data[i].dishName}</td>
+                                       <td>${getToppingStr(orderDetail.data[i].topping)}</td>
+                                       <td>${orderDetail.data[i].size}</td>
+                                       <td>${orderDetail.data[i].amount}</td>
+                                       <td>${itemPrice}</td>
+                                       </tr>`).insertBefore("tbody");
+                    }
+                    $(`<tr class="food-item">
+                                   <th scope="row"> </th>
+                                   <td colspan="3"></td>
+                                   <td ><strong>Total Price</strong></td>
+                                   <td ><strong>${totalPrice}</strong></td>
+                                   </tr>`).insertAfter("tbody");
+
+
+                    // if (result.data.type === 1 && count==0){
+                    //     if (result.data.state===1){
+                    //         $("#making").addClass("order_active");
+                    //         $("#deliveryStateM").removeClass("order_active");
+                    //     }
+                    //     if (result.data.state===2){
+                    //         $("#making").addClass("order_active");
+                    //         $("#deliveryStateM").addClass("order_active");
+                    //         $("#deliveryStateC").removeClass("order_active");
+                    //     }
+                    // }
+                    // if (result.data.type === 0){
+                    //     if (result.data.state===1 && count==0){
+                    //         $("#making").addClass("order_active");
+                    //         $("#finished").removeClass("order_active");
+                    //     }
+                    // }
+                }
+            }
+        })
+
+    }
+
+    let updatePromise = null;
+
     function check() {
         // let result = {
         //     "code": 1,
@@ -425,134 +620,142 @@
 
         $.ajax({
             type: "get",
-            url:"order/get?orderId="+isNaN(iorderId)?-1:iorderId,
+            url:"order/getOne?orderId="+(isNaN(iorderId)?-1:iorderId),
             contentType:"application/json",
             success:function (result){
-                result = JSON.parse(result);
                 if (result === undefined||result===null){
                     alertUtil.message("server error","danger",$("#messageContainer"));
+                    return;
                 }
                 else if (result.code!==1){
                     alertUtil.message(result.message,"warning",$("#messageContainer"));
+                    return;
                 }else {
-                    let orderId = result.data.id;
-                    $("#QRcode2")[0].innerText = orderId;
-
-                    let pay = $("#paid");
-                    if (result.data.paid === 0) pay.removeClass("order_active")
-                    else pay.addClass("order_active")
-
-                    let estimatedTime = $("#estimatedTime")
-                    let time;
-                    if (result.data.pickupTime!==result.data.createTime) time = result.data.pickupTime;
-                    else time = result.data.createTime;
-                    let totalSeconds = (time + 1200000)/1000;
-                    let currentSeconds = totalSeconds % 60;
-                    let currentMinutes = (totalSeconds / 60) % 60;
-                    let currentHours = ((totalSeconds / 60) / 60 + 8) % 24;
-                    let finalTime = parseInt(currentHours)+" : "+parseInt(currentMinutes)+" : "+parseInt(currentSeconds);
-                    estimatedTime[0].innerText= finalTime;
-
-                    let orderType = result.data.type;
-                    let deliverymanID = result.data.deliverymanId;
-                    if (orderType === 1){
-                        $(` <div id="deliveryman" style="margin-top: 40px">
-                    <span style="font-size: 30px"><strong>Deliveryman</strong></span>
-                    <div style="height: 10px"></div>
-                    <ul class="list-group list-group-flush">
-                        <li class="list-group-item" id="deliverymanName">Name:</li>
-                        <li class="list-group-item" id="deliverymanPhone">Phone Number:</li>
-                    </ul>
-                </div>`).insertAfter("#orderList")
-                        $.ajax({
-                            type: "get",
-                            url: "deliveryman/get?delivertmanId="+deliverymanID,
-                            success: function (deliveryman) {
-                                deliveryman = JSON.parse(deliveryman)
-                                if (deliveryman === undefined || deliveryman === null) {
-                                    alertUtil.message("server error", "danger", $("#messageContainer"));
-                                } else if (deliveryman.code !== 1) {
-                                    alertUtil.message(deliveryman.message, "warning", $("#messageContainer"));
-                                } else {
-                                    let deliverymanName = $("#deliverymanName")[0]
-                                    deliverymanName.innerText = "Name : " + deliveryman.data.name
-                                    let deliverymanPhone = $("#deliverymanPhone")[0]
-                                    deliverymanPhone.innerText = "Phone Number:  " + deliveryman.data.phone
-
-                                }
-                            }
-                        });
-                    }
-
-
-                   $.ajax({
-                        type:"get",
-                        url:"order/detail/get?orderId="+orderId,
-                        success: function (orderDetail){
-                            orderDetail = JSON.parse(orderDetail)
-                            if (orderDetail === undefined||orderDetail===null){
-                                alertUtil.message("server error","danger",$("#messageContainer"));
-                            }
-                            else if (orderDetail.code!==1){
-                                alertUtil.message(orderDetail.message,"warning",$("#messageContainer"));
-                            }else {
-                                let count = orderDetail.data.length;
-                                let num = 100 / count;
-                                let progressBar = $("#progressBar")[0]
-                                let totalPrice = 0;
-                                for (let i = 0; i < orderDetail.data.length; i++) {
-                                    if (orderDetail.data[i].state === 1) {
-                                        count--;
-                                        progressBar.style.width = Number(progressBar.style.width.substring(0,progressBar.style.width.indexOf("%")))+num+"%";
-                                    }
-                                    totalPrice += orderDetail.data[i].singlePrice*orderDetail.data[i].amount;
-                                    $(`<tr>
-                                       <th scope="row">${i}</th>
-                                       <td>${orderDetail.data[i].dishName}</td>
-                                       <td>${getToppingStr(orderDetail.data[i].topping)}</td>
-                                       <td>${orderDetail.data[i].size}</td>
-                                       <td>${orderDetail.data[i].amount}</td>
-                                       <td>${orderDetail.data[i].singlePrice}</td>
-                                       </tr>`).insertBefore("tbody");
-                                }
-                                $(`<tr>
-                                   <th scope="row"> </th>
-                                   <td colspan="3"></td>
-                                   <td ><strong>Total Price</strong></td>
-                                   <td ><strong>${totalPrice}</strong></td>
-                                   </tr>`).insertAfter("tbody");
+                    renderOrderInfo(result);
+                    updateOrderInfo(result.data.id,result);
+                    updatePromise = setInterval(function (){
+                        updateOrderInfo(result.data.id,result);
+                    },6000)
+                //     let orderId = result.data.id;
+                //     $("#QRcode2")[0].innerText = orderId;
+                //
+                //     let pay = $("#paid");
+                //     if (result.data.paid === 0) pay.removeClass("order_active")
+                //     else pay.addClass("order_active")
+                //
+                //     let estimatedTime = $("#estimatedTime")
+                //     let time;
+                //     if (result.data.pickupTime!==result.data.createTime) time = result.data.pickupTime;
+                //     else time = result.data.createTime;
+                //     let totalSeconds = (time + 1200000)/1000;
+                //     let currentSeconds = totalSeconds % 60;
+                //     let currentMinutes = (totalSeconds / 60) % 60;
+                //     let currentHours = ((totalSeconds / 60) / 60 + 8) % 24;
+                //     let finalTime = parseInt(currentHours)+" : "+parseInt(currentMinutes)+" : "+parseInt(currentSeconds);
+                //     estimatedTime[0].innerText= finalTime;
+                //
+                //     let orderType = result.data.type;
+                //     let deliverymanID = result.data.deliverymanId;
+                //     if (orderType === 1){
+                //         $(` <div id="deliveryman" style="margin-top: 40px">
+                //     <span style="font-size: 30px"><strong>Deliveryman</strong></span>
+                //     <div style="height: 10px"></div>
+                //     <ul class="list-group list-group-flush">
+                //         <li class="list-group-item" id="deliverymanName">Name:</li>
+                //         <li class="list-group-item" id="deliverymanPhone">Phone Number:</li>
+                //     </ul>
+                // </div>`).insertAfter("#orderList")
+                //         $.ajax({
+                //             type: "get",
+                //             url: "deliveryman/get?delivertmanId="+deliverymanID,
+                //             success: function (deliveryman) {
+                //                 deliveryman = JSON.parse(deliveryman)
+                //                 if (deliveryman === undefined || deliveryman === null) {
+                //                     alertUtil.message("server error", "danger", $("#messageContainer"));
+                //                 } else if (deliveryman.code !== 1) {
+                //                     alertUtil.message(deliveryman.message, "warning", $("#messageContainer"));
+                //                 } else {
+                //                     let deliverymanName = $("#deliverymanName")[0]
+                //                     deliverymanName.innerText = "Name : " + deliveryman.data.name
+                //                     let deliverymanPhone = $("#deliverymanPhone")[0]
+                //                     deliverymanPhone.innerText = "Phone Number:  " + deliveryman.data.phone
+                //
+                //                 }
+                //             }
+                //         });
+                //     }
 
 
-                                if (orderType === 1 && count==0){
-                                    if (result.data.state===1){
-                                        $("#making").addClass("order_active");
-                                        $("#deliveryStateM").removeClass("order_active");
-                                    }
-                                    if (result.data.state===2){
-                                        $("#making").addClass("order_active");
-                                        $("#deliveryStateM").addClass("order_active");
-                                        $("#deliveryStateC").removeClass("order_active");
-                                    }
-                                }
-                                if (orderType === 0){
-                                    if (result.data.state===1 && count==0){
-                                        $("#making").addClass("order_active");
-                                        $("#finished").removeClass("order_active");
-                                    }
-                                }
-
-                            }
-                        }
-                    })
+                   // $.ajax({
+                   //      type:"get",
+                   //      url:"order/detail/get?orderId="+orderId,
+                   //      success: function (orderDetail){
+                   //          if (orderDetail === undefined||orderDetail===null){
+                   //              alertUtil.message("server error","danger",$("#messageContainer"));
+                   //          }
+                   //          else if (orderDetail.code!==1){
+                   //              alertUtil.message(orderDetail.message,"warning",$("#messageContainer"));
+                   //          }else {
+                   //              let count = orderDetail.data.length;
+                   //              let num = 100 / count;
+                   //              let progressBar = $("#progressBar")[0]
+                   //              let totalPrice = 0;
+                   //              for (let i = 0; i < orderDetail.data.length; i++) {
+                   //                  if (orderDetail.data[i].state === 1) {
+                   //                      count--;
+                   //                      progressBar.style.width = Number(progressBar.style.width.substring(0,progressBar.style.width.indexOf("%")))+num+"%";
+                   //                  }
+                   //                  totalPrice += orderDetail.data[i].singlePrice*orderDetail.data[i].amount;
+                   //                  $("#food-list").children("tr").remove();
+                   //                  $(`<tr>
+                   //                     <th scope="row">${i}</th>
+                   //                     <td>${orderDetail.data[i].dishName}</td>
+                   //                     <td>${getToppingStr(orderDetail.data[i].topping)}</td>
+                   //                     <td>${orderDetail.data[i].size}</td>
+                   //                     <td>${orderDetail.data[i].amount}</td>
+                   //                     <td>${orderDetail.data[i].singlePrice}</td>
+                   //                     </tr>`).insertBefore("tbody");
+                   //              }
+                   //              $(`<tr>
+                   //                 <th scope="row"> </th>
+                   //                 <td colspan="3"></td>
+                   //                 <td ><strong>Total Price</strong></td>
+                   //                 <td ><strong>${totalPrice}</strong></td>
+                   //                 </tr>`).insertAfter("tbody");
+                   //
+                   //
+                   //              if (orderType === 1 && count==0){
+                   //                  if (result.data.state===1){
+                   //                      $("#making").addClass("order_active");
+                   //                      $("#deliveryStateM").removeClass("order_active");
+                   //                  }
+                   //                  if (result.data.state===2){
+                   //                      $("#making").addClass("order_active");
+                   //                      $("#deliveryStateM").addClass("order_active");
+                   //                      $("#deliveryStateC").removeClass("order_active");
+                   //                  }
+                   //              }
+                   //              if (orderType === 0){
+                   //                  if (result.data.state===1 && count==0){
+                   //                      $("#making").addClass("order_active");
+                   //                      $("#finished").removeClass("order_active");
+                   //                  }
+                   //              }
+                   //
+                   //          }
+                   //      }
+                   //  })
                 }
             }
         })
     }
 
-    document.onload = function (){
+    $(function (){
         iorderId = parseInt($("#orderId").val());
-        setInterval(check,60000);
-    }
+        // check();
+        // setInterval(check,60000);
+        check()
+    })
 
 
 </script>

@@ -90,6 +90,10 @@
         $("#detail-container").modal({backdrop:false});
     }
 
+    function goComment(orderId){
+        window.open("comment/commentResult?orderId="+orderId);
+    }
+
     function checkOrderDetail(orderId){
         if (detailList[orderId]!=undefined){renderOrderDetail(detailList[orderId]);return}
 
@@ -185,6 +189,13 @@
                         return "<button type='button' class='btn btn-warning' onclick='checkOrderDetail("+row.id+")'>check detail</button>"
                     },
                     clickToSelect:false
+                },
+                {
+                    title:"Comment",
+                    formatter:function (value,row,index,field){
+                        return "<button type='button' class='btn btn-warning' onclick='goComment("+row.id+")'>check detail</button>"
+                    },
+                    clickToSelect: false
                 }
             ]
 
@@ -215,7 +226,7 @@
                 },
                 error:function (){
                     disableLoadingVideo($btn,html);
-                    alertUtil.message("Confim failed",dangerType,document.getElementById("messageContainer"));
+                    alertUtil.message("Confirm failed",dangerType,document.getElementById("messageContainer"));
                 }
             }
         )

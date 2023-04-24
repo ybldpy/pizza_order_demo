@@ -81,7 +81,7 @@
               Username
             </a>
             <ul class="dropdown-menu" >
-              <li><a class="dropdown-item" href="../templates/OrderDetail/All orders.html" th:href="@{/templates/Order/All orders.html}"">
+              <li><a class="dropdown-item" href="order/all">
                 <i class="bi bi-list">&nbsp&nbsp</i>
                 All Orders</a></li>
               <li><a class="dropdown-item" href="#">
@@ -197,7 +197,6 @@
       $.ajax({
           type: "get",
           url:"order/get",
-          contentType:"application/json",
           success:function (result){
             load1(result)
           }
@@ -208,19 +207,18 @@
     let inProgress ="#inProgress";
     let all = "#all";
     for (let i=0;i<result.total;i++){
-      if (result.rows[i].state===1) orders(result.rows[i],all);
+      if (result.rows[i].state===1||result.rows[i].state==2) orders(result.rows[i],all);
       else orders(result.rows[i],inProgress);
     }
     alert("finish")
 
   }
   function orders(row,type){
-    let imgnum = row.img.length;
     let img1="";
     let img2="";
     let img1Name="";
     let img2Name="";
-    if ((row.img[0]===null||row.img[0]==="")&&(row.img[1]===null||row.img[1]==="")){
+    if ((row.imgs[0]===null||row.imgs[0]==="")&&(row.imgs[1]===null||row.imgs[1]==="")){
       $(`<div class="card order1" style="width: 90%;position: relative;margin-bottom: 20px">
                    <div class="dishPhoto card-img-top" style="width: 51%;padding: 10px 10px;height: 230px"></div>
 
@@ -230,10 +228,10 @@
                    <p class="card-text"> Total Quantity: ${row.quantity}</p>
                    <p class="card-text"> Total Price: ${row.totalPrice}</p>
                    </div>
-                   <a class="btn  btn-warning finishbtn" herf="" role="button" style="position: absolute;left: 83%;bottom: 5%; font-size: 17px;width:15%">Order Detail</a>
+                   <a class="btn  btn-warning finishbtn" href="order/info?orderId=${row.id}" role="button" style="position: absolute;left: 83%;bottom: 5%; font-size: 17px;width:15%">Order Detail</a>
                    </div>`).insertBefore(type);
-    }else if ((row.img[1]===null||row.img[1]==="")&&(row.img[0]!==null||row.img[0]!=="")) {
-      img1 = row.img[0];
+    }else if ((row.imgs[1]===null||row.imgs[1]==="")&&(row.imgs[0]!==null||row.imgs[0]!=="")) {
+      img1 = row.imgs[0];
       img1Name = "Dish1";
       $(`<div class="card order1" style="width: 90%;position: relative;margin-bottom: 20px">
                    <div class="dishPhoto card-img-top" style="width: 51%;padding: 10px 10px;height: 230px">
@@ -249,12 +247,12 @@
                    <p class="card-text"> Total Quantity: ${row.quantity}</p>
                    <p class="card-text"> Total Price: ${row.totalPrice}</p>
                    </div>
-                   <a class="btn  btn-warning finishbtn" herf="" role="button" style="position: absolute;left: 83%;bottom: 5%; font-size: 17px;width:15%">Order Detail</a>
+                   <a class="btn  btn-warning finishbtn" href="order/info?orderId=${row.id}" role="button" style="position: absolute;left: 83%;bottom: 5%; font-size: 17px;width:15%">Order Detail</a>
                    </div>`).insertBefore(type);
 
     }
-    else if ((row.img[0]===null||row.img[0]==="")&&(row.img[1]!==null||row.img[1]!=="")) {
-        img1 = row.img[1];
+    else if ((row.imgs[0]===null||row.imgs[0]==="")&&(row.imgs[1]!==null||row.imgs[1]!=="")) {
+        img1 = row.imgs[1];
         img1Name = "Dish1";
         $(`<div class="card order1" style="width: 90%;position: relative;margin-bottom: 20px">
                    <div class="dishPhoto card-img-top" style="width: 51%;padding: 10px 10px;height: 230px">
@@ -270,12 +268,12 @@
                    <p class="card-text"> Total Quantity: ${row.quantity}</p>
                    <p class="card-text"> Total Price: ${row.totalPrice}</p>
                    </div>
-                   <a class="btn  btn-warning finishbtn" herf="" role="button" style="position: absolute;left: 83%;bottom: 5%; font-size: 17px;width:15%">Order Detail</a>
+                   <a class="btn  btn-warning finishbtn" href="order/info?orderId=${row.id}" role="button" style="position: absolute;left: 83%;bottom: 5%; font-size: 17px;width:15%">Order Detail</a>
                    </div>`).insertBefore(type);
     }else {
-      img1 =row.img[0];
+      img1 =row.imgs[0];
       img1Name = "Dish1";
-      img2 = row.img[1];
+      img2 = row.imgs[1];
       img2Name = "Dish2";
       $(`<div class="card order1" style="width: 90%;position: relative;margin-bottom: 20px">
                    <div class="dishPhoto card-img-top" style="width: 51%;padding: 10px 10px;height: 250px">
@@ -299,15 +297,15 @@
                    <p class="card-text"> Total Quantity: ${row.quantity}</p>
                    <p class="card-text"> Total Price: ${row.totalPrice}</p>
                    </div>
-                   <a class="btn  btn-warning finishbtn" herf="" role="button" style="position: absolute;left: 83%;bottom: 5%; font-size: 17px;width:15%">Order Detail</a>
+                   <a class="btn  btn-warning finishbtn" href="order/info?orderId=${row.id}" role="button" style="position: absolute;left: 83%;bottom: 5%; font-size: 17px;width:15%">Order Detail</a>
                    </div>`).insertBefore(type);
     }
 
   }
 
-  document.onload = function (){
-    setInterval(load,60000);
-  }
+  $(function (){
+    load();
+  })
 
 
 </script>

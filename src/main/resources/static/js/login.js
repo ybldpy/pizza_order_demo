@@ -37,7 +37,13 @@ function login(){
                     alertUtil.message(result.message,"warning",$("#messageContainer"));
                 }
                 else {
-                    window.location.href = result.data;
+                    let manager = document.getElementById("manager").checked;
+                    if (manager){
+                        window.location.href = "admin/index"
+                    }
+                    else {
+                        window.location.href = "index";
+                    }
                 }
             },
             error:function (){

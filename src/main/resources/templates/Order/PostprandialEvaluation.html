@@ -110,7 +110,7 @@
 
 
   </style>
-  <body th:style="'background-size: 100% 100%;background-image: url('+@{img/loginBack.jpg}+');background-repeat: no-repeat;background-position: center;background-attachment: fixed'" style="background-size: 100% 100%;background-image: url('../../static/img/loginBack.jpg');background-repeat: no-repeat;background-position: center;background-attachment: fixed">
+  <body style="background-size: 100% 100%;background-image: url('img/loginBack.jpg');background-repeat: no-repeat;background-position: center;background-attachment: fixed">
   <div id="header" class="fixed-top" >
       <nav class="navbar navbar-expand-lg navbar-light color" style="height-max: 100px" >
           <a class="navbar-brand color" href="#" style="height: 100%;padding: 0 0 ">
@@ -153,7 +153,7 @@
                               Username
                           </a>
                           <ul class="dropdown-menu" >
-                              <li><a class="dropdown-item" href="../templates/OrderDetail/All orders.html" th:href="@{/templates/Order/All orders.html}"">
+                              <li><a class="dropdown-item" href="order/all">
                                   <i class="bi bi-list">&nbsp&nbsp</i>
                                   All Orders</a></li>
                               <li><a class="dropdown-item" href="#">
@@ -430,6 +430,7 @@
               </div>
           </div>
       </div>
+  <input id="orderId" th:value="${orderId}" hidden/>
   </body>
 
 <script>
@@ -493,15 +494,16 @@
         data.push(messageAnswerList);
 
         let commentData ={
-            orderid: 1, //orderID
+            orderId: parseInt($("#orderId").val()), //orderID
             remark:data,
         };
 
         $.ajax(
             {
-                type: "Post",
-                url:"Postprandial evaluation",
+                type: "post",
+                url:"comment/postprandialEvaluation",
                 data: JSON.stringify(commentData),
+                contentType:"application/json",
                 beforeSend:function (){
                     let canSend = true
                     if (data.at(0).length!==5) {
@@ -525,10 +527,10 @@
                     }
                     else if (result.code!==1){
                         alertUtil.message(result.message,"warning",$("#messageContainer"));
-                    }else window.location.href= "/OrderDetail.html"
+                    }else window.location.href= "index";
                 },
                 error:function (){
-                    // alertUtil.message("server error","danger",$("#messageContainer"));
+                    alertUtil.message("server error","danger",$("#messageContainer"));
                 }
             })
     }

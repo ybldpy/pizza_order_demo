@@ -111,9 +111,13 @@
 
 </style>
 <body>
+<input type="number" th:value="${orderId}" hidden>
+<div id="messageContainer" style="width: 30%;margin-top: 1%;position: fixed;z-index: 1055;margin-left: 35%;top: 0">
+
+</div>
 <div class="Big">
   <p2 class="title"> <strong>Postprandial evaluation
-    <a class="btn  btn-warning" href="#" role="button" style="float: right;margin-top: 20px; font-size: 20px">Finish</a>
+<!--    <a class="btn  btn-warning" href="#" role="button" style="float: right;margin-top: 20px; font-size: 20px">Finish</a>-->
   </strong></p2>
   <hr class="dropdown-divider" style="border-top: 3px solid #FFBF3D; ">
   <div style="height: 15px;"></div>
@@ -356,7 +360,7 @@
       </div>
     </div>
   </div>
-  <a class="btn  btn-warning"  role="button" style="float: right;margin-top: 20px; font-size: 20px;margin-bottom: 20px" href="#">Next</a>
+<!--  <a class="btn  btn-warning"  role="button" style="float: right;margin-top: 20px; font-size: 20px;margin-bottom: 20px" href="#">Next</a>-->
 
 </div>
 </body>
@@ -364,22 +368,7 @@
 <script>
 
 
-  $('#myList a').on('click', function (event) {
-    event.preventDefault()
-    $(this).tab('show')
-  })
-
-  $('a[data-toggle="list"]').on('shown.bs.tab', function (event) {
-    event.target // newly activated tab
-    event.relatedTarget // previous active tab
-  })
-
-    let qData = {
-      orderid: 1, //orderID
-      remark:[["A","B","C","D","C"],[["A","C"],["B","C","D"],["B","C","D",{"G":true,"text":"asddddddddddddddd"}],["B","C","D"],["B","C","D"]],["aaabfhdg"]],
-    }
-
-    // alert(qData.remark[0][1])
+  function renderResult(qData){
     for (let i = 0;i<qData.remark[0].length;i++){
       let question = $("#RadioQuestion"+(i+1));
       let item = question.find("input[value='"+qData.remark[0][i]+"']")
@@ -415,6 +404,50 @@
     let item = $('.textq1');
     // alert(qData.remark[2])
     item[0].innerText = qData.remark[2]
+
+  }
+
+
+  $(function (){
+
+    $('#myList a').on('click', function (event) {
+      event.preventDefault()
+      $(this).tab('show')
+    })
+
+    $('a[data-toggle="list"]').on('shown.bs.tab', function (event) {
+      event.target // newly activated tab
+      event.relatedTarget // previous active tab
+    })
+
+    let orderId = parseInt($("#orderId").val());
+    $.ajax(
+            {
+              type:"post",
+              url:"comment/commentResult?orderId="+isNaN(orderId)?-1:orderId,
+              success:function (result){
+                if (result == null||result==undefined){
+                  alertUtil.message("Load data failed",dangerType,document.getElementById("messageContainer"));
+                  return;
+                }
+                if (result.code!=1){
+                  alertUtil.message(result.message==null?"Load data failed":result.message,dangerType,document.getElementById("messageContainer"));
+                  return;
+                }
+                let remark = JSON.parse(result.data.remark)
+                renderResult(remark);
+              },
+              error:function (){
+                alertUtil.message("Load data failed",dangerType,document.getElementById("messageContainer"));
+              }
+
+            }
+    )
+
+    // alert(qData.remark[0][1])
+
+
+  });
 
 
 

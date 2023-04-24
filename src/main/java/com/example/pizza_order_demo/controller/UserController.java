@@ -42,10 +42,10 @@ public class UserController {
     private RoleService roleService;
     @Autowired
     private UserRoleService userRoleService;
-
     private ConcurrentHashMap<String,String> codeMap = new ConcurrentHashMap<>();
     @Autowired
     private PasswordEncoder passwordEncoder;
+
     private static final long duration = 1*1000*60*5;
     private static final String MAIL_POSTFIX_REGISTER = "register";
     private static final String MAIL_POSTFIX_RESET = "reset";
@@ -246,6 +246,8 @@ public class UserController {
     public Object createResetCode(Integer uid){
         return null;
     }
+
+
 
 
 
