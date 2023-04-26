@@ -22,6 +22,13 @@
         .yellow-active{
             background: #FFCB62;
         }
+        .color {
+            background-color: #FFBF3D !important;
+        }
+
+        a.color:focus, a.color:hover, button.color:focus, button.color:hover {
+            background-color: #DFB300 !important
+        }
     </style>
 </head>
 <body style="background-size: 100% 100%;background-image: url('img/loginBack.jpg');background-repeat: no-repeat;background-position: center;background-attachment: fixed">
@@ -29,8 +36,8 @@
 <input type="number" id="deliveryType" th:value="${deliveryType}" hidden/>
 <div id="messageContainer" style="width: 30%;margin-top: 1%;position: fixed;z-index: 1055;margin-left: 35%;top: 0">
 </div>
-<div id="header" class="fixed-top">
-    <nav class="navbar navbar-expand-lg navbar-light color" style="height-max: 100px" >
+<div id="header" class="fixed-top" >
+    <nav class="navbar navbar-expand-lg navbar-light color" style="max-height: 100px" >
         <a class="navbar-brand color" href="#" style="height: 100%;padding: 0 0 ">
             <img src="img/logo.png" alt="logo"  style="height: 40px;">
         </a>
@@ -42,28 +49,8 @@
                 <li class="nav-item active">
                     <a class="nav-link" href="#">Home <span class="sr-only">(current)</span></a>
                 </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="#">Link</a>
-                </li>
-                <li class="nav-item dropdown">
-                    <a class="nav-link dropdown-toggle" href="#" role="button" data-toggle="dropdown" aria-expanded="false">
-                        Link
-                    </a>
-                    <ul class="dropdown-menu">
-                        <li><a class="dropdown-item" href="#">Action</a></li>
-                        <li><a class="dropdown-item" href="#">Another action</a></li>
-                        <li><hr class="dropdown-divider"></li>
-                        <li><a class="dropdown-item" href="#">Something else here</a></li>
-                    </ul>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link disabled">Link</a>
-                </li>
             </ul>
-            <form class="d-flex">
-                <input class="form-control mr-2" type="search" placeholder="Search" aria-label="Search">
-                <button class="btn btn-outline-success" type="submit">Search</button>
-            </form>
+            
             <div style="">
                 <ul class="navbar-nav mr-auto my-2 my-lg-0 navbar-nav-scroll" style="max-height: 100px;">
                     <li class="nav-item dropdown" style="">
@@ -71,14 +58,14 @@
                             Username
                         </a>
                         <ul class="dropdown-menu" >
-                            <li><a class="dropdown-item" href="../templates/OrderDetail/All orders.html" th:href="@{/Order/All orders.html}">
+                            <li><a class="dropdown-item" href="Order/All orders.html" th:href="@{/order/all}">
                                 <i class="bi bi-list">&nbsp&nbsp</i>
                                 All Orders</a></li>
-                            <li><a class="dropdown-item" href="#">
+                            <li><a class="dropdown-item" href="user/Profile.html" th:href="@{/user/profile}">
                                 <i class="bi bi-person-lines-fill">&nbsp&nbsp</i>
                                 Profile</a></li>
                             <li><hr class="dropdown-divider"></li>
-                            <li><a class="dropdown-item" href="#">
+                            <li><a class="dropdown-item" href="logout">
                                 <i class="bi bi-box-arrow-right">&nbsp&nbsp</i>
                                 Log out</a></li>
                         </ul>
@@ -333,7 +320,13 @@
 
     function payment(){
 
-        if (shoppingCar.length<1){return;}
+        if (shoppingCar.length<1){alertUtil.message("Please select at least one food",warningType,document.getElementById("messageContainer"));return;}
+        let count = 0
+        for(let i in shoppingCar){
+            count+=shoppingCar[i].count
+            if (count>=1){break;}
+        }
+        if (count<1){alertUtil.message("Please select at least one food",warningType,document.getElementById("messageContainer"));return;}
         let form = document.createElement("form");
         form.method = "post";
         form.action = "order/payment";
@@ -520,7 +513,7 @@
         $("#cur-price")[0].innerText = "$ "+price;
     }
     function isNan(val){
-        return val!==val;
+        return isNaN(val);
     }
     function minusTopping(foodItem,toppingElement){
         let count = $(toppingElement).siblings("span.count");

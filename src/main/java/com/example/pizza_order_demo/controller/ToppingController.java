@@ -97,6 +97,9 @@ public class ToppingController {
         }
         ToppingExample toppingExample = new ToppingExample();
         toppingExample.or().andIdIn(ids);
+        if (toppingService.countByExample(toppingExample)!= ids.size()){
+            return new Result(ResultConstant.CODE_FAILED,"Some toppings don't find",null);
+        }
         Topping updateTopping = new Topping();
         updateTopping.setDeleted(1);
         int res  =toppingService.updateByExampleSelective(updateTopping,toppingExample);

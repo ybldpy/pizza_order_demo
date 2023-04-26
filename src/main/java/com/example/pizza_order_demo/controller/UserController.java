@@ -62,10 +62,6 @@ public class UserController {
     public Result loginSuccess(Authentication authentication){
         return new Result(ResultConstant.CODE_SUCCESS,ResultConstant.MESSAGE_SUCCESS,UserUtil.hasRole(SecurityContextHolder.getContext().getAuthentication(),UserConstant.ROLE_ADMIN)?UserConstant.PAGE_INDEX_ADMIN:UserConstant.PAGE_INDEX_CUSTOMER);
     }
-    @RequestMapping("/one")
-    public String a(){
-        return "admin/one";
-    }
 
     @GetMapping("/index")
     public String getIndexPage(){
@@ -88,7 +84,6 @@ public class UserController {
     @ResponseBody
     public Result test(String param1,String param2){
         return new Result(ResultConstant.CODE_FAILED,ErrorConstant.MAIL_EMPTY,new String[]{param1,param2});
-
     }
 
     @GetMapping("/forget/username")
@@ -109,7 +104,7 @@ public class UserController {
         String code = MailUtil.createValidationCode(6);
         // send code
         boolean res = true;
-        //res = MailUtil.sendCode(code,mail);
+        res = MailUtil.sendCode(code,mail);
         if (!res){
             return new Result(ResultConstant.CODE_FAILED,ErrorConstant.CODE_SEND_ERROR,null);
         }

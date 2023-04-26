@@ -75,7 +75,7 @@
                             Username
                         </a>
                         <ul class="dropdown-menu" >
-                            <li><a class="dropdown-item" href="order/all" th:href="@{/order/all}"">
+                            <li><a class="dropdown-item" href="order/all" th:href="@{/order/all}">
                                 <i class="bi bi-list">&nbsp&nbsp</i>
                                 All Orders</a></li>
                             <li><a class="dropdown-item" href="#">
@@ -108,37 +108,16 @@
                     <div style="margin: 20%"></div>
                     <div class="card fat">
                         <div class="card-body">
-                            <h3 class="card-title">Reset your password</h3>
+                            <h3 class="card-title">Pay</h3>
                             <hr class="dropdown-divider" style="border-top: 1px solid; ">
-                            <form id="resetForm" class="my-login-validation" novalidate="" style="margin-top: 20px">
+                            <form id="pay-form" class="my-login-validation" novalidate="" style="margin-top: 20px">
+                                <input name="orderId" th:value="${orderId}" hidden/>
                                 <div class="form-group">
-                                    <label for="password">Old Password
-                                    </label>
-                                    <input id="password" type="password" class="form-control" name="oldPassword" required data-eye>
-                                    <div class="invalid-feedback">
-                                        The length of password is 5-16 and only letters and numbers are allowed to appear in password
-                                    </div>
+                                    <span class="form-control" readonly>$ [${price}]</span>
                                 </div>
-
-                                <div class="form-group">
-                                    <label for="password">New Password</label>
-                                    <input id="resetPassword" type="password" class="form-control" name="password" required data-eye>
-                                    <div class="invalid-feedback">
-                                        The length of password is 5-16 and only letters and numbers are allowed to appear in password
-                                    </div>
-                                </div>
-
-                                <div class="form-group">
-                                    <label for="password">Repeat your New Password</label>
-                                    <input id="repeatResetPassword" type="password" class="form-control" required data-eye>
-                                    <div class="invalid-feedback">
-                                        Repeat password must be same as password
-                                    </div>
-                                </div>
-
                                 <div class="form-group m-0">
-                                    <button type="button" id="resetBtn" class="btn btn-primary btn-block submitBtn" style="background-color: #FFCB62">
-                                        Reset
+                                    <button type="button" id="pay-btn" class="btn btn-primary btn-block submitBtn" style="background-color: #FFCB62">
+                                        Pay
                                     </button>
                                 </div>
                             </form>
@@ -151,64 +130,40 @@
 
 </div>
 <script>
-
-    const messageContainer = document.getElementById("messageContainer");
-
-
-
-    function doReset(){
-        let $form = $("#resetForm");
-        let $btn = $(this);
-        let html = $btn.text();
-        $.ajax(
-            {
-                type:"post",
-                url:"user/resetPassword",
-                data:$form.serialize(),
-                beforeSend:function (){
-                    let canSend = true;
-                    let old = $form.find("input[name='oldPassword']");
-                    if (!checkPassword(old.val())){
-                        canSend = false;
-                        old.siblings(".invalid-feedback").show();
-                    }
-                    let password = $form.find("input[name='password']");
-                    if (!checkPassword(password.val())){
-                        canSend = false;
-                        password.siblings(".invalid-feedback").show()
-                    }
-                    let rpw = $form.find('#repeatResetPassword');
-                    if (rpw.val()!==password.val()){
-                        rpw.siblings(".invalid-feedback").show();
-                        canSend = false
-                    }
-                    if (canSend){
-                        enableLoadingVideo($btn);
-                    }
-                    return canSend;
-                },
-                success:function (result){
-                    disableLoadingVideo($btn,html);
-                    if (result.code!=1){
-                        alertUtil.message(result.message==null?"Reset failed":result.message,dangerType,messageContainer);
-                        return;
-                    }
-                    window.location.href = "logout";
-                },
-                error:function (){
-                    disableLoadingVideo($btn,html);
-                    alertUtil.message("Reset failed",dangerType,messageContainer);
-                }
-            }
-        )
-
-    }
-
     $(function (){
-        $("#resetForm").find("input").on("input",function (){
-            $(this).siblings(".invalid-feedback").hide();
+        $("#pay-btn").click(function (){
+            let $form = $("#pay-form");
+            let $btn = $(this);
+            let html = $btn.text();
+            $.ajax(
+                {
+                    type:"post",
+                    url:"pay/order",
+                    data:$form.serialize(),
+                    beforeSend:function (){
+                        let id = $form.find("input[name='orderId']").val();
+                        if (isNaN(id)){
+                            alertUtil.message("Order id error",warningType,document.getElementById("messageContainer"));
+                            return false;
+                        }
+                        enableLoadingVideo($btn);
+                    },
+                    success:function (result){
+                        disableLoadingVideo($btn,html);
+                        $btn[0].disabled = true;
+                        if (result.code!=1){
+                            alertUtil.message(result.message==null?"Pay failed":result.message,dangerType,document.getElementById("messageContainer"));
+                            return;
+                        }
+                        window.location.href = "order/info?orderId="+$form.find("input[name='orderId']").val();
+                    },
+                    error:function (){
+                        disableLoadingVideo($btn,html);
+                        alertUtil.message("Pay failed",warningType,document.getElementById("messageContainer"));
+                    }
+                }
+            )
         })
-        $("#resetBtn").click(doReset);
     })
 </script>
 

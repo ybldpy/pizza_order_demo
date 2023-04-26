@@ -63,22 +63,44 @@ public class OrderController {
         return result;
     }
 
+
+    /**
+     *
+     * @param orderId id of order
+     * @return if success then returning success result, otherwise return failed result
+     * @throws NotFoundException
+     *
+     * set delivering order state to finished state
+     */
     @GetMapping("/order/confirmDelivery")
     @ResponseBody
     public Result ConfirmOrderDelivery(int orderId) throws NotFoundException {
-
+        /**
+         * check if order exist
+         */
         Order order = orderService.selectByPrimaryKey(orderId);
         if (ObjectUtils.isEmpty(order)){
             throw new NotFoundException("order not find");
         }
-
+        /**
+         * check if type of order is delivery
+         */
         if (order.getType()!=1){
             return new Result(ResultConstant.CODE_FAILED,"this order is not delivery",null);
         }
+        /**
+         * check if dishes in the order have finished
+         */
         if (order.getState()<1){
             return new Result(ResultConstant.CODE_FAILED,"order hasn't finished yet",null);
         }
+        /**
+         * if above step passes, delivering order can be set finished
+         */
         order.setState(2);
+        /**
+         * check if update success.
+         */
         int res = orderService.updateByPrimaryKey(order);
         if (res<1){
             return new Result(ResultConstant.CODE_FAILED,ResultConstant.MESSAGE_FAILED,null);

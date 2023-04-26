@@ -125,7 +125,7 @@
 
 
 
-<body th:style="'background-size: 100% 100%;background-image: url('+@{img/loginBack.jpg}+');background-repeat: no-repeat;background-position: center;background-attachment: fixed'" style="background-size: 100% 100%;background-image: url('img/loginBack.jpg');background-repeat: no-repeat;background-position: center;background-attachment: fixed">
+<body style="background-size: 100% 100%;background-image: url('img/loginBack.jpg');background-repeat: no-repeat;background-position: center;background-attachment: fixed">
 
 
 <div id="messageContainer" style="width: 30%;margin-top: 1%;position: fixed;z-index: 1055;margin-left: 35%;top: 0">
@@ -146,7 +146,6 @@
                             <h5>Address: [(${address.location})]</h5>
                         </li>
                     </ul>
-
             </div>
             <div class="modal-footer">
                 <button class="btn btn-secondary" onclick="$('#address-list').children('li').removeClass('active');$('#addressContainer').modal('hide')">Close</button>
@@ -185,9 +184,9 @@
 </script>
 
 <div id="header" class="fixed-top" >
-    <nav class="navbar navbar-expand-lg navbar-light color" style="height: 50px" >
-        <a class="navbar-brand color" href="#">
-            <img src="img/logo.png" alt="logo" style="height: 40px">
+    <nav class="navbar navbar-expand-lg navbar-light color" style="max-height: 100px" >
+        <a class="navbar-brand color" href="#" style="height: 100%;padding: 0 0 ">
+            <img src="img/logo.png" alt="logo"  style="height: 40px;">
         </a>
         <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarScroll" aria-controls="navbarScroll" aria-expanded="false" aria-label="Toggle navigation">
             <span class="navbar-toggler-icon"></span>
@@ -197,28 +196,7 @@
                 <li class="nav-item active">
                     <a class="nav-link" href="#">Home <span class="sr-only">(current)</span></a>
                 </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="#">Link</a>
-                </li>
-                <li class="nav-item dropdown">
-                    <a class="nav-link dropdown-toggle" href="#" role="button" data-toggle="dropdown" aria-expanded="false">
-                        Link
-                    </a>
-                    <ul class="dropdown-menu">
-                        <li><a class="dropdown-item" href="#">Action</a></li>
-                        <li><a class="dropdown-item" href="#">Another action</a></li>
-                        <li><hr class="dropdown-divider"></li>
-                        <li><a class="dropdown-item" href="#">Something else here</a></li>
-                    </ul>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link disabled">Link</a>
-                </li>
             </ul>
-            <form class="d-flex">
-                <input class="form-control mr-2" type="search" placeholder="Search" aria-label="Search">
-                <button class="btn btn-outline-success" type="submit">Search</button>
-            </form>
             <div style="">
                 <ul class="navbar-nav mr-auto my-2 my-lg-0 navbar-nav-scroll" style="max-height: 100px;">
                     <li class="nav-item dropdown" style="">
@@ -226,10 +204,10 @@
                             Username
                         </a>
                         <ul class="dropdown-menu" >
-                            <li><a class="dropdown-item" href="#">
+                            <li><a class="dropdown-item" href="Order/All orders.html" th:href="@{/order/all}">
                                 <i class="bi bi-list">&nbsp&nbsp</i>
-                                Order</a></li>
-                            <li><a class="dropdown-item" href="#">
+                                All Orders</a></li>
+                            <li><a class="dropdown-item" href="user/Profile.html" th:href="@{/user/profile}">
                                 <i class="bi bi-person-lines-fill">&nbsp&nbsp</i>
                                 Profile</a></li>
                             <li><hr class="dropdown-divider"></li>
@@ -244,11 +222,10 @@
 
                 </ul>
             </div>
+
+
         </div>
     </nav>
-
-
-
 </div>
 
 <div id="recommendationSection">
@@ -423,7 +400,7 @@
             alertUtil.message("remove failed, try to refresh or remove again",warningType,document.getElementById("messageContainer"));
             return;
         }
-        foodItem.count--;
+        foodItem.count = foodItem.count==1?foodItem.count:foodItem.count-1;
         countContainer.text(foodItem.count);
         countContainer.parents("div.operationContainer").siblings("div.item-info").children("h5.item-price").text("$ "+foodItem.count*foodItem.singlePrice);
         if (foodItem.count<=0){
@@ -592,7 +569,12 @@
         if (shoppingCarStr==undefined||shoppingCarStr==null||shoppingCarStr==""){
             return;
         }
-        shoppingCar = JSON.parse(shoppingCarStr);
+        let shoppingCarJson = JSON.parse(shoppingCarStr);
+        for(let i in shoppingCarJson){
+            if (shoppingCarJson[i].count>0){
+                shoppingCar.push(shoppingCarJson[i]);
+            }
+        }
         renderShoppingCar();
     })
 </script>

@@ -72,6 +72,16 @@ public class DishController {
     @Transactional(rollbackFor = Exception.class)
     @ResponseBody
     public Result addDish(@RequestBody Map<String,Object> map, Authentication authentication){
+        if (ObjectUtils.anyNull(map,map.get("dishName"),map.get("categoryName"),map.get("state"),map.get("sizePrice"))){return new Result(ResultConstant.CODE_FAILED,ErrorConstant.PARAM_MISSING,null);}
+        if ((ObjectUtils.isNotEmpty(map.get("toppings"))&&!(map.get("toppings") instanceof List)) || !(map.get("sizePrice") instanceof List)){
+            return new Result(ResultConstant.CODE_FAILED,"params is illegal",null);
+        }
+        for(Object o:(List)map.get("sizePrice")){
+            if (! (o instanceof Map)){
+                return new Result(ResultConstant.CODE_FAILED,"params is illegal",null);
+            }
+            break;
+        }
         Dish dish = null;
         try {
             dish = Dish.map2Dish(map);
@@ -162,6 +172,16 @@ public class DishController {
     @PostMapping("/dish/modify")
     @ResponseBody
     public Result modifyDish(@RequestBody Map<String,Object> map,int dishId,Authentication authentication){
+        if (ObjectUtils.anyNull(map,map.get("dishName"),map.get("categoryName"),map.get("state"),map.get("sizePrice"))){return new Result(ResultConstant.CODE_FAILED,ErrorConstant.PARAM_MISSING,null);}
+        if ((ObjectUtils.isNotEmpty(map.get("toppings"))&&!(map.get("toppings") instanceof List)) || !(map.get("sizePrice") instanceof List)){
+            return new Result(ResultConstant.CODE_FAILED,"params is illegal",null);
+        }
+        for(Object o:(List)map.get("sizePrice")){
+            if (! (o instanceof Map)){
+                return new Result(ResultConstant.CODE_FAILED,"params is illegal",null);
+            }
+            break;
+        }
         Dish oldDish = dishService.selectByPrimaryKey(dishId);
         if (ObjectUtils.isEmpty(oldDish)||oldDish.getDeleted()==1){
             return new Result(ResultConstant.CODE_FAILED,"Such dish doesn't exist",null);
@@ -242,20 +262,20 @@ public class DishController {
     @PostMapping("/dish/delete")
     @Transactional(rollbackFor = Exception.class)
     @ResponseBody
-    public Result deleteDish(@RequestBody List<Integer> ids,Authentication authentication){
-        if (ObjectUtils.isEmpty(ids)){
+    public Result deleteDish(@RequestBody List<Integer> dishIds,Authentication authentication){
+        if (ObjectUtils.isEmpty(dishIds)){
             return new Result(ResultConstant.CODE_FAILED,"Empty ids",null);
         }
         DishExample dishExample = new DishExample();
-        dishExample.or().andDeletedEqualTo(0).andIdIn(ids);
-        List<Dish> dishes = dishService.selectByExample(dishExample);
-        if (ObjectUtils.isEmpty(dishes)||dishes.size()!=ids.size()){
+        dishExample.or().andDeletedEqualTo(0).andIdIn(dishIds);
+        List<Dish> dishesToDelete = dishService.selectByExample(dishExample);
+        if (ObjectUtils.isEmpty(dishesToDelete)||dishesToDelete.size()!=dishIds.size()){
             return new Result(ResultConstant.CODE_FAILED,"One or more than one dishes don't exist",null);
         }
         Dish dish = new Dish();
         dish.setDeleted(1);
         int res = dishService.updateByExampleSelective(dish,dishExample);
-        if (res!=ids.size()){
+        if (res!=dishIds.size()){
             throw new CURDException();
         }
         String curUser = "admin";
@@ -267,7 +287,7 @@ public class DishController {
         log.setCreateTime(System.currentTimeMillis());
         log.setIsHandled(0);
         log.setOperationtype(1);
-        log.setDescription(String.format("Delete dishs: %s", Arrays.toString(ids.toArray())));
+        log.setDescription(String.format("Delete dishs: %s", Arrays.toString(dishIds.toArray())));
         log.setUserName(curUser);
         logService.insert(log);
         return new Result(ResultConstant.CODE_SUCCESS,ResultConstant.MESSAGE_SUCCESS,null);

@@ -46,6 +46,38 @@
 
 </style>
 <body style="background-size: 100% 100%;background-image: url('img/loginBack.jpg');background-repeat: no-repeat;background-position: center;background-attachment: fixed">
+
+<div id="messageContainer" style="width: 30%;margin-top: 1%;position: fixed;z-index: 1055;margin-left: 35%;top: 0">
+  <!--        <div class="alert alert-danger fade" role="alert" style="font-size: 15px">-->
+  <!--            Server error-->
+  <!--            <button type="button" class="close" data-dismiss="alert" aria-label="Close">-->
+  <!--                <span aria-hidden="true">&times;</span>-->
+  <!--            </button>-->
+  <!--        </div>-->
+</div>
+
+<div id="rechargeContainer" class="modal" tabindex="-1">
+
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Recharge</h5>
+      </div>
+      <div class="modal-body">
+        <form id="recharge-form">
+          <div class="form-group">
+            <div class="input-group-prepend">$</div>
+            <input type="number" class="form-control" name="balance"/>
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer" style="width: 100%">
+        <button type="button" class="btn btn-secondary addBtn" onclick="$('#recharge-form').find('input').val('');$('#rechargeContainer').modal('hide')">Close</button>
+        <button type="button" class="btn btn-warning addBtn" id="recharge-btn">Recharge</button>
+      </div>
+    </div>
+  </div>
+</div>
 <div id="header" class="fixed-top" >
   <nav class="navbar navbar-expand-lg navbar-light color" style="max-height: 100px" >
     <a class="navbar-brand color" href="#" style="height: 100%;padding: 0 0 ">
@@ -62,20 +94,6 @@
         <li class="nav-item ">
           <a class="nav-link" href="#">Menu</a>
         </li>
-        <!--        <li class="nav-item dropdown">-->
-        <!--          <a class="nav-link dropdown-toggle" href="#" role="button" data-toggle="dropdown" aria-expanded="false">-->
-        <!--            Link-->
-        <!--          </a>-->
-        <!--          <ul class="dropdown-menu">-->
-        <!--            <li><a class="dropdown-item" href="#">Action</a></li>-->
-        <!--            <li><a class="dropdown-item" href="#">Another action</a></li>-->
-        <!--            <li><hr class="dropdown-divider"></li>-->
-        <!--            <li><a class="dropdown-item" href="#">Something else here</a></li>-->
-        <!--          </ul>-->
-        <!--        </li>-->
-        <!--        <li class="nav-item">-->
-        <!--          <a class="nav-link disabled">Link</a>-->
-        <!--        </li>-->
       </ul>
       <form class="d-flex" >
         <input class="form-control mr-2" type="search" placeholder="Search" aria-label="Search">
@@ -160,7 +178,7 @@
                   <div class="input-group-prepend">
                     <span class="input-group-text">$</span>
                   </div>
-                  <span type="text" class="form-control" aria-label="Amount (to the nearest dollar)" style="font-size: 20px" readonly>[(${balance})]</span>
+                  <span type="text" class="form-control" id="balance" aria-label="Amount (to the nearest dollar)" style="font-size: 20px" readonly>[(${balance})]</span>
                   <div class="input-group-append">
                     <span class="input-group-text">.00</span>
                   </div>
@@ -171,6 +189,7 @@
                 <div class="input-group mb-3">
                   <a class="btn btn-warning" type="button" id="button-addon1" style="font-size: 20px" href="user/address">Delivery Address</a>
                   <a class="btn btn-warning" type="button" href="user/resetPassword" style="font-size: 20px;margin-left: 1%">Change password</a>
+                  <a class="btn btn-warning" type="button" onclick="$('#rechargeContainer').modal({backdrop:false})" style="font-size: 20px;margin-left: 1%">Recharge</a>
                 </div>
               </li>
             </ul>
@@ -188,6 +207,47 @@
 <script>
 
 
+
+
+$(function (){
+
+  $("#recharge-btn").click(function (){
+    let $form = $("#recharge-form");
+    let $btn = $(this);
+    let html = $btn.text();
+    $.ajax(
+            {
+              url:"wallet/recharge",
+              type:"post",
+              data:$form.serialize(),
+              beforeSend:function (){
+                let balance = parseInt($form.find("input[name='balance']").val());
+                if (isNaN(balance)||balance<=0){
+                  alertUtil.message("Balance cannot be negative",warningType,document.getElementById("messageContainer"));
+                  return false;
+                }
+                enableLoadingVideo($btn);
+                return true;
+              },
+              success:function (result) {
+                disableLoadingVideo($btn,html);
+                if (result.code!=1){
+                  alertUtil.message(result.message==null?"Recharge failed":result.message,dangerType,document.getElementById("messageContainer"));
+                }
+                else {
+                  $("#balance").text(result.data);
+                  alertUtil.message("Success",successType,document.getElementById("messageContainer"));
+                }
+              },
+              error:function (){
+                disableLoadingVideo($btn,html);
+                alertUtil.message("Recharge failed",dangerType,document.getElementById("messageContainer"));
+              }
+            }
+    )
+  })
+
+})
 
 
 </script>
