@@ -1,8 +1,11 @@
 file:
-  upload-path: D:\pizza_order_demo\upload
+  upload-path: E:\Year3\CPT202\upload
 spring:
   thymeleaf:
     cache: false
+  servlet:
+    multipart:
+      max-file-size: 30MB
 
   datasource:
     driver-class-name: com.mysql.jdbc.Driver

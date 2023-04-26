@@ -1,6 +1,7 @@
 package com.example.pizza_order_demo.controller;
 
 import com.example.pizza_order_demo.commons.Result;
+import com.example.pizza_order_demo.commons.constant.ResultConstant;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
 import org.springframework.util.ClassUtils;
@@ -9,8 +10,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.File;
-import java.io.FileNotFoundException;
+import java.io.*;
 
 @Controller
 public class FileController {

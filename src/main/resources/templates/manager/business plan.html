@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <base href="../../static/" th:href="@{/}">
+    <meta charset="UTF-8">
+    <script src="js/header.js"></script>
+    <link href="plugins/bootstrap-table/bootstrap-table.min.css" rel="stylesheet"/>
+    <script src="js/footer.js"></script>
+    <script src="plugins/bootstrap-table/bootstrap-table.min.js"></script>
+    <title>businessPlan</title>
+</head>
+
+<style>
+
+</style>
+
+<body>
+
+
+
+<div class="container" style="margin-top: 5%">
+
+
+    <div id="toolbar">
+        <div class="btns">
+            <a class="btn-primary btn" onclick="window.open('../templates/manager/addNewPlan.html')">Add Plan</a>
+        </div>
+
+    </div>
+    <table id="table" data-cache="false">
+
+    </table>
+</div>
+
+<script>
+    $(function (){
+        $('#table').bootstrapTable({
+            search:true,
+            toolbar:"#toolbar",
+            url:"category/query",
+            columns: [{
+                field: 'plans',
+                title: 'All Plans'
+            },
+                {
+                    field: "operate",
+                    title:"operation",
+                    clickToSelect: false,
+                    align:'center',
+                    events: window.operateEvents,
+                    formatter: operateFormatter
+                }
+            ]
+        })
+    })
+
+
+    function operateFormatter(){
+        return ["<span class=\"glyphicon glyphicon-trash\" aria-hidden=\"true\"></span>","<span class=\"glyphicon glyphicon-edit\" aria-hidden=\"true\"></span>"].join("<div></div>");
+    }
+
+    $.ajax(
+        {
+            type:"post",
+            url:"plan/add",
+
+
+        }
+    )
+
+
+</script>
+
+</body>
+</html>
