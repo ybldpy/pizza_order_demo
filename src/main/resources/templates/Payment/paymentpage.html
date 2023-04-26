@@ -140,7 +140,7 @@
             <div class="modal-body">
                     <ul id="address-list" class="list-group" style="height: 90%;overflow-y: scroll;word-wrap: anywhere">
                         <li class="list-group-item list-group-item-action" th:each="address:${addressList}" >
-                            <textarea class="address-id" hidden>[(${address.id})]</textarea>
+                            <input class="address-id" type="number" th:value="${address.id}" hidden/>
                             <h5>Contact: [(${address.contact})]</h5>
                             <h5>Phone: [(${address.phone})]</h5>
                             <h5>Address: [(${address.location})]</h5>
@@ -486,7 +486,6 @@
             if(shoppingCar[i].count<1){
                 continue;
             }
-            alert(JSON.stringify(shoppingCar[i]))
             nonEmptyShoppingCar.push(shoppingCar[i]);
         }
         let $selected = $(".pickup-checker");
@@ -499,7 +498,7 @@
         let deliveryType = parseInt($("#deliveryType").val());
         let addressId = -1;
         if (!isNaN(deliveryType)&&deliveryType==1){
-            let address = $("#address-list").children("li.active").children("textarea.address-id").text();
+            let address = $("#address-list").children("li.active").children("input").val();
             if (isBlank(address)){selectAddress();return;}
             else {
                 addressId = parseInt(address);
