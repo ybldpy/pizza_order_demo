@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <base href="../../static/" th:href="@{/}">
+    <meta charset="UTF-8">
+    <title>Order to do</title>
+    <script src="js/header.js"></script>
+    <link href="plugins/bootstrap-table/bootstrap-table.min.css" rel="stylesheet"/>
+    <link rel="stylesheet" href="font/fonts.css">
+    <script src="js/footer.js"></script>
+    <script src="plugins/bootstrap-table/bootstrap-table.min.js"></script>
+</head>
+<style type="text/css">
+    td{
+        word-break: break-all;
+        word-wrap: break-word;
+    }
+</style>
+<body>
+<div id="messageContainer" style="width: 30%;margin-top: 1%;position: fixed;z-index: 1055;margin-left: 35%;top: 0">
+
+</div>
+<div id="add-container" class="modal" tabindex="-1" >
+
+    <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Add topping</h5>
+            </div>
+            <div class="modal-body">
+                <form id="add-form">
+                        <div class="form-group">
+                            <label>Topping name</label>
+                            <input class="form-control" name="toppingName" type="text">
+                        </div>
+                        <div class="form-group">
+                            <label>price</label>
+                            <input class="form-control" name="price" type="number"/>
+                        </div>
+                </form>
+            </div>
+            <div class="modal-footer" style="width: 100%">
+                <button type="button" class="btn btn-warning" onclick="doAdd($(this))">Add</button>
+                <button type="button" class="btn btn-secondary" onclick="let $container = $('#add-container');$container.modal('hide');$container.find('input').val('');">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="change-container" class="modal" tabindex="-1" >
+
+    <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Add topping</h5>
+            </div>
+            <div class="modal-body">
+                <form id="change-form">
+                    <input name="id" type="number" hidden/>
+                    <label id="toppingNameLabel"></label>
+                    <div class="form-group">
+                        <label>$</label>
+                        <input class="form-control" name="price" type="number"/>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer" style="width: 100%">
+                <button type="button" class="btn btn-secondary" onclick="doChange($(this))">Change</button>
+                <button type="button" class="btn btn-secondary" onclick="$('#change-container').modal('hide')">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<div style="margin-top: 5%;width: 95%;margin-left: 2.5%">
+        <div id="toolbar">
+            <span>
+                <button class="btn btn-danger" id="deleteBtn" onclick="doDelete($(this))"><i class="bi bi-trash"></i>Delete</button>
+            </span>
+            <span>
+                <button class="btn btn-warning" id="addBtn"><i class="bi bi-plus"></i>Add topping</button>
+            </span>
+        </div>
+    <table id="toppingTable"></table>
+</div>
+
+<script>
+
+
+
+    $(function (){
+        $("#addBtn").click(showAddModal);
+
+        $("#toppingTable").bootstrapTable(
+            {
+                url:"topping/get",
+                search:true,
+                columns:[
+                    {
+                        checkbox:true
+                    },
+                    {
+                        title:"Id",
+                        field:"id"
+                    },
+                    {
+                        title:"Name",
+                        field:"toppingName",
+                        searchable:true
+                    },
+                    {
+                        title:"price",
+                        field:"price",
+                        searchable: true
+                    },
+                    {
+                        title: "Change price",
+                        formatter:function (value,row,index,field){
+                            return "<a class='btn btn-warning' onclick=\"showChangeModal("+row.id+",'"+row.toppingName+"',"+row.price+")\"><i class=\"bi bi-pencil-square\"></i></a>"
+                        }
+                    }
+                ]
+            }
+        )
+    })
+
+    function showAddModal(){
+        $("#add-container").modal({backdrop:false})
+    }
+    function doAdd($btn){
+        let html = $btn.text();
+        let $form = $("#add-form");
+        $.ajax(
+            {
+                type:"post",
+                url:"topping/add",
+                data:$form.serialize(),
+                beforeSend:function (){
+                    let price = parseInt($form.find("input[name='price']").val());
+                    let name = $form.find("input[name='toppingName']").val();
+                    if (isNaN(price)||price<=0){
+                        alertUtil.message("Price is illegal",warningType,document.getElementById("messageContainer"));
+                        return false;
+                    }
+                    if (isBlank(name)){
+                        alertUtil.message("Topping name cannot be empty",warningType,document.getElementById("messageContainer"));
+                        return false;
+                    }
+                    enableLoadingVideo($btn);
+                    return true;
+                },
+                success:function (result){
+                    disableLoadingVideo($btn,html);
+                    if (result==undefined||result==null){
+                        alertUtil.message("Add failed",dangerType,document.getElementById("messageContainer"));
+                        return;
+                    }
+                    if (result.code!=1){
+                        alertUtil.message(result.message==null?"Add failed":result.message,dangerType,document.getElementById("messageContainer"));
+                        return;
+                    }
+                    alertUtil.message("Success",successType,document.getElementById("messageContainer"));
+                    $("#toppingTable").bootstrapTable("refresh");
+                },
+                error:function (){
+                    disableLoadingVideo($btn,html);
+                    alertUtil.message("Add failed",dangerType,document.getElementById("messageContainer"));
+                }
+            }
+        )
+    }
+
+    function doDelete($btn){
+        let html = $btn.text();
+        let selections = $("#toppingTable").bootstrapTable("getSelections");
+        if (selections.length == 0){
+            alertUtil.message("You must at least one topping",warningType,document.getElementById("messageContainer"));
+            return;
+        }
+        let ids = [];
+        for(let i in selections){
+            ids.push(selections[i].id);
+        }
+        $.ajax(
+            {
+                type:"post",
+                url:"topping/delete",
+                contentType:"application/json",
+                data:JSON.stringify(ids),
+                beforeSend:function (){
+                    enableLoadingVideo($btn);
+                    return true;
+                },
+                success:function (result){
+                    disableLoadingVideo($btn,html);
+                    if (result==undefined||result==null){
+                        alertUtil.message("Delete failed",dangerType,document.getElementById("messageContainer"));
+                        return;
+                    }
+                    if (result.code!=1){
+                        alertUtil.message(result.message==null?"Delete failed":result.message,dangerType,document.getElementById("messageContainer"));
+                        return;
+                    }
+                    alertUtil.message("Success",successType,document.getElementById("messageContainer"));
+                    $("#toppingTable").bootstrapTable("refresh");
+                },
+                error:function (){
+                    disableLoadingVideo($btn,html);
+                    alertUtil.message("Delete failed",dangerType,document.getElementById("messageContainer"));
+                }
+            }
+        )
+
+    }
+
+    function doChange($btn){
+        let html = $btn.text();
+        let $form = $("#change-form");
+
+        $.ajax(
+            {
+                type:"post",
+                url:"topping/modify",
+                data:$form.serialize(),
+                beforeSend:function (){
+                    let price = parseInt($form.find("input[name='price']").val());
+                    if (isNaN(price)||price<=0){
+                        alertUtil.message("price is illegal",warningType,document.getElementById("messageContainer"));
+                        return;
+                    }
+                    enableLoadingVideo($btn);
+                },
+                success:function (result){
+                    disableLoadingVideo($btn,html);
+                    if (result==undefined||result==null){
+                        alertUtil.message("Change failed",dangerType,document.getElementById("messageContainer"));
+                        return;
+                    }
+                    if (result.code!=1){
+                        alertUtil.message(result.message==null?"Change failed":result.message,dangerType,document.getElementById("messageContainer"));
+                        return;
+                    }
+                    alertUtil.message("Success",successType,document.getElementById("messageContainer"));
+                    $("#toppingTable").bootstrapTable("refresh");
+                },
+                error:function (){
+                    disableLoadingVideo($btn,html);
+                    alertUtil.message("Change failed",dangerType,document.getElementById("messageContainer"));
+                }
+            }
+        )
+    }
+    function showChangeModal(id,toppingName,price){
+        let $container = $("#change-container");
+        $container.find("input[name='id']").val(id);
+        $container.find("#toppingNameLabel").text(toppingName);
+        $container.find("input[name='price']").val(price);
+        $("#change-container").modal({backdrop: false})
+    }
+</script>
+</body>
+</html>

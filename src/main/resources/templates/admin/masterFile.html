@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <base href="../../static/" th:href="@{/}">
+    <meta charset="UTF-8">
+    <title>master file</title>
+    <script src="js/header.js"></script>
+    <link href="plugins/bootstrap-table/bootstrap-table.min.css" rel="stylesheet"/>
+    <link rel="stylesheet" href="font/fonts.css">
+    <script src="js/footer.js"></script>
+    <script src="plugins/bootstrap-table/tableExport.js"></script>
+    <script src="plugins/bootstrap-table/jsPDF.js"></script>
+    <script src="plugins/bootstrap-table/autoTable.js"></script>
+    <script src="plugins/bootstrap-table/bootstrap-table.min.js"></script>
+    <script src="plugins/bootstrap-table/bootstrap-table-export.min.js"></script>
+</head>
+<style type="text/css">
+    td{
+        word-break: break-all;
+    }
+</style>
+<body>
+<div id="messageContainer" style="width: 30%;margin-top: 1%;position: fixed;z-index: 1055;margin-left: 35%;top: 0">
+
+</div>
+<div id="addContainer" class="modal" tabindex="-1">
+
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Change state</h5>
+            </div>
+            <div class="modal-body">
+                <div class="input-group">
+                    <select id="state" class="form-control">
+                        <option value="0">Hide</option>
+                        <option value="1">Selling</option>
+                    </select>
+                </div>
+            </div>
+            <div class="modal-footer" style="width: 100%">
+                <button type="button" class="btn btn-secondary" onclick="$('#addContainer').modal('hide')">Close</button>
+                <button id="changeBtn" type="button" class="btn btn-warning" >Change</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<div style="margin-top: 5%;width: 85%;margin-left: 7.5%">
+<!--    <div id="toolbar">-->
+<!--        <span>-->
+<!--            <button class="btn btn-danger" id="deleteBtn" onclick="window.open('log/download')"><i class="bi bi-trash"></i>Download master file</button>-->
+<!--        </span>-->
+<!--    </div>-->
+    <table id="logTable"></table>
+</div>
+
+<script>
+
+
+    $(function (){
+        $("#logTable").bootstrapTable({
+            url:"log/get",
+            showExport:true,
+            search:true,
+            exportDataType: $(this).val(),
+            exportTypes: ['json', 'xml', 'csv', 'txt', 'sql', 'excel', 'pdf'],
+            columns:[
+                {
+                    title:"Log type",
+                    formatter:function (value,row,index,field){
+                        if (row.operationtype == 1){return "Operation";}
+                        return "System Log"
+                    },
+                    searchable: true
+                },
+                {
+                    title:"Description",
+                    field:"description",
+                    searchable: true
+                },
+                {
+                    title: "Operator",
+                    formatter:function (value,row,index,field){
+                        if (row.operationtype == 1){
+                            return row.userName;
+                        }
+                        return "System"
+                    },
+                    searchable: true
+                },
+                {
+                    title:"time",
+                    formatter:function (value,row,index,field){
+                        return new Date(row.createTime).toLocaleString();
+                    },
+                    searchable:true
+                }
+            ]
+        })
+    })
+
+
+</script>
+</body>
+</html>

@@ -3,21 +3,36 @@ package com.example.pizza_order_demo.controller;
 import com.example.pizza_order_demo.commons.Result;
 import com.example.pizza_order_demo.commons.constant.ErrorConstant;
 import com.example.pizza_order_demo.commons.constant.ResultConstant;
+import com.example.pizza_order_demo.model.Log;
+import com.example.pizza_order_demo.model.LogExample;
+import com.example.pizza_order_demo.service.LogService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.servlet.http.HttpServletResponse;
 import java.io.File;
 import java.io.IOException;
+import java.io.OutputStream;
+import java.io.Writer;
+import java.util.List;
 
 
 @Controller
 public class FileController {
     @Value("${file.upload-path}")
     private String uploadDir;
+
+    @Value("${file.temp-path}")
+    private String tempDir;
+
+    @Autowired
+    private LogService logService;
 
     @PostMapping("/file/img/upload")
     @ResponseBody
@@ -50,5 +65,8 @@ public class FileController {
 //        out.close();
         return new Result(ResultConstant.CODE_SUCCESS,ResultConstant.MESSAGE_SUCCESS,"upload/img/"+fileName);
     }
+
+
+
 
 }

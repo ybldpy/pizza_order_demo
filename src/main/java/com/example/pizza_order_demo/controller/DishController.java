@@ -7,12 +7,14 @@ import com.example.pizza_order_demo.exception.CURDException;
 import com.example.pizza_order_demo.model.*;
 import com.example.pizza_order_demo.service.CategoryService;
 import com.example.pizza_order_demo.service.DishService;
+import com.example.pizza_order_demo.service.LogService;
 import com.example.pizza_order_demo.service.ToppingService;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.ui.Model;
@@ -22,7 +24,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 
-
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -36,6 +38,8 @@ public class DishController {
     private DishService dishService;
     @Autowired
     private ToppingService toppingService;
+    @Autowired
+    private LogService logService;
 
     private static final String DEFAULT_IMG = "img/default.jpg";
 
@@ -67,7 +71,7 @@ public class DishController {
     @PostMapping("/dish/add")
     @Transactional(rollbackFor = Exception.class)
     @ResponseBody
-    public Result addDish(@RequestBody Map<String,Object> map){
+    public Result addDish(@RequestBody Map<String,Object> map, Authentication authentication){
         Dish dish = null;
         try {
             dish = Dish.map2Dish(map);
@@ -107,9 +111,24 @@ public class DishController {
         for(Map<String,Object> e:sizePrice){
             if (e.size()!=2){return new Result(ResultConstant.CODE_FAILED,"illegal size and price",null);}
             if (e.get("size")==null||e.get("price")==null){return new Result(ResultConstant.CODE_FAILED,"size or price is missing",null);}
+            if (!(e.get("price") instanceof Number)){
+                return new Result(ResultConstant.CODE_FAILED,"price cannot be negative",null);
+            }
         }
         int res = dishService.insert(dish);
         if (res<1){return new Result(ResultConstant.CODE_FAILED,ResultConstant.MESSAGE_FAILED,null);}
+        String curUser = "admin";
+        if (!ObjectUtils.isEmpty(authentication)){
+            Object principal = authentication.getPrincipal();
+            curUser = principal==null?curUser:((UserDetailsImpl)principal).getUsername();
+        }
+        Log log = new Log();
+        log.setCreateTime(System.currentTimeMillis());
+        log.setIsHandled(0);
+        log.setOperationtype(1);
+        log.setDescription(String.format("Add dish: id: %d, name: %s",dish.getId(),dish.getDishName()));
+        log.setUserName(curUser);
+        logService.insert(log);
         return new Result(ResultConstant.CODE_SUCCESS,ResultConstant.MESSAGE_SUCCESS,null);
         //Map<String,Integer> sizePrice = null;
 
@@ -142,7 +161,7 @@ public class DishController {
 
     @PostMapping("/dish/modify")
     @ResponseBody
-    public Result modifyDish(@RequestBody Map<String,Object> map,int dishId){
+    public Result modifyDish(@RequestBody Map<String,Object> map,int dishId,Authentication authentication){
         Dish oldDish = dishService.selectByPrimaryKey(dishId);
         if (ObjectUtils.isEmpty(oldDish)||oldDish.getDeleted()==1){
             return new Result(ResultConstant.CODE_FAILED,"Such dish doesn't exist",null);
@@ -196,11 +215,26 @@ public class DishController {
             for(Map<String,Object> e:sizePrice){
                 if (e.size()!=2){return new Result(ResultConstant.CODE_FAILED,"illegal size and price",null);}
                 if (e.get("size")==null||e.get("price")==null){return new Result(ResultConstant.CODE_FAILED,"size or price is missing",null);}
+                if (!(e.get("price") instanceof Number)){
+                    return new Result(ResultConstant.CODE_FAILED,"price cannot be negetive",null);
+                }
             }
         }
 
         int res = dishService.updateByPrimaryKey(newDish);
         if (res<1){return new Result(ResultConstant.CODE_FAILED,ResultConstant.MESSAGE_FAILED,null);}
+        String curUser = "admin";
+        if (!ObjectUtils.isEmpty(authentication)){
+            Object principal = authentication.getPrincipal();
+            curUser = principal==null?curUser:((UserDetailsImpl)principal).getUsername();
+        }
+        Log log = new Log();
+        log.setCreateTime(System.currentTimeMillis());
+        log.setIsHandled(0);
+        log.setOperationtype(1);
+        log.setDescription(String.format("Modify dish: id:%d", dishId));
+        log.setUserName(curUser);
+        logService.insert(log);
         return new Result(ResultConstant.CODE_SUCCESS,ResultConstant.MESSAGE_SUCCESS,null);
 
     }
@@ -208,7 +242,7 @@ public class DishController {
     @PostMapping("/dish/delete")
     @Transactional(rollbackFor = Exception.class)
     @ResponseBody
-    public Result deleteDish(@RequestBody List<Integer> ids){
+    public Result deleteDish(@RequestBody List<Integer> ids,Authentication authentication){
         if (ObjectUtils.isEmpty(ids)){
             return new Result(ResultConstant.CODE_FAILED,"Empty ids",null);
         }
@@ -224,12 +258,24 @@ public class DishController {
         if (res!=ids.size()){
             throw new CURDException();
         }
+        String curUser = "admin";
+        if (!ObjectUtils.isEmpty(authentication)){
+            Object principal = authentication.getPrincipal();
+            curUser = principal==null?curUser:((UserDetailsImpl)principal).getUsername();
+        }
+        Log log = new Log();
+        log.setCreateTime(System.currentTimeMillis());
+        log.setIsHandled(0);
+        log.setOperationtype(1);
+        log.setDescription(String.format("Delete dishs: %s", Arrays.toString(ids.toArray())));
+        log.setUserName(curUser);
+        logService.insert(log);
         return new Result(ResultConstant.CODE_SUCCESS,ResultConstant.MESSAGE_SUCCESS,null);
     }
     @PostMapping("/dish/changeState")
     @Transactional(rollbackFor = Exception.class)
     @ResponseBody
-    public Result changeDishState(@RequestBody Map<String,Object> map){
+    public Result changeDishState(@RequestBody Map<String,Object> map,Authentication authentication){
         if (ObjectUtils.isEmpty(map.get("ids"))||ObjectUtils.isEmpty(map.get("state"))||!(map.get("ids") instanceof List)||!((map.get("state")) instanceof Integer)){
             return new Result(ResultConstant.CODE_FAILED,ErrorConstant.PARAM_MISSING,null);
         }
@@ -246,6 +292,19 @@ public class DishController {
         if (res!=ids.size()){
             throw new CURDException();
         }
+
+        String curUser = "admin";
+        if (!ObjectUtils.isEmpty(authentication)){
+            Object principal = authentication.getPrincipal();
+            curUser = principal==null?curUser:((UserDetailsImpl)principal).getUsername();
+        }
+        Log log = new Log();
+        log.setCreateTime(System.currentTimeMillis());
+        log.setIsHandled(0);
+        log.setOperationtype(1);
+        log.setDescription(String.format("Change dishes %s state to %d",Arrays.toString(ids.toArray()),map.get("state")));
+        log.setUserName(curUser);
+        logService.insert(log);
         return new Result(ResultConstant.CODE_SUCCESS,ResultConstant.MESSAGE_SUCCESS,null);
     }
 }

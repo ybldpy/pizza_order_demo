@@ -111,7 +111,7 @@
 
 </style>
 <body>
-<input type="number" th:value="${orderId}" hidden>
+<textarea id="comment-data" th:value="${commentData}" hidden></textarea>
 <div id="messageContainer" style="width: 30%;margin-top: 1%;position: fixed;z-index: 1055;margin-left: 35%;top: 0">
 
 </div>
@@ -420,29 +420,8 @@
       event.relatedTarget // previous active tab
     })
 
-    let orderId = parseInt($("#orderId").val());
-    $.ajax(
-            {
-              type:"post",
-              url:"comment/commentResult?orderId="+isNaN(orderId)?-1:orderId,
-              success:function (result){
-                if (result == null||result==undefined){
-                  alertUtil.message("Load data failed",dangerType,document.getElementById("messageContainer"));
-                  return;
-                }
-                if (result.code!=1){
-                  alertUtil.message(result.message==null?"Load data failed":result.message,dangerType,document.getElementById("messageContainer"));
-                  return;
-                }
-                let remark = JSON.parse(result.data.remark)
-                renderResult(remark);
-              },
-              error:function (){
-                alertUtil.message("Load data failed",dangerType,document.getElementById("messageContainer"));
-              }
-
-            }
-    )
+    let data = $("#comment-data").val();
+    renderResult(JSON.parse(data));
 
     // alert(qData.remark[0][1])
 

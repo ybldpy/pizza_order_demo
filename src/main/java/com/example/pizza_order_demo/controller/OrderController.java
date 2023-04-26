@@ -172,16 +172,10 @@ public class OrderController {
         }
         else {
             resultMap.put("total",0);
+            resultMap.put("rows",new ArrayList<>());
             return resultMap;
         }
 
-        OrderDetailExample orderDetailExample = new OrderDetailExample();
-        orderDetailExample.or().andOrderIdIn(orderIds);
-        List<OrderDetail> orderDetailList = orderDetailService.selectByExample(orderDetailExample);
-        if (ObjectUtils.isEmpty(orderDetailList)||orderDetailList.isEmpty()){
-            resultMap.put("total",0);
-            return resultMap;
-        }
         List<OrderDTO> orderDTOList = new ArrayList<>(orders.size());
         for(int i=0;i<orders.size();i++){
             int price = 0;
@@ -223,16 +217,10 @@ public class OrderController {
         }
         else {
             resultMap.put("total",0);
+            resultMap.put("rows",new ArrayList<>());
             return resultMap;
         }
 
-        OrderDetailExample orderDetailExample = new OrderDetailExample();
-        orderDetailExample.or().andOrderIdIn(orderIds);
-        List<OrderDetail> orderDetailList = orderDetailService.selectByExample(orderDetailExample);
-        if (ObjectUtils.isEmpty(orderDetailList)||orderDetailList.isEmpty()){
-            resultMap.put("total",0);
-            return resultMap;
-        }
         List<OrderDTO> orderDTOList = new ArrayList<>(orders.size());
         for(int i=0;i<orders.size();i++){
             int price = 0;
@@ -272,16 +260,10 @@ public class OrderController {
         }
         else {
             resultMap.put("total",0);
+            resultMap.put("rows",new ArrayList<>());
             return resultMap;
         }
 
-        OrderDetailExample orderDetailExample = new OrderDetailExample();
-        orderDetailExample.or().andOrderIdIn(orderIds);
-        List<OrderDetail> orderDetailList = orderDetailService.selectByExample(orderDetailExample);
-        if (ObjectUtils.isEmpty(orderDetailList)||orderDetailList.isEmpty()){
-            resultMap.put("total",0);
-            return resultMap;
-        }
         List<OrderDTO> orderDTOList = new ArrayList<>(orders.size());
         for(int i=0;i<orders.size();i++){
             int price = 0;
@@ -465,7 +447,8 @@ public class OrderController {
             DeliverymanExample deliverymanExample = new DeliverymanExample();
             List<Deliveryman> deliverymanList = deliverymanService.selectByExample(deliverymanExample);
             if (!ObjectUtils.isEmpty(deliverymanList)&&!deliverymanList.isEmpty()){
-                Deliveryman deliveryman = deliverymanList.get((int)(System.currentTimeMillis())/deliverymanList.size());
+
+                Deliveryman deliveryman = deliverymanList.get((int)(System.currentTimeMillis()%deliverymanList.size()));
                 newOrder.setDeliverymanId(deliveryman.getId());
             }
             newOrder.setType(1);

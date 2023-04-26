@@ -224,7 +224,7 @@
         )
     })
     function operationFormatter(val,row,index,field){
-        return "<a href=\"dish/modify?dishId="+row["id"]+"\"><i class='bi bi-pencil-square'></i>"
+        return "<a class='btn btn-warning' onclick='window.open(\"dish/modify?dishId="+row.id+"\")'><i class='bi bi-pencil-square'></i>"
     }
 
     function imgFormatter(value,row,index,field){

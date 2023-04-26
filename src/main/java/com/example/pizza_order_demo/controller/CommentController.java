@@ -29,23 +29,23 @@ public class CommentController {
     @Autowired
     private OrderService orderService;
 
-    @GetMapping("/comment/resultData")
+    @GetMapping("/comment/doComment")
     public String comment(int orderId, Model model){
         model.addAttribute("orderId",orderId);
         return "Order/PostprandialEvaluation";
     }
 
-    @PostMapping("/comment/resultData")
-    @ResponseBody
-    public Result getCommentData(int orderId){
+    @GetMapping("/comment/result")
+    public String getCommentData(int orderId,Model model){
         CommentExample commentExample = new CommentExample();
         commentExample.or().andOrderIdEqualTo(orderId);
         Comment comment = commentService.selectFirstByExample(commentExample);
-        if (ObjectUtils.isEmpty(comment)){return new Result(ResultConstant.CODE_FAILED,"this order has't been evaluated yet",null);}
-        return new Result(ResultConstant.CODE_SUCCESS,ResultConstant.MESSAGE_SUCCESS,comment);
+        if (ObjectUtils.isEmpty(comment)){return "404";}
+        model.addAttribute("commentData",comment.getRemark());
+        return "Order/Evalution";
     }
 
-    @PostMapping("/comment/postprandialEvaluation")
+    @PostMapping("/comment/doComment")
     @ResponseBody
     public Object insertCommentData(@RequestBody Map<String,Object> data) throws JsonProcessingException {
         OrderExample orderExample = new OrderExample();

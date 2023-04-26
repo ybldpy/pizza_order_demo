@@ -3,6 +3,7 @@ package com.example.pizza_order_demo.model;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.lang3.ObjectUtils;
+import org.apache.commons.lang3.StringUtils;
 
 import java.util.List;
 import java.util.Map;
@@ -158,7 +159,7 @@ public class Dish {
      * @mbg.generated Sun Apr 16 20:46:06 CST 2023
      */
     public void setImg(String img) {
-        this.img = img == null ? null : img.trim();
+        this.img = StringUtils.isBlank(img) ? "img/default.jpg" : img.trim();
     }
 
     /**
@@ -311,7 +312,6 @@ public class Dish {
         dish.setDishName((String) map.get("dishName"));
         dish.setCategoryName((String) map.get("categoryName"));
         dish.setImg((String) map.get("img"));
-
         dish.setState((Integer) map.get("state"));
         dish.setRemark((String) map.get("remark"));
         ObjectMapper objectMapper = new ObjectMapper();

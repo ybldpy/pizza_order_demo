@@ -121,52 +121,60 @@
                 menuActived: '0',
                 userInfo: {},
                 menuList: [
-
                     {
-                        id:"6",
+                        id:"0",
                         name:"Statistic report",
                         url:"admin/statistic"
+                    },
+                    {
+                      id:"1",
+                      name:"Master file",
+                      url:"log/management"
                     },
                     // {
                     //   id: '1',
                     //   name: '门店管理',
                     //   children: [
                     {
-                      id: '0',
-                      name: '外卖员管理',
-                      url: 'page/member/list.html',
+                      id: '2',
+                      name: 'Deliveryman management',
+                      url: 'deliveryman/management',
                       icon: 'icon-member'
                     },
                     {
-                        id: '1',
-                        name: '分类管理',
-                        url: 'category/management',
-                        icon: 'icon-category'
-                    },
-                    {
-                        id: '2',
+                        id: '3',
                         name: 'Dish Management',
                         children: [
                             {
-                                id:'6',
+                                id:'4',
                                 name:'Dish Table',
                                 url:"dish/management",
                             },
                             {
-                                id:"7",
+                                id:"5",
                                 name:"Add Dish",
                                 url:"dish/add"
+                            },
+                            {
+                                id:"6",
+                                name:"Category management",
+                                url:"category/management"
+                            },
+                            {
+                                id:"7",
+                                name:"Topping management",
+                                url:"topping/management"
                             }
                         ],
                         icon: 'icon-food'
                     },
                     {
-                        id: '3',
+                        id: '8',
                         name: 'Order management',
                         url:"order/management/all",
                         children:[
                             {
-                                id:"4",
+                                id:"9",
                                 name:"Order to do",
                                 url:"order/todo"
                             },
@@ -177,7 +185,7 @@
                             },
 
                             {
-                                id:"5",
+                                id:"11",
                                 name:"History order",
                                 url:"order/history"
                             }
@@ -187,7 +195,7 @@
                     //   ],
                     // },
                 ],
-                iframeUrl: 'admin/statistic',
+                // iframeUrl: 'admin/statistic',
                 headTitle: 'dashboard',
                 goBackFlag: false,
                 loading: true,

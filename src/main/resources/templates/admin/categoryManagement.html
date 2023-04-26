@@ -6,6 +6,7 @@
     <title>categoryManagement</title>
     <script src="js/header.js"></script>
     <link href="plugins/bootstrap-table/bootstrap-table.min.css" rel="stylesheet"/>
+    <link href="font/fonts.css" rel="stylesheet"/>
     <script src="js/footer.js"></script>
     <script src="plugins/bootstrap-table/bootstrap-table.min.js"></script>
 </head>
@@ -63,7 +64,8 @@
 
     <div id="toolbar">
         <div class="btns">
-            <a class="btn-primary btn" onclick="" id="addCategoryBtn">Add Category</a>
+            <a class="btn-warning btn"  id="addCategoryBtn"><i class="bi bi-plus"></i>Add Category</a>
+            <a class="btn-danger btn"  id="deleteCategoryBtn"><i class="bi bi-trash"></i>Delete Category</a>
         </div>
 <!--        <div class="col-3">-->
 <!--            <input class="form-control" type="text" id="searchText" placeholder="search here"/>-->
@@ -74,6 +76,45 @@
     </table>
 </div>
 <script>
+
+    function doDelete(){
+        let selections = $("#table").bootstrapTable("getSelections");
+        if (selections.length<1){
+            alertUtil.message("You must select at least one to delete",warningType,document.getElementById("messageContainer"));
+            return;
+        }
+        let names = [];
+        for (let i in selections){
+            names.push(selections[i].categoryName);
+        }
+        let html = $(this).text();
+        $.ajax(
+            {
+                type:"post",
+                url:"category/delete",
+                contentType:"application/json",
+                data:JSON.stringify(names),
+                beforeSend:function (){
+                    enableLoadingVideo($(this));
+                    return true
+                },
+                success:function (result){
+                    disableLoadingVideo($(this),html);
+                    if (result.code!=1){
+                        alertUtil.message(result.message==null?"Delete failed":result.message,dangerType,document.getElementById("messageContainer"));
+                        return;
+                    }
+                    alertUtil.message("Success",successType,document.getElementById("messageContainer"));
+                    $("#table").bootstrapTable("refresh");
+                },
+                error:function (){
+                  disableLoadingVideo($(this),html);
+                  alertUtil.message("Delete failed",dangerType,document.getElementById("messageContainer"));
+                }
+            }
+        )
+    }
+
     $(function (){
         $("#addContainer").on("hide.bs.modal",function (){
             document.getElementById("addCategoryInput").value = '';
@@ -81,13 +122,17 @@
         $("#addCategoryBtn").on("click",function (){
             $("#addContainer").modal({keyboard:true,focus:true,show:true});
         })
+        $("#deleteCategoryBtn").on("click",doDelete);
         $('#table').bootstrapTable({
             search:true,
             toolbar:"#toolbar",
-            // url:"category/query",
-            checkbox:true,
-            clickToSelect: true,
-            columns: [{
+            url:"category/query",
+            columns: [
+
+                {
+                    checkbox:true
+                },
+                {
                 field: 'id',
                 title: 'Category ID'
             }, {
@@ -95,27 +140,16 @@
                 title: 'name'
             },
                 {
-                    field: "operate",
-                    title:"operation",
-                    clickToSelect: false,
-                    align:'center',
-                    searchable:false,
-                    events: window.operateEvents,
-                    formatter: operateFormatter
-                }
-            ],
-            data:[
-                {
-                    "id":"1",
-                    "categoryName":"123"
+                    title:"Edit",
+                    formatter:operateFormatter
                 }
             ]
         })
     })
 
 
-    function operateFormatter(){
-        return ["<a href='javascript:void(0)' title='delete'><i>remove</i></a>","<a href='javascript:void(0)' title='edit'><i>edit</i></a>"].join("<span class='col-1'></span>");
+    function operateFormatter(value,row,index,field){
+        return "<button class='btn btn-warning'><i class='bi bi-pencil-square'></i>Edit</button>"
     }
 
     function addNewCategory(btn){

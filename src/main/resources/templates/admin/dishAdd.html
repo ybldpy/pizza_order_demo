@@ -167,6 +167,7 @@
             let jsonObj = {};
             jsonObj["size"] = inputs[0].value;
             jsonObj["price"] = parseInt(inputs[1].value);
+            if (isNaN(jsonObj["price"]||jsonObj["price"]<=0)){alertUtil.message("price is illegal",warningType,document.getElementById("messageContainer"));return;}
             size_price.push(jsonObj);
         }
         dish["sizePrice"] = size_price;

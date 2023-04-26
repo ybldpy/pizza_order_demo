@@ -1,5 +1,6 @@
 file:
   upload-path: D:/pizza_order_demo/upload
+  temp-path: D:/pizza_order_demo/temp
 spring:
   thymeleaf:
     cache: false
@@ -16,7 +17,7 @@ spring:
   mail:
     host: smtp.163.com
     username: 18508782239@163.com
-    password: KGMTTQVMGTGLEIJN
+    password: WXBZCJYSENDTJCR
     properties:
       mail:
         smtp:

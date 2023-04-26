@@ -41,12 +41,11 @@
 
 
 <div style="margin-top: 5%;width: 95%;margin-left: 2.5%">
-    <!--    <div id="toolbar">-->
-    <!--        <span>-->
-    <!--            <button class="btn btn-danger" id="deleteBtn"><i class="bi bi-trash"></i>Delete</button>-->
-    <!--        </span>-->
-    <!--        <span><button class="btn btn-warning" id="stateBtn"><i class="bi bi-pen"></i> Change state</button></span>-->
-    <!--    </div>-->
+        <div id="toolbar">
+            <span>
+                <button class="btn btn-warning" onclick="$('#orderTable').bootstrapTable('refresh')"><i class="bi bi-arrow-clockwise"></i>Refresh</button>
+            </span>
+        </div>
     <table id="orderTable"></table>
 </div>
 
@@ -126,6 +125,7 @@
 
         $("#orderTable").bootstrapTable({
             search:true,
+            toolbar:'#toolbar',
             url:"order/toDelivery/orders",
             detailFormatter:function (index, row, $element){
                 let html = "<h5>Contact: "+(row.userAddress==null?"-":row.userAddress.contact)+"</h5>\n"+

@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <base href="../../static/" th:href="@{/}">
+    <meta charset="UTF-8">
+    <title>dish table</title>
+    <script src="js/header.js"></script>
+    <link href="plugins/bootstrap-table/bootstrap-table.min.css" rel="stylesheet"/>
+    <link rel="stylesheet" href="font/fonts.css">
+    <script src="js/footer.js"></script>
+    <script src="plugins/bootstrap-table/bootstrap-table.min.js"></script>
+</head>
+<style type="text/css">
+    td{
+        word-break: break-all;
+        word-wrap: break-word;
+    }
+</style>
+<body>
+<div id="messageContainer" style="width: 30%;margin-top: 1%;position: fixed;z-index: 1055;margin-left: 35%;top: 0">
+
+</div>
+<div id="edit-container" class="modal" tabindex="-1">
+
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Edit</h5>
+            </div>
+            <div class="modal-body">
+                <form id="edit-form">
+                    <input name="id" type="number" hidden/>
+                    <div class="form-group">
+                        <label>Deliveryman name</label>
+                        <input name="deliverymanName" type="text" class="form-control"/>
+                    </div>
+                    <div class="form-group">
+                        <label>Phone</label>
+                        <input name="phone" type="text" class="form-control" />
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer" style="width: 100%">
+                <button type="button" class="btn btn-secondary" onclick="let $container = $('#edit-container');$container.modal('hide');$container.find('input').val('')">Close</button>
+                <button id="changeBtn" type="button" onclick="doEdit($(this))" class="btn btn-warning">Edit</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="add-container" class="modal" tabindex="-1">
+
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Edit</h5>
+            </div>
+            <div class="modal-body">
+                <form id="add-form">
+                    <div class="form-group">
+                        <label>Deliveryman name</label>
+                        <input name="deliverymanName" type="text" class="form-control"/>
+                    </div>
+                    <div class="form-group">
+                        <label>Phone</label>
+                        <input name="phone" type="text" class="form-control" />
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer" style="width: 100%">
+                <button type="button" class="btn btn-secondary" onclick="let $container = $('#add-container');$container.modal('hide');$container.find('input').val('')">Close</button>
+                <button type="button" onclick="doAdd($(this))" class="btn btn-warning">Add</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<div style="margin-top: 5%;width: 85%;margin-left: 7.5%">
+    <div id="toolbar">
+        <span><button class="btn btn-warning" id="addBtn" onclick="$('#add-container').modal({backdrop: false})"><i class="bi bi-plus"></i>Add delivery man</button></span>
+        <span><button class="btn btn-danger" id="deleteBtn" onclick="doDelete($(this))"><i class="bi bi-trash"></i>Delete</button></span>
+    </div>
+    <table id="deliveryman-table"></table>
+</div>
+
+<script>
+
+    function doDelete($btn){
+        let ids = [];
+        let selections = $("#deliveryman-table").bootstrapTable('getSelections');
+        if (selections.length<1){
+            alertUtil.message("You must select at one to delete",warningType,messageContainer);
+        }
+        for(let i in selections){
+            ids.push(selections[i].id);
+        }
+        let html = $btn.text();
+        $.ajax(
+            {
+                type:"post",
+                contentType:"application/json",
+                url:"deliveryman/delete",
+                data:JSON.stringify(ids),
+                beforeSend:function (){
+                    enableLoadingVideo($btn)
+                    return true
+                },
+                success:function (result){
+                    disableLoadingVideo($btn,html);
+                    if (result.code!=1){
+                        alertUtil.message(result.message==null?"Delete failed":result.message,dangerType,messageContainer);
+                        return;
+                    }
+                    alertUtil.message("Success",successType,messageContainer);
+                    $("#deliveryman-table").bootstrapTable("refresh");
+                },
+                error:function (){
+                    disableLoadingVideo($btn,html);
+                    alertUtil.message("Delete failed",dangerType,messageContainer);
+                }
+            }
+        )
+
+    }
+
+
+    function doAdd($btn){
+        let $form = $("#add-form");
+        let name = $form.find("input[name='deliverymanName']").val();
+        if (isBlank(name)){
+            alertUtil.message("You must input deliveryman name",warningType,messageContainer);
+            return;
+        }
+        let phone = $form.find("input[name='phone']").val();
+        if (isBlank(phone)){
+            alertUtil.message("You must input phone",warningType,messageContainer);
+            return;
+        }
+        let html = $btn.text();
+        $.ajax(
+            {
+                type:"post",
+                url:"deliveryman/add",
+                data:$form.serialize(),
+                beforeSend:function (){
+                    enableLoadingVideo($btn);
+                },
+                success:function (result){
+                    disableLoadingVideo($btn,html);
+                    if (result.code!=1){
+                        alertUtil.message(result.message==null?"Add failed":result.message,dangerType,messageContainer);
+                        return;
+                    }
+                    alertUtil.message("Success",successType,messageContainer);
+                    $("#deliveryman-table").bootstrapTable("refresh");
+                },
+                error:function (){
+                    disableLoadingVideo($btn,html)
+                    alertUtil.message("Add failed",dangerType,messageContainer);
+                }
+            }
+        )
+    }
+
+    function getSelections(){
+        return $("#dishTable").bootstrapTable("getSelections");
+    }
+
+    function doEdit($btn){
+        let $form = $("#edit-form");
+        let name = $form.find("input[name='deliverymanName']").val();
+        if (isBlank(name)){
+            alertUtil.message("You must input deliveryman name",warningType,messageContainer);
+            return;
+        }
+        let phone = $form.find("input[name='phone']").val();
+        if (isBlank(phone)){
+            alertUtil.message("You must input phone",warningType,messageContainer);
+            return;
+        }
+        let html = $btn.text();
+        $.ajax(
+            {
+                type:"post",
+                url:"deliveryman/edit",
+                data:$form.serialize(),
+                beforeSend:function (){
+                    enableLoadingVideo($btn);
+                },
+                success:function (result){
+                  disableLoadingVideo($btn,html);
+                  if (result.code!=1){
+                      alertUtil.message(result.message==null?"Edit failed":result.message,dangerType,messageContainer);
+                      return;
+                  }
+                  alertUtil.message("Success",successType,messageContainer);
+                  $("#deliveryman-table").bootstrapTable("refresh");
+
+                },
+                error:function (){
+                    disableLoadingVideo($btn,html)
+                    alertUtil.message("Edit failed",dangerType,messageContainer);
+                }
+            }
+        )
+    }
+
+    const messageContainer = document.getElementById("messageContainer");
+
+    $(function (){
+        $("#deliveryman-table").bootstrapTable(
+            {
+                search:true,
+                url:"deliveryman/get",
+                toolbar:"#toolbar",
+                columns:[
+                    {
+                        checkbox:true
+                    },
+                    {
+                        field:"id",
+                        title:"id",
+                        searchable: true
+                    },
+                    {
+                        field: "deliverymanName",
+                        title: "Name",
+                        searchable:true
+                    },
+                    {
+                        field: "phone",
+                        title: "Phone",
+                        searchable: true
+                    },
+                    {
+                        title: "Edit",
+                        formatter:function (value,row,index,field){
+                            return "<button type='button' class='btn btn-warning' onclick='showEditModal("+row.id+",\""+row.deliverymanName+"\",\""+row.phone+"\")'><i class='bi bi-pencil-square'></i> Edit</button>"
+                        }
+                    }
+                ]
+            }
+        )
+    })
+
+
+    function showEditModal(id,name,phone){
+        let $form = $("#edit-form")
+        $form.find("input[name='id']").val(id);
+        $form.find("input[name='deliverymanName']").val(name);
+        $form.find("input[name='phone']").val(phone);
+        $("#edit-container").modal({backdrop: false});
+    }
+
+
+
+</script>
+</body>
+</html>

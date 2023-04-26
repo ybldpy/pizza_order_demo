@@ -78,7 +78,7 @@
         <div id="sizeAndPrice">
             <div class="form-row group-item" th:each="sizePrice:${sizePrice}">
                 <div class="form-group col-md-4">
-                    <input type="number" class="form-control" placeholder="Input size" th:value="${sizePrice.size}"/>
+                    <input class="form-control" type="text" placeholder="Input size" th:value="${sizePrice.size}"/>
                 </div>
                 <div class="form-group col-md-4">
                     <input type="number" class="form-control" placeholder="Input price" th:value="${sizePrice.price}"/>
@@ -113,8 +113,8 @@
             <div class="form-group col-5">
                 <label>Set status</label>
                 <select class="form-control selectpicker" name="state">
-                    <option value="1">Selling</option>
-                    <option value="0">Hide</option>
+                    <option value="1" th:selected="${dish.state} eq 1">Selling</option>
+                    <option value="0" th:selected="${dish.state} eq 0">Hide</option>
                 </select>
             </div>
             <!--            <div class="form-group col-4">-->
@@ -157,10 +157,11 @@
         let size_price = [];
         let items = $("#sizeAndPrice").find(".group-item");
         for(let i=0;i<items.length;i++){
-            let inputs = items.find("input[type='number']");
+            let inputs = $(items[i]).find("input");
             let jsonObj = {};
             jsonObj["size"] = parseInt(inputs[0].value);
-            jsonObj["price"] = parseInt(inputs[0].value);
+            jsonObj["price"] = parseInt(inputs[1].value);
+            if (isNaN(jsonObj["price"]||jsonObj["price"]<=0)){alertUtil.message("price is illegal",warningType,document.getElementById("messageContainer"));return;}
             size_price.push(jsonObj);
         }
         dish["sizePrice"] = size_price;
@@ -220,8 +221,6 @@
                 }
             }
         )
-
-
     }
 
 
@@ -264,55 +263,55 @@
         $(item).remove();
     }
 
-    function getCategory(){
-        $.ajax(
-            {
-                type:"get",
-                url:"category/query",
-                success:function (result){
-                    if (result==null||result==undefined||result.total==undefined||result.total==null){
-                        alertUtil.message("Get category failed, try to refresh",dangerType,document.getElementById("messageContainer"));
-                    }
-                    else {
-                        let select = $("select[name='categoryName']");
-                        let rows = result.rows;
-                        for(let i=0;i<rows.length;i++){
-                            select.append("<option value='"+rows[i].categoryName+"'>"+rows[i].categoryName+"</option>");
-                        }
-
-                    }
-                },
-                error:function (){
-                    alertUtil.message("Get category failed, try to refresh",dangerType,document.getElementById("messageContainer"));
-                }
-            }
-        );
-    }
-    function getTopping(){
-        $.ajax(
-            {
-                type:"get",
-                url:"topping/get",
-                success:function (result){
-                    if (result==null||result==undefined){
-                        alertUtil.message("Get topping failed, try to refresh",dangerType,document.getElementById("messageContainer"));
-                    }
-                    else {
-                        let select = $("#topping");
-                        let prefix = "<option value='";
-                        let postFix = "</option>"
-                        for(let i=0;i<result.total;i++){
-                            select.append(prefix+result.rows[i].toppingName+"'>"+result.rows[i].toppingName+postFix);
-                        }
-                        select.selectpicker("refresh");
-                    }
-                },
-                error:function (){
-                    alertUtil.message("Get topping failed, try to refresh",dangerType,document.getElementById("messageContainer"));
-                }
-            }
-        );
-    }
+    // function getCategory(){
+    //     $.ajax(
+    //         {
+    //             type:"get",
+    //             url:"category/query",
+    //             success:function (result){
+    //                 if (result==null||result==undefined||result.total==undefined||result.total==null){
+    //                     alertUtil.message("Get category failed, try to refresh",dangerType,document.getElementById("messageContainer"));
+    //                 }
+    //                 else {
+    //                     let select = $("select[name='categoryName']");
+    //                     let rows = result.rows;
+    //                     for(let i=0;i<rows.length;i++){
+    //                         select.append("<option value='"+rows[i].categoryName+"'>"+rows[i].categoryName+"</option>");
+    //                     }
+    //
+    //                 }
+    //             },
+    //             error:function (){
+    //                 alertUtil.message("Get category failed, try to refresh",dangerType,document.getElementById("messageContainer"));
+    //             }
+    //         }
+    //     );
+    // }
+    // function getTopping(){
+    //     $.ajax(
+    //         {
+    //             type:"get",
+    //             url:"topping/get",
+    //             success:function (result){
+    //                 if (result==null||result==undefined){
+    //                     alertUtil.message("Get topping failed, try to refresh",dangerType,document.getElementById("messageContainer"));
+    //                 }
+    //                 else {
+    //                     let select = $("#topping");
+    //                     let prefix = "<option value='";
+    //                     let postFix = "</option>"
+    //                     for(let i=0;i<result.total;i++){
+    //                         select.append(prefix+result.rows[i].toppingName+"'>"+result.rows[i].toppingName+postFix);
+    //                     }
+    //                     select.selectpicker("refresh");
+    //                 }
+    //             },
+    //             error:function (){
+    //                 alertUtil.message("Get topping failed, try to refresh",dangerType,document.getElementById("messageContainer"));
+    //             }
+    //         }
+    //     );
+    // }
 
     $(function (){
         // getCategory();
@@ -343,7 +342,6 @@
                     }
                     else {
                         alertUtil.message("Upload success","success",document.getElementById("messageContainer"));
-                        alert(result.data)
                         $("input[name='img']")[0].value = result.data
                     }
                 },

@@ -234,10 +234,10 @@ public class UserController {
         }
         String code = MailUtil.createValidationCode(4);
         System.out.println(code);
-//        boolean success = MailUtil.sendCode(code,mail);
-//        if (!success){
-//            return new Result(ResultConstant.CODE_FAILED,ErrorConstant.CODE_SEND_ERROR,null);
-//        }
+        boolean success = MailUtil.sendCode(code,mail);
+        if (!success){
+            return new Result(ResultConstant.CODE_FAILED,ErrorConstant.CODE_SEND_ERROR,null);
+        }
         codeMap.put(mail+MAIL_POSTFIX_REGISTER,code+","+System.currentTimeMillis());
         return new Result(ResultConstant.CODE_SUCCESS,ResultConstant.MESSAGE_SUCCESS,null);
     }

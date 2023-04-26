@@ -5,19 +5,19 @@ import com.example.pizza_order_demo.commons.Result;
 import com.example.pizza_order_demo.commons.constant.ErrorConstant;
 import com.example.pizza_order_demo.commons.constant.ResultConstant;
 import com.example.pizza_order_demo.exception.CURDException;
-import com.example.pizza_order_demo.model.Category;
-import com.example.pizza_order_demo.model.CategoryExample;
+import com.example.pizza_order_demo.model.*;
 import com.example.pizza_order_demo.service.CategoryService;
+import com.example.pizza_order_demo.service.DishService;
+import com.example.pizza_order_demo.service.LogService;
 import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import java.util.*;
@@ -28,6 +28,10 @@ public class CategoryController {
 
     @Autowired
     private CategoryService categoryService;
+    @Autowired
+    private LogService logService;
+    @Autowired
+    private DishService dishService;
 
 
     @GetMapping("/category/management")
@@ -39,7 +43,7 @@ public class CategoryController {
     @PostMapping("/category/add")
     @Transactional(rollbackFor = Exception.class)
     @ResponseBody
-    public Result addCategory(String categoryName){
+    public Result addCategory(String categoryName,Authentication authentication){
         if (StringUtils.isBlank(categoryName)){
             Result result = new Result(ResultConstant.CODE_FAILED,"Empty",null);
             return result;
@@ -57,6 +61,18 @@ public class CategoryController {
             }
             else {
                 Result resultSuccess= new Result(ResultConstant.CODE_SUCCESS,"Success",category);
+                String curUser = "admin";
+                if (!ObjectUtils.isEmpty(authentication)){
+                    Object principal = authentication.getPrincipal();
+                    curUser = principal==null?curUser:((UserDetailsImpl)principal).getUsername();
+                }
+                Log log = new Log();
+                log.setCreateTime(System.currentTimeMillis());
+                log.setIsHandled(0);
+                log.setOperationtype(1);
+                log.setDescription(String.format("add category %s",category.getCategoryName()));
+                log.setUserName(curUser);
+                logService.insert(log);
                 return resultSuccess;
             }
         }
@@ -79,7 +95,6 @@ public class CategoryController {
 //                categoryExample.or().andIdEqualTo(Integer.parseInt(search));
 //            }
 //        }
-
         List<Category> categoryList = categoryService.selectByExample(categoryExample);
         int count = categoryList.size();
         Map<String,Object> resultMap = new HashMap<>();
@@ -91,7 +106,7 @@ public class CategoryController {
     @PostMapping("/category/delete")
     @Transactional(rollbackFor = Exception.class)
     @ResponseBody
-    public Result deleteCategory(List<String> categoryName){
+    public Result deleteCategory(@RequestBody List<String> categoryName, Authentication authentication){
         if (ObjectUtils.isEmpty(categoryName)){
             return new Result(ResultConstant.CODE_FAILED, ErrorConstant.PARAM_MISSING,null);
         }
@@ -101,13 +116,29 @@ public class CategoryController {
         if (ObjectUtils.isEmpty(categoryList)||categoryList.size()!=categoryName.size()){
             return new Result(ResultConstant.CODE_FAILED,"One or more than one categories don't find",null);
         }
-
+        DishExample dishExample = new DishExample();
+        dishExample.or().andCategoryNameIn(categoryName);
+        if (dishService.countByExample(dishExample)>0){
+            return new Result(ResultConstant.CODE_FAILED,"Some dishes is in those categories, please make sure there is no dishes in categories",null);
+        }
         Category category = new Category();
         category.setDeleted(1);
         int res = categoryService.updateByExampleSelective(category,categoryExample);
         if (res!=categoryList.size()){
             throw new CURDException();
         }
+        String curUser = "admin";
+        if (!ObjectUtils.isEmpty(authentication)){
+            Object principal = authentication.getPrincipal();
+            curUser = principal==null?curUser:((UserDetailsImpl)principal).getUsername();
+        }
+        Log log = new Log();
+        log.setCreateTime(System.currentTimeMillis());
+        log.setIsHandled(0);
+        log.setOperationtype(1);
+        log.setDescription(String.format("add category %s",category.getCategoryName()));
+        log.setUserName(curUser);
+        logService.insert(log);
         return new Result(ResultConstant.CODE_SUCCESS,ResultConstant.MESSAGE_SUCCESS,null);
     }
 }
