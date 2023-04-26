@@ -92,7 +92,7 @@ public class ToppingController {
     @ResponseBody
     @Transactional(rollbackFor = Exception.class)
     public Result deleteTopping(@RequestBody List<Integer> ids,Authentication authentication) throws JsonProcessingException {
-        if (ObjectUtils.isEmpty(ids)||ids.isEmpty()){
+        if (ObjectUtils.isEmpty(ids)){
             return new Result(ResultConstant.CODE_FAILED,ErrorConstant.PARAM_MISSING,null);
         }
         ToppingExample toppingExample = new ToppingExample();
