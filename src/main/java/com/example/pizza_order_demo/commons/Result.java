@@ -6,11 +6,11 @@ public class Result {
 
 
     /**
-     * 0-成功 1-失败
+     * 0-success 1-failed
      */
     private int code;
     /**
-     * 反馈消息
+     * response message
      */
     private String message;
 
@@ -24,7 +24,7 @@ public class Result {
     }
 
     /**
-     * 传输的数据
+     * data send to front-end
      */
     private Object data;
 

@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
   <base href="../../static/" th:href="@{/}">
   <meta charset="UTF-8">
@@ -45,8 +45,7 @@
 
 
 </style>
-<body th:style="'background-size: 100% 100%;background-image: url('+@{img/loginBack.jpg}+');background-repeat: no-repeat;background-position: center;background-attachment: fixed'"
-      style="background-size: 100% 100%;background-image: url('../../static/img/loginBack.jpg');background-repeat: no-repeat;background-position: center;background-attachment: fixed">
+<body style="background-size: 100% 100%;background-image: url('img/loginBack.jpg');background-repeat: no-repeat;background-position: center;background-attachment: fixed">
 <div id="header" class="fixed-top" >
   <nav class="navbar navbar-expand-lg navbar-light color" style="max-height: 100px" >
     <a class="navbar-brand color" href="#" style="height: 100%;padding: 0 0 ">
@@ -89,10 +88,10 @@
               Username
             </a>
             <ul class="dropdown-menu" >
-              <li><a class="dropdown-item" href="Order/All orders.html" th:href="@{Order/All orders.html}">
+              <li><a class="dropdown-item" href="Order/All orders.html" th:href="@{/order/all}">
                 <i class="bi bi-list">&nbsp&nbsp</i>
                 All Orders</a></li>
-              <li><a class="dropdown-item" href="user/Profile.html" th:herf="@{user/Profile.html}">
+              <li><a class="dropdown-item" href="user/Profile.html" th:href="@{/user/profile}">
                 <i class="bi bi-person-lines-fill">&nbsp&nbsp</i>
                 Profile</a></li>
               <li><hr class="dropdown-divider"></li>
@@ -112,14 +111,14 @@
     </div>
   </nav>
 </div>
-<input type="number" id="orderId" th:value="${orderId}" hidden>
+
 <div class="Big">
   <section class="individual">
     <div class="card">
       <div class="card-header"><h3>Personal information</h3></div>
       <div class="card-body">
         <blockquote class="blockquote mb-0">
-          <div class="float-left " style="width: 20%;">
+          <div class="float-left" style="width: 20%;">
             <div class="brand" href="#" style="width: 80%;overflow: hidden;border-radius: 50%;box-shadow: 0 40px 80px rgba(0,0,0,.05);z-index: 1;margin: 20px 10% ">
               <img src="img/defaultAvatar.png" alt="Default avatar" style="width: 100%;" >
             </div>
@@ -131,7 +130,7 @@
                   <div class="input-group-prepend">
                     <span class="input-group-text" id="basic-addon1" style="font-size: 20px">Username</span>
                   </div>
-                  <span type="text" class="form-control" placeholder="Username" aria-label="Username" aria-describedby="basic-addon1" style="font-size: 20px"></span>
+                  <span type="text" class="form-control" placeholder="Username" aria-label="Username" aria-describedby="basic-addon1" style="font-size: 20px" readonly>[(${user.username})]</span>
                 </div>
               </li>
 
@@ -140,18 +139,18 @@
                   <div class="input-group-prepend">
                     <span class="input-group-text" id="basic-addon2" style="font-size: 20px">Email</span>
                   </div>
-                  <span type="text" class="form-control" placeholder="email" aria-label="email" aria-describedby="basic-addon2" style="font-size: 20px"></span>
+                  <span type="text" class="form-control" placeholder="email" aria-label="email" aria-describedby="basic-addon2" style="font-size: 20px" readonly>[(${user.mail}})]</span>
                 </div>
               </li>
 
-              <li class="list-group-item" id="phoneNumber" >
-                <div class="input-group mb-3">
-                  <div class="input-group-prepend">
-                    <span class="input-group-text" id="basic-addon3" style="font-size: 20px">Phone Number</span>
-                  </div>
-                  <span type="text" class="form-control" placeholder="phoneNumber" aria-label="phoneNumber" aria-describedby="basic-addon3" style="font-size: 20px"></span>
-                </div>
-              </li>
+<!--              <li class="list-group-item" id="phoneNumber" >-->
+<!--                <div class="input-group mb-3">-->
+<!--                  <div class="input-group-prepend">-->
+<!--                    <span class="input-group-text" id="basic-addon3" style="font-size: 20px">Phone Number</span>-->
+<!--                  </div>-->
+<!--                  <span type="text" class="form-control" placeholder="phoneNumber" aria-label="phoneNumber" aria-describedby="basic-addon3" style="font-size: 20px"></span>-->
+<!--                </div>-->
+<!--              </li>-->
 
               <li class="list-group-item" id="wallet" >
                 <div class="input-group mb-3">
@@ -161,7 +160,7 @@
                   <div class="input-group-prepend">
                     <span class="input-group-text">$</span>
                   </div>
-                  <span type="text" class="form-control" aria-label="Amount (to the nearest dollar)" style="font-size: 20px"></span>
+                  <span type="text" class="form-control" aria-label="Amount (to the nearest dollar)" style="font-size: 20px" readonly>[(${balance})]</span>
                   <div class="input-group-append">
                     <span class="input-group-text">.00</span>
                   </div>
@@ -170,10 +169,10 @@
 
               <li class="list-group-item" id="address" >
                 <div class="input-group mb-3">
-                  <button class="btn btn-outline-secondary" type="button" id="button-addon1" style="font-size: 20px" href="#">Delivery Address</button>
+                  <a class="btn btn-warning" type="button" id="button-addon1" style="font-size: 20px" href="user/address">Delivery Address</a>
+                  <a class="btn btn-warning" type="button" href="user/resetPassword" style="font-size: 20px;margin-left: 1%">Change password</a>
                 </div>
               </li>
-
             </ul>
           </div>
         </blockquote>

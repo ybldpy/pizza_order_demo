@@ -10,6 +10,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+/**
+ * class that is responsible for handling exception
+ * managed by Spring IOC
+ */
 @ControllerAdvice
 public class ExceptionHandler {
 

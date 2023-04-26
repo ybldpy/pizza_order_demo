@@ -14,7 +14,7 @@ public class MailUtil {
 
 
     private static JavaMailSender javaMailSender;
-    private static String[] sender = {"18508782239@163.com"};
+    private static String sender = "18508782239@163.com";
 
     public MailUtil(JavaMailSender mailSender){
         javaMailSender = mailSender;
@@ -45,18 +45,10 @@ public class MailUtil {
         simpleMailMessage.setTo(mail);
         simpleMailMessage.setSubject("Verification Code");
         simpleMailMessage.setText(code);
-        for(String s:sender){
-            try {
-                simpleMailMessage.setFrom(s);
-                javaMailSender.send(simpleMailMessage);
-                return true;
-            }
-            catch (MailException e){
-                e.printStackTrace();
-            }
-        }
 
-        return false;
+        simpleMailMessage.setFrom(sender);
+        javaMailSender.send(simpleMailMessage);
+        return true;
 
     }
 

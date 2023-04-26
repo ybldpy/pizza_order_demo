@@ -1,6 +1,6 @@
 
 const illegalUsername = "The length of user name is 5-30 and only letters and numbers are allowed to appear in username";
-const illegalPassword = "The length of user name is 5-16 and only letters and numbers are allowed to appear in password";
+const illegalPassword = "The length of password is 5-16 and only letters and numbers are allowed to appear in password";
 const repeatPasswordNotEqual = "Repeat password must equals to password";
 const successType = "success";
 const dangerType = "danger";
@@ -123,7 +123,7 @@ function checkUsername(username,rep){
 }
 
 function checkPassword(password,rep){
-    if (typeof rep=="undefined"){
+    if (rep == undefined||typeof rep=="undefined"){
         rep = /^[A-Za-z0-9]+$/;
     }
     if (typeof password!="string"){

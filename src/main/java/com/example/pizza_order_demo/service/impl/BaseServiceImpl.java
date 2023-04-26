@@ -20,7 +20,6 @@ import java.util.List;
 public abstract class BaseServiceImpl<Mapper, Record, Example> implements BaseService<Record, Example> {
 
     private static final Log log = LogFactory.getLog(BaseServiceImpl.class);
-    private Example EMPTY_EXAMPLE;
 
     public Mapper mapper;
 

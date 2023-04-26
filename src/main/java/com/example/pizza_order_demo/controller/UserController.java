@@ -11,6 +11,7 @@ import com.example.pizza_order_demo.model.*;
 import com.example.pizza_order_demo.service.RoleService;
 import com.example.pizza_order_demo.service.UserRoleService;
 import com.example.pizza_order_demo.service.UserService;
+import com.example.pizza_order_demo.service.WalletService;
 import com.example.pizza_order_demo.utils.MailUtil;
 import com.example.pizza_order_demo.utils.UserUtil;
 import org.apache.commons.lang3.ObjectUtils;
@@ -45,6 +46,8 @@ public class UserController {
     private ConcurrentHashMap<String,String> codeMap = new ConcurrentHashMap<>();
     @Autowired
     private PasswordEncoder passwordEncoder;
+    @Autowired
+    private WalletService walletService;
 
     private static final long duration = 1*1000*60*5;
     private static final String MAIL_POSTFIX_REGISTER = "register";
@@ -170,7 +173,52 @@ public class UserController {
         return "login";
     }
 
+    @GetMapping("/user/profile")
+    public String userProfile(Authentication authentication,Model model){
+        String curUser = ((UserDetailsImpl)(authentication.getPrincipal())).getUsername();
+        UserExample userExample = new UserExample();
+        userExample.or().andUsernameEqualTo(curUser);
+        User user = userService.selectFirstByExample(userExample);
+        WalletExample walletExample = new WalletExample();
+        walletExample.or().andUsernameEqualTo(curUser);
+        Wallet wallet = walletService.selectFirstByExample(walletExample);
+        model.addAttribute("user",user);
+        model.addAttribute("balance",wallet.getBalance());
+        return "user/Profile";
+    }
 
+    @GetMapping("/user/resetPassword")
+    public String resetPassword(){
+        return "user/resetPassword";
+    }
+
+
+    @PostMapping("/user/resetPassword")
+    @ResponseBody
+    public Result resetPassword(String oldPassword,String password,Authentication authentication){
+        if (!UserUtil.isValidateField(oldPassword,5,30) || UserUtil.isValidateField(password,5,30)){
+            return new Result(ResultConstant.CODE_FAILED,ErrorConstant.USER_REGISTER_PASSWORD_LENGTH,null);
+        }
+        if (!UserUtil.isLegalUsernameOrPwd(oldPassword)||!UserUtil.isLegalUsernameOrPwd(password)){
+            return new Result(ResultConstant.CODE_FAILED,ErrorConstant.USER_REGISTER_PASSWORD_ILLEGAL_CHARACTER,null);
+        }
+
+        String curUser = ((UserDetailsImpl)authentication.getPrincipal()).getUsername();
+        UserExample userExample = new UserExample();
+        userExample.or().andUsernameEqualTo(curUser);
+        User user = userService.selectFirstByExample(userExample);
+        if (!passwordEncoder.matches(oldPassword,user.getPwd())){
+            return new Result(ResultConstant.CODE_FAILED,"Old password is not correct",null);
+        }
+        user.setPwd(passwordEncoder.encode(password));
+        int res = userService.updateByPrimaryKey(user);
+        if (res<1){
+            return new Result(ResultConstant.CODE_FAILED,"Reset failed",null);
+        }
+        return new Result(ResultConstant.CODE_SUCCESS,ResultConstant.MESSAGE_SUCCESS,null);
+
+
+    }
 
     @PostMapping("/register")
     @Transactional(rollbackFor = Exception.class)
@@ -216,6 +264,13 @@ public class UserController {
         userRole.setRoleId(role.getId());
         res = userRoleService.insert(userRole);
         if(res<1){
+            throw new CURDException();
+        }
+        Wallet wallet = new Wallet();
+        wallet.setBalance(0);
+        wallet.setUsername(user.getUsername());
+        res = walletService.insert(wallet);
+        if (res<1){
             throw new CURDException();
         }
         codeMap.remove(user.getMail()+MAIL_POSTFIX_REGISTER);
