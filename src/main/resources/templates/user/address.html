@@ -7,6 +7,7 @@
     <script src="js/header.js"></script>
     <link href="plugins/bootstrap-table/bootstrap-table.min.css" rel="stylesheet"/>
     <script src="js/footer.js"></script>
+    <link href="font/fonts.css" rel="stylesheet"/>
     <script src="plugins/bootstrap-table/bootstrap-table.min.js"></script>
 
 </head>
@@ -137,9 +138,9 @@
 
 </div>
 <div id="header" class="fixed-top" >
-    <nav class="navbar navbar-expand-lg navbar-light color" style="height: 50px" >
-        <a class="navbar-brand color" href="#">
-            <img src="img/logo.png" alt="logo" style="height: 40px">
+    <nav class="navbar navbar-expand-lg navbar-light color" style="max-height: 100px" >
+        <a class="navbar-brand color" href="#" style="height: 100%;padding: 0 0 ">
+            <img src="img/logo.png" alt="logo"  style="height: 40px;">
         </a>
         <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarScroll" aria-controls="navbarScroll" aria-expanded="false" aria-label="Toggle navigation">
             <span class="navbar-toggler-icon"></span>
@@ -149,27 +150,27 @@
                 <li class="nav-item active">
                     <a class="nav-link" href="#">Home <span class="sr-only">(current)</span></a>
                 </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="#">Link</a>
+                <li class="nav-item ">
+                    <a class="nav-link" href="#">Menu</a>
                 </li>
-                <li class="nav-item dropdown">
-                    <a class="nav-link dropdown-toggle" href="#" role="button" data-toggle="dropdown" aria-expanded="false">
-                        Link
-                    </a>
-                    <ul class="dropdown-menu">
-                        <li><a class="dropdown-item" href="#">Action</a></li>
-                        <li><a class="dropdown-item" href="#">Another action</a></li>
-                        <li><hr class="dropdown-divider"></li>
-                        <li><a class="dropdown-item" href="#">Something else here</a></li>
-                    </ul>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link disabled">Link</a>
-                </li>
+                <!--        <li class="nav-item dropdown">-->
+                <!--          <a class="nav-link dropdown-toggle" href="#" role="button" data-toggle="dropdown" aria-expanded="false">-->
+                <!--            Link-->
+                <!--          </a>-->
+                <!--          <ul class="dropdown-menu">-->
+                <!--            <li><a class="dropdown-item" href="#">Action</a></li>-->
+                <!--            <li><a class="dropdown-item" href="#">Another action</a></li>-->
+                <!--            <li><hr class="dropdown-divider"></li>-->
+                <!--            <li><a class="dropdown-item" href="#">Something else here</a></li>-->
+                <!--          </ul>-->
+                <!--        </li>-->
+                <!--        <li class="nav-item">-->
+                <!--          <a class="nav-link disabled">Link</a>-->
+                <!--        </li>-->
             </ul>
-            <form class="d-flex">
+            <form class="d-flex" >
                 <input class="form-control mr-2" type="search" placeholder="Search" aria-label="Search">
-                <button class="btn btn-outline-success" type="submit">Search</button>
+                <button class="btn btn-outline-secondary" type="submit" style="width: 130px"><i class="bi bi-search">&nbsp;Search</i> </button>
             </form>
             <div style="">
                 <ul class="navbar-nav mr-auto my-2 my-lg-0 navbar-nav-scroll" style="max-height: 100px;">
@@ -178,10 +179,10 @@
                             Username
                         </a>
                         <ul class="dropdown-menu" >
-                            <li><a class="dropdown-item" href="#">
+                            <li><a class="dropdown-item" href="Order/All orders.html" th:href="@{Order/All orders.html}">
                                 <i class="bi bi-list">&nbsp&nbsp</i>
-                                Order</a></li>
-                            <li><a class="dropdown-item" href="#">
+                                All Orders</a></li>
+                            <li><a class="dropdown-item" href="user/Profile.html" th:herf="@{user/Profile.html}">
                                 <i class="bi bi-person-lines-fill">&nbsp&nbsp</i>
                                 Profile</a></li>
                             <li><hr class="dropdown-divider"></li>
