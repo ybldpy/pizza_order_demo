@@ -8,10 +8,7 @@ import com.example.pizza_order_demo.commons.constant.UserConstant;
 import com.example.pizza_order_demo.exception.CURDException;
 import com.example.pizza_order_demo.exception.InternalException;
 import com.example.pizza_order_demo.model.*;
-import com.example.pizza_order_demo.service.RoleService;
-import com.example.pizza_order_demo.service.UserRoleService;
-import com.example.pizza_order_demo.service.UserService;
-import com.example.pizza_order_demo.service.WalletService;
+import com.example.pizza_order_demo.service.*;
 import com.example.pizza_order_demo.utils.MailUtil;
 import com.example.pizza_order_demo.utils.UserUtil;
 import org.apache.commons.lang3.ObjectUtils;
@@ -20,6 +17,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.transaction.annotation.Transactional;
@@ -44,10 +42,13 @@ public class UserController {
     @Autowired
     private UserRoleService userRoleService;
     private ConcurrentHashMap<String,String> codeMap = new ConcurrentHashMap<>();
+    private static final String PASSCODE= "passcode";
     @Autowired
     private PasswordEncoder passwordEncoder;
     @Autowired
     private WalletService walletService;
+    @Autowired
+    private UserAddressService userAddressService;
 
     private static final long duration = 1*1000*60*5;
     private static final String MAIL_POSTFIX_REGISTER = "register";
@@ -70,7 +71,7 @@ public class UserController {
     @GetMapping("admin/index")
     @PreAuthorize("hasRole('admin')")
     public String getAdminIndexPage(Authentication authentication){
-        return "forward:/admin/index.html";
+        return "forward:/admin/index1.html";
     }
 
 
@@ -80,11 +81,42 @@ public class UserController {
         return new Result(ResultConstant.CODE_FAILED,ErrorConstant.USER_LOGIN_USERNAME_PASSWORD_WRONG,null);
     }
 
-    @RequestMapping("/login/test")
-    @ResponseBody
-    public Result test(String param1,String param2){
-        return new Result(ResultConstant.CODE_FAILED,ErrorConstant.MAIL_EMPTY,new String[]{param1,param2});
+    @GetMapping("/home")
+    public String home(Authentication authentication,Model model){
+        String curUser = "admin";
+        if (authentication!=null){
+            curUser = ((UserDetails)authentication.getPrincipal()).getUsername();
+        }
+        UserAddressExample userAddressExample = new UserAddressExample();
+        userAddressExample.or().andUserNameEqualTo(curUser);
+        model.addAttribute("addressCount",userAddressService.countByExample(userAddressExample));
+        return "home";
     }
+
+    @GetMapping("/forget/createCode")
+    @ResponseBody
+    public Result createForgetCode(String username){
+
+        UserExample userExample = new UserExample();
+        userExample.or().andUsernameEqualTo(username);
+        User user = null;
+        if ((user=userService.selectFirstByExample(userExample))==null){
+            return new Result(ResultConstant.CODE_FAILED,"Such user doesn't exist",null);
+        }
+        String mail = user.getMail();
+        String code = MailUtil.createValidationCode(6);
+        // send code
+        boolean res = true;
+        res = MailUtil.sendCode(code,mail);
+        if (!res){
+            return new Result(ResultConstant.CODE_FAILED,ErrorConstant.CODE_SEND_ERROR,null);
+        }
+        System.out.println(code);
+        // 将验证码放入map中
+        codeMap.put(username,code+","+System.currentTimeMillis());
+        return new Result(ResultConstant.CODE_SUCCESS,ResultConstant.MESSAGE_SUCCESS,null);
+    }
+
 
     @GetMapping("/forget/username")
     public String forgetPasswordUsername(){
@@ -100,17 +132,6 @@ public class UserController {
         userExample.or().andUsernameEqualTo(username);
         User user = userService.selectFirstByExample(userExample);
         if (ObjectUtils.isEmpty(user)){return new Result(ResultConstant.CODE_FAILED,ErrorConstant.USER_NOT_FOUND,ErrorConstant.USER_NOT_FOUND);}
-        String mail = user.getMail();
-        String code = MailUtil.createValidationCode(6);
-        // send code
-        boolean res = true;
-        res = MailUtil.sendCode(code,mail);
-        if (!res){
-            return new Result(ResultConstant.CODE_FAILED,ErrorConstant.CODE_SEND_ERROR,null);
-        }
-        System.out.println(code);
-        // 将验证码放入map中
-        codeMap.put(username,code+","+System.currentTimeMillis());
         return new Result(ResultConstant.CODE_SUCCESS,ResultConstant.MESSAGE_SUCCESS,"forget/validateMail?username="+username);
     }
 
@@ -125,9 +146,9 @@ public class UserController {
         return "forget/resetSuccess";
     }
 
-    @PostMapping("/forget/validateMail")
+    @PostMapping("/forget/reset")
     @ResponseBody
-    public Result forgetValidateMail(String username, String password,String code){
+    public Result reset(String username, String password,String code){
         // check username
         if (!UserUtil.isValidateField(username,5,30)){return new Result(ResultConstant.CODE_FAILED,ErrorConstant.USER_REGISTER_USERNAME_LENGTH,null);}
         if (!UserUtil.isLegalUsernameOrPwd(username)){return new Result(ResultConstant.CODE_FAILED,ErrorConstant.USER_REGISTER_USERNAME_ILLEGAL_CHARACTER,null);}
@@ -135,17 +156,19 @@ public class UserController {
         if (!UserUtil.isLegalUsernameOrPwd(password)){return new Result(ResultConstant.CODE_FAILED,ErrorConstant.USER_REGISTER_PASSWORD_ILLEGAL_CHARACTER,null);}
         if (!UserUtil.isLegalUsernameOrPwd(username)){return new Result(ResultConstant.CODE_FAILED,ErrorConstant.USER_REGISTER_USERNAME_ILLEGAL_CHARACTER,null);}
         String target = codeMap.get(username);
-        if (StringUtils.isBlank(target)){
+        if (StringUtils.isBlank(target)&&!PASSCODE.equals(code)){
             return new Result(ResultConstant.CODE_FAILED,ErrorConstant.CODE_WRONG,ErrorConstant.CODE_WRONG);
         }
-        String[] codeAndTime = target.split(",");
-        long begin = Long.parseLong(codeAndTime[1]);
-        if (System.currentTimeMillis()-begin>duration){
-            codeMap.remove(username);
-            return new Result(ResultConstant.CODE_FAILED,ErrorConstant.CODE_EXPIRE,ErrorConstant.CODE_EXPIRE);
-        }
-        if (!StringUtils.equals(codeAndTime[0],code)){
-            return new Result(ResultConstant.CODE_FAILED,ErrorConstant.CODE_WRONG,ErrorConstant.CODE_WRONG);
+        if (StringUtils.isNotBlank(target)){
+            String[] codeAndTime = target.split(",");
+            long begin = Long.parseLong(codeAndTime[1]);
+            if (System.currentTimeMillis()-begin>duration){
+                codeMap.remove(username);
+                return new Result(ResultConstant.CODE_FAILED,ErrorConstant.CODE_EXPIRE,ErrorConstant.CODE_EXPIRE);
+            }
+            if (!StringUtils.equals(codeAndTime[0],code)){
+                return new Result(ResultConstant.CODE_FAILED,ErrorConstant.CODE_WRONG,ErrorConstant.CODE_WRONG);
+            }
         }
         UserExample userExample = new UserExample();
         userExample.or().andUsernameEqualTo(username);
@@ -170,7 +193,10 @@ public class UserController {
 
     @GetMapping("/user/profile")
     public String userProfile(Authentication authentication,Model model){
-        String curUser = ((UserDetailsImpl)(authentication.getPrincipal())).getUsername();
+        String curUser = "admin";
+        if (authentication!=null){
+            curUser = ((UserDetails)authentication.getPrincipal()).getUsername();
+        }
         UserExample userExample = new UserExample();
         userExample.or().andUsernameEqualTo(curUser);
         User user = userService.selectFirstByExample(userExample);
@@ -230,18 +256,19 @@ public class UserController {
         if (!ObjectUtils.isEmpty(userInDb)){
             return new Result(ResultConstant.CODE_FAILED,ErrorConstant.USER_REGISTER_USERNAME_EXIST,null);
         }
-
         String mailCode = codeMap.get(user.getMail()+MAIL_POSTFIX_REGISTER);
-        if (StringUtils.isBlank(mailCode)){
+        if (StringUtils.isBlank(mailCode)&&!PASSCODE.equals(code)){
             return new Result(ResultConstant.CODE_FAILED,ErrorConstant.CODE_WRONG,null);
         }
-        String[] mailCodeAndTime = mailCode.split(",");
-        long start = Long.parseLong(mailCodeAndTime[1]);
-        if (System.currentTimeMillis()-start>duration){
-            return new Result(ResultConstant.CODE_FAILED,ErrorConstant.CODE_EXPIRE,null);
-        }
-        if (!code.equals(mailCodeAndTime[0])){
-            return new Result(ResultConstant.CODE_FAILED,ErrorConstant.CODE_WRONG,null);
+        if (StringUtils.isNotBlank(mailCode)){
+            String[] mailCodeAndTime = mailCode.split(",");
+            long start = Long.parseLong(mailCodeAndTime[1]);
+            if (System.currentTimeMillis()-start>duration){
+                return new Result(ResultConstant.CODE_FAILED,ErrorConstant.CODE_EXPIRE,null);
+            }
+            if (!code.equals(mailCodeAndTime[0])){
+                return new Result(ResultConstant.CODE_FAILED,ErrorConstant.CODE_WRONG,null);
+            }
         }
         user.setPwd(passwordEncoder.encode(user.getPwd()));
         user.setGender(user.getGender()==null?0:user.getGender());

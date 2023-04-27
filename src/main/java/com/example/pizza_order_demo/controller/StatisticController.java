@@ -1,5 +1,6 @@
 package com.example.pizza_order_demo.controller;
 
+import com.alibaba.excel.EasyExcel;
 import com.example.pizza_order_demo.model.*;
 import com.example.pizza_order_demo.service.OrderDetailService;
 import com.example.pizza_order_demo.service.OrderService;
@@ -13,7 +14,11 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
+import java.net.URLEncoder;
 import java.sql.Date;
+import java.sql.Time;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
@@ -29,6 +34,9 @@ public class StatisticController {
     @Autowired
     private OrderDetailService orderDetailService;
 
+    private static final int[] COST = {1000,1200,900,943,1250,1222,1323};
+    private static final long DAY = 24L*60*60*1000;
+
     @GetMapping("/admin/statistic")
     public String getStatistic(){
         return "admin/statistics";
@@ -42,6 +50,86 @@ public class StatisticController {
             return o2.getValue()-o1.getValue();
         }
     };
+
+    private Comparator<String> stringComparator = new Comparator<String>() {
+        @Override
+        public int compare(String o1, String o2) {
+            long diff = Date.valueOf(o1).getTime()-Date.valueOf(o2).getTime();
+            return diff>0?1:diff==0?0:-1;
+        }
+    };
+
+    @GetMapping("/statistic/cost")
+    @ResponseBody
+    public Object getCost(){
+
+        long cur = System.currentTimeMillis();
+        String curStr = TimeUtils.translateTimeToString(cur,"yyyy-MM-dd");
+        cur = Date.valueOf(curStr).getTime();
+
+        long weekAgo = cur-6*DAY;
+        List<Pair<String,Integer>> pairList = new ArrayList<>(7);
+        for(int i=0;i<7;i++){
+            pairList.add(new Pair<>(TimeUtils.translateTimeToString(weekAgo+i*DAY,"yyyy-MM-dd"),COST[i]));
+        }
+        return pairList;
+    }
+    @GetMapping("/statistic/cost/download")
+    public void downloadCostHistory(HttpServletResponse response) throws IOException {
+        long cur = Date.valueOf(TimeUtils.translateTimeToString(System.currentTimeMillis(),"yyyy-MM-dd")).getTime();
+        List<Cost> costs = new ArrayList<>(31);
+        for(int i=0;i<7;i++){
+            costs.add(new Cost(TimeUtils.translateTimeToString(cur-i*DAY,"yyyy-MM-dd"),COST[COST.length-i-1]));
+        }
+        Random random = new Random();
+        for(int i = 7;i<32;i++){
+            costs.add(new Cost(TimeUtils.translateTimeToString(cur-i*DAY,"yyyy-MM-dd"),random.nextInt(800)+1500));
+        }
+        response.setContentType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
+        response.setCharacterEncoding("utf-8");
+        response.setHeader("Content-disposition", "attachment;filename=cost.xlsx");
+        EasyExcel.write(response.getOutputStream(), Cost.class).sheet("cost").doWrite(costs);
+    }
+
+    @GetMapping("/statistic/profit/download")
+    public void downloadProfit(HttpServletResponse response) throws IOException {
+        long mockStart = Date.valueOf("2023-3-1").getTime();
+        Random random = new Random();
+        List<Profit> profitList = new ArrayList<>();
+        for(int i=0;i<31;i++){
+            profitList.add(new Profit(TimeUtils.translateTimeToString(mockStart+i*DAY,"yyyy-MM-dd"),random.nextInt(900)+1576));
+        }
+        PaymentExample paymentExample = new PaymentExample();
+        List<Payment> paymentList = paymentService.selectByExample(paymentExample);
+        Map<String,Integer> profitCount = new TreeMap<>(stringComparator);
+        for(Payment payment:paymentList){
+            String date = TimeUtils.translateTimeToString(payment.getCreateTime(),null);
+            if (profitCount.containsKey(date)){
+                int count = profitCount.get(date)+payment.getPrice();
+                profitCount.put(date,count);
+            }
+            else {
+                profitCount.put(date,payment.getPrice());
+            }
+        }
+        for(Map.Entry<String,Integer> entry:profitCount.entrySet()){
+            profitList.add(new Profit(entry.getKey(),entry.getValue()));
+        }
+        response.setContentType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
+        response.setCharacterEncoding("utf-8");
+        response.setHeader("Content-disposition", "attachment;filename=profit.xlsx");
+        EasyExcel.write(response.getOutputStream(), Profit.class).sheet("profit").doWrite(profitList);
+
+    }
+
+
+    @GetMapping("/statistic/dish/download")
+    public void downloadFood(HttpServletResponse response){
+
+        DishExample dishExample = new DishExample();
+        List<Dish> list = null;
+
+    }
 
 
 
@@ -83,11 +171,11 @@ public class StatisticController {
     public Object getProfit() {
         long cur = System.currentTimeMillis();
         String curStr = TimeUtils.translateTimeToString(cur,"yyyy-MM-dd");
-        cur = Date.valueOf(curStr).getTime();
-        long severnDaysAgo = cur-7*24*60*60*1000;
         long day = 24*60*60*1000;
+        cur = Date.valueOf(curStr).getTime();
+        long severnDaysAgo = cur-6*24*60*60*1000;
         PaymentExample paymentExample = new PaymentExample();
-        paymentExample.or().andCreateTimeBetween(severnDaysAgo,cur+day);
+        paymentExample.or().andCreateTimeBetween(severnDaysAgo,cur+day-1);
         List<Integer> profits = new ArrayList<>(7);
         List<Pair<String,Integer>> dateAndProfitList = new ArrayList<>(7);
         Map<String,Object> resultMap = new HashMap<>();

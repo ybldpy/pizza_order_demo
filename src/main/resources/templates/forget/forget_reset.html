@@ -195,6 +195,33 @@
 
         $(function (){
 
+
+            $.ajax(
+                {
+                    type:"get",
+                    url:"forget/createCode?username="+$("input[name='username']").val(),
+                    beforeSend:function (){
+                        if (isBlank($("input[name='username']").val())){
+                            alertUtil.message("Illegal user name",warningType,document.getElementById("messageContainer"));
+                            return false;
+                        }
+                        return true;
+                    },
+                    success:function (result){
+
+                        if(result.code!=1){
+                            let message = result.message;
+                            if (message=="Cannot send verification code"){
+                                alertUtil.message("Cannot send verification code, try passcode 'passcode'",dangerType,document.getElementById("messageContainer"));
+                                return;
+                            }
+                            alertUtil.message(message==null?"Send failed":message,dangerType,document.getElementById("messageContainer"));
+                        }
+                    }
+                }
+            )
+
+
             $("#form").find("input.checks").on("input",function (){
 
                 $(this).siblings(".invalid-feedback").hide();
@@ -203,12 +230,11 @@
             $("#btn").on("click",function (){
                 $.ajax({
                     type:"post",
-                    url:basePath+"/forget/validateMail",
+                    url:"forget/reset",
                     data:$("#form").serialize(),
                     beforeSend:function (){
                         let canSend = true;
                         let code = $("#verificationCode").val();
-                        alert(code)
                         if (code==undefined||code==null||code==""){
                             $("#verificationCodeFeedback").show();
                             canSend = false;
@@ -238,16 +264,6 @@
                             alertUtil.message("server error","danger",$("#messageContainer"));
                         }
                         if (result.code!=1){
-                            // if (result.data==null||result==undefined){
-                            //     // alert(result.message);
-                            //     alertUtil.message(result.message,"warning",$("#messageContainer"));
-                            // }
-                            // else {
-                            //     // $(".invalid-feedback")[0].innerText = result.message;
-                            //     // $(".invalid-feedback").show();
-                            //     alertUtil.message(result.message,"danger",$("#messageContainer"));
-                            //     // $("#form")[0].innerHTML = ('<div class="alert alert-primary" role="alert">server error</div>');
-                            // }
                             alertUtil.message(result.message,"danger",$("#messageContainer"));
                         }
                         else {

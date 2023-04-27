@@ -34,7 +34,15 @@ function login(){
                 disableLoadingVideo($(".submitBtn"),"Log in");
                 if (result == undefined||result==null){alertUtil.message("server error","danger",$("#messageContainer"));}
                 else if (result.code!=1){
-                    alertUtil.message(result.message,"warning",$("#messageContainer"));
+                    let message = result.message;
+                    if (message==null){
+                        alertUtil.message("Register failed",dangerType,document.getElementById("messageContainer"));
+                        return;
+                    }
+                    else {
+                        alertUtil.message(result.message,dangerType,document.getElementById("messageContainer"));
+                    }
+
                 }
                 else {
                     let manager = document.getElementById("manager").checked;
@@ -42,7 +50,7 @@ function login(){
                         window.location.href = "admin/index"
                     }
                     else {
-                        window.location.href = "index";
+                        window.location.href = "home";
                     }
                 }
             },

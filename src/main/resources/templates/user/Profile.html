@@ -89,16 +89,9 @@
     <div class="collapse navbar-collapse" id="navbarScroll">
       <ul class="navbar-nav mr-auto my-2 my-lg-0 navbar-nav-scroll" style="max-height: 100px;">
         <li class="nav-item active">
-          <a class="nav-link" href="#">Home <span class="sr-only">(current)</span></a>
-        </li>
-        <li class="nav-item ">
-          <a class="nav-link" href="#">Menu</a>
+          <a class="nav-link" href="home">Home<span class="sr-only">(current)</span></a>
         </li>
       </ul>
-      <form class="d-flex" >
-        <input class="form-control mr-2" type="search" placeholder="Search" aria-label="Search">
-        <button class="btn btn-outline-secondary" type="submit" style="width: 130px"><i class="bi bi-search">&nbsp;Search</i> </button>
-      </form>
       <div style="">
         <ul class="navbar-nav mr-auto my-2 my-lg-0 navbar-nav-scroll" style="max-height: 100px;">
           <li class="nav-item dropdown" style="">
@@ -106,14 +99,14 @@
               Username
             </a>
             <ul class="dropdown-menu" >
-              <li><a class="dropdown-item" href="Order/All orders.html" th:href="@{/order/all}">
+              <li><a class="dropdown-item" href="order/all" th:href="@{/order/all}">
                 <i class="bi bi-list">&nbsp&nbsp</i>
                 All Orders</a></li>
-              <li><a class="dropdown-item" href="user/Profile.html" th:href="@{/user/profile}">
+              <li><a class="dropdown-item" href="javascript:void(0)">
                 <i class="bi bi-person-lines-fill">&nbsp&nbsp</i>
                 Profile</a></li>
               <li><hr class="dropdown-divider"></li>
-              <li><a class="dropdown-item" href="#">
+              <li><a class="dropdown-item" href="logout" th:href="@{/logout}">
                 <i class="bi bi-box-arrow-right">&nbsp&nbsp</i>
                 Log out</a></li>
             </ul>
@@ -157,7 +150,7 @@
                   <div class="input-group-prepend">
                     <span class="input-group-text" id="basic-addon2" style="font-size: 20px">Email</span>
                   </div>
-                  <span type="text" class="form-control" placeholder="email" aria-label="email" aria-describedby="basic-addon2" style="font-size: 20px" readonly>[(${user.mail}})]</span>
+                  <span type="text" class="form-control" placeholder="email" aria-label="email" aria-describedby="basic-addon2" style="font-size: 20px" readonly>[(${user.mail})]</span>
                 </div>
               </li>
 

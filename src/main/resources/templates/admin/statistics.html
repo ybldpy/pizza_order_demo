@@ -23,16 +23,17 @@
 </div>
 <div class="chart-container">
     <h5 style="margin-left: 3%">Cost chart</h5>
-    <div style="margin-left: 77%"><a class="btn-link btn">Download historical cost</a></div>
+    <div style="margin-left: 77%"><a class="btn-link btn" href="statistic/cost/download" target="_blank">Download historical cost</a></div>
     <div id="cost-chart" style="width: 100%;height: 100%;position: relative"></div>
 </div>
 <div class="chart-container" style="margin-left: 45%">
     <h5 style="margin-left: 3%">Profit chart</h5>
-    <div style="margin-left: 77%"><a class="btn-link btn">Download historical profit</a></div>
+    <div style="margin-left: 77%"><a class="btn-link btn" href="statistic/profit/download" target="_blank">Download historical profit</a></div>
     <div id="profit-chart" style="width: 100%;height: 100%;position: relative;"></div>
 </div>
 <div class="chart-container" style="margin-top: 30%;width: 100%;height: 60%">
     <h5 style="margin-left: 2%">Most popular food</h5>
+    <div style="margin-left: 77%"><a class="btn-link btn" href="statistics/dish/download" target="_blank">Download All food sale history</a></div>
     <div id="food-chart" style="width: 100%;height: 100%;position: relative;">
     </div>
 </div>
@@ -40,25 +41,33 @@
 
 <script>
 
-    function initCostContainer(chart){
+
+
+
+    function renderCostChart(chart,data){
+
+        let x = [];
+        let y = [];
+        for(let i in data){
+            x.push(data[i].key)
+            y.push(data[i].value)
+        }
         let option = {
             xAxis: {
                 name:"day",
-                data: ['Mon','Thue','Wes','Thur','Fri','Sat','Sun']
+                data:x
             },
-            yAxis:{
-                name:"cost"
+            yAxis: {
+                name:"Cost",
             },
-            series: [
-                {
-                    data:[5000,3900,4500,6000,5500,6789,5642],
-                    type:"line",
-                    label:{
-                        show:true
-                    }
+            series: {
+                data:y,
+                type:"line",
+                label:{
+                    show:true
                 }
-            ]
-        };
+            }
+        }
         chart.setOption(option);
     }
 
@@ -173,11 +182,9 @@
             profitChar.resize();
             foodChart.resize();
         }
-        initCostContainer(costChart);
+        initChart(costChart,"statistic/cost",renderCostChart);
         initChart(profitChar,"statistic/profit",renderProfitChart);
         initChart(foodChart,"statistic/popularFood",renderFoodChart);
-
-
     })
 </script>
 </body>

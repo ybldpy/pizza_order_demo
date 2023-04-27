@@ -274,6 +274,7 @@ public class OrderController {
     public Object todoOrders(){
         OrderExample orderExample = new OrderExample();
         orderExample.or().andStateEqualTo(0);
+        orderExample.or().andPaidEqualTo(1);
         Map<String,Object> resultMap = new HashMap<>();
         List<Order> orders = orderService.selectByExample(orderExample);
         List<Integer> orderIds = null;
@@ -498,7 +499,7 @@ public class OrderController {
                 throw new CURDException();
             }
         }
-        return new Result(ResultConstant.CODE_SUCCESS,ResultConstant.MESSAGE_SUCCESS,"order/pay?orderId="+newOrder.getId());
+        return new Result(ResultConstant.CODE_SUCCESS,ResultConstant.MESSAGE_SUCCESS,newOrder.getId());
     }
 
     @PostMapping("/order/payment")

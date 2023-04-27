@@ -12,6 +12,7 @@ import org.omg.CORBA.PUBLIC_MEMBER;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Controller;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -35,10 +36,12 @@ public class UserAddressController {
     @PostMapping("/user/address/add")
     @Transactional(rollbackFor = Exception.class)
     @ResponseBody
-    public Result addAddress(UserAddress userAddress){
+    public Result addAddress(UserAddress userAddress,Authentication authentication){
         if (StringUtils.isAnyBlank(userAddress.getLocation(),userAddress.getPhone(),userAddress.getContact())){return new Result(ResultConstant.CODE_FAILED,ErrorConstant.PARAM_MISSING,null);}
-        Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        String curUser = principal instanceof String?"anonymousUser":((UserDetailsImpl)principal).getUsername();
+        String curUser = "admin";
+        if (authentication!=null){
+            curUser = ((UserDetails)authentication.getPrincipal()).getUsername();
+        }
         userAddress.setUserName(curUser);
         userAddress.setDeleted(0);
         int res = userAddressService.insert(userAddress);
@@ -69,9 +72,11 @@ public class UserAddressController {
     }
     @GetMapping("/user/address/query")
     @ResponseBody
-    public Object queryUserAddress(){
-        Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        String curUser = principal instanceof String?"anonymousUser":((UserDetailsImpl)principal).getUsername();
+    public Object queryUserAddress(Authentication authentication){
+        String curUser = "admin";
+        if (authentication!=null){
+            curUser = ((UserDetails)authentication.getPrincipal()).getUsername();
+        }
         UserAddressExample userAddressExample = new UserAddressExample();
         userAddressExample.or().andDeletedEqualTo(0).andUserNameEqualTo(curUser);
         List<UserAddress> userAddresses = userAddressService.selectByExample(userAddressExample);
@@ -94,12 +99,10 @@ public class UserAddressController {
         UserAddressExample userAddressExample = new UserAddressExample();
         userAddressExample.or().andIdEqualTo(userAddress.getId());
         int count = userAddressService.countByExample(userAddressExample);
-        if (count<1){
-            return new Result(ResultConstant.CODE_FAILED,"Address doesn't exist",null);
+        if (count<1) {
+            return new Result(ResultConstant.CODE_FAILED, "Address doesn't exist", null);
         }
-        userAddress.setDeleted(0);
-        userAddress.setUserName((String) SecurityContextHolder.getContext().getAuthentication().getPrincipal());
-        int res = userAddressService.updateByPrimaryKey(userAddress);
+        int res = userAddressService.updateByPrimaryKeySelective(userAddress);
         if (res<1){
             return new Result(ResultConstant.CODE_FAILED,ResultConstant.MESSAGE_FAILED,null);
         }

@@ -69,13 +69,18 @@ public class PaymentController {
         if (wallet.getBalance()<count){
             return new Result(ResultConstant.CODE_FAILED,"Balance is not enough",null);
         }
+        wallet.setBalance(wallet.getBalance()-count);
+        int res = walletService.updateByPrimaryKey(wallet);
+        if (res<1){
+            return new Result(ResultConstant.CODE_FAILED,"Pay failed",null);
+        }
         Payment payment = new Payment();
         payment.setPrice(count);
         payment.setCreateTime(System.currentTimeMillis());
         payment.setOrderId(orderId);
-        int res = paymentService.insert(payment);
+        res = paymentService.insert(payment);
         if (res<1){
-            return new Result(ResultConstant.CODE_FAILED,"Pay failed",null);
+            throw new CURDException();
         }
         res = walletService.updateByPrimaryKey(wallet);
         if(res<1){

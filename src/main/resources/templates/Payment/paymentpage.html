@@ -544,6 +544,7 @@
                         alertUtil.message(result.message,dangerType,document.getElementById("messageContainer"));
                         return;
                     }
+                    window.location.href = "pay/order?orderId="+result.data;
                 },
                 error:function (){
                     disableLoadingVideo($btn,html);

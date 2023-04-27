@@ -51,10 +51,10 @@ function register(){
             }
             else {
                 if (result.code==0){
-                    alertUtil.message("server error","danger",$("#messageContainer"));
+                    alertUtil.message(result.message==null?"Register failed":result.message,"danger",$("#messageContainer"));
                 }
                 else {
-                    window.location.href = basePath+"/registerSuccess.html";
+                    window.location.href = "registerSuccess.html";
                 }
             }
         },
@@ -88,15 +88,18 @@ function sendVerificationCode(btn){
         },
         success:function (result){
             disableLoadingVideo(btnJ,"Send Verification Code");
-            if (result==undefined||result==null||result.code!=1){
+            if (result==undefined||result==null){
                 alertUtil.message("Send failed","danger",$("#messageContainer"));
+            }
+            else  if (result.code!=1){
+                alertUtil.message("Send failed, try passcode 'passcode'",'danger',$("#messageContainer"))
             }
             else {
                 alertUtil.message("Send Success","info",$("#messageContainer"));
                 btnJ[0].disabled = true;
                 let count = 60*1000;
                 let func = setInterval(function (){
-                    btnJ[0].innerText = "retry after "+count+"seconds";
+                    btnJ[0].innerText = "retry after "+count/1000+"seconds";
                     count = count-1000;
                 },1000);
                 setTimeout(function(){

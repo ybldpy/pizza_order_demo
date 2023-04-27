@@ -17,7 +17,7 @@ spring:
   mail:
     host: smtp.163.com
     username: 18508782239@163.com
-    password: WXBZCJYSENDTJCR
+    password: WXBZCJYSENDETJCR
     properties:
       mail:
         smtp:

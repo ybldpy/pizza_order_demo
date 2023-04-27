@@ -39,7 +39,10 @@
   }
 
 </style>
-<body th:style="'background-size: 100% 100%;background-image: url('+@{img/loginBack.jpg}+');background-repeat: no-repeat;background-position: center;background-attachment: fixed'" style="background-size: 100% 100%;background-image: url('../../static/img/loginBack.jpg');background-repeat: no-repeat;background-position: center;background-attachment: fixed">
+<body style="background-size: 100% 100%;background-image: url('img/loginBack.jpg');background-repeat: no-repeat;background-position: center;background-attachment: fixed">
+<div id="messageContainer" style="width: 30%;margin-top: 1%;position: fixed;z-index: 1055;margin-left: 35%;top: 0">
+</div>
+
 <div id="header" class="fixed-top" >
   <nav class="navbar navbar-expand-lg navbar-light color" style="max-height: 100px" >
     <a class="navbar-brand color" href="#" style="height: 100%;padding: 0 0 ">
@@ -51,10 +54,7 @@
     <div class="collapse navbar-collapse" id="navbarScroll">
       <ul class="navbar-nav mr-auto my-2 my-lg-0 navbar-nav-scroll" style="max-height: 100px;">
         <li class="nav-item active">
-          <a class="nav-link" href="#">Home <span class="sr-only">(current)</span></a>
-        </li>
-        <li class="nav-item ">
-          <a class="nav-link" href="#">Menu</a>
+          <a class="nav-link" href="home">Home <span class="sr-only">(current)</span></a>
         </li>
         <!--        <li class="nav-item dropdown">-->
         <!--          <a class="nav-link dropdown-toggle" href="#" role="button" data-toggle="dropdown" aria-expanded="false">-->
@@ -71,10 +71,6 @@
         <!--          <a class="nav-link disabled">Link</a>-->
         <!--        </li>-->
       </ul>
-      <form class="d-flex" >
-        <input class="form-control mr-2" type="search" placeholder="Search" aria-label="Search">
-        <button class="btn btn-outline-secondary" type="submit" style="width: 130px"><i class="bi bi-search">&nbsp;Search</i> </button>
-      </form>
       <div style="">
         <ul class="navbar-nav mr-auto my-2 my-lg-0 navbar-nav-scroll" style="max-height: 100px;">
           <li class="nav-item dropdown" style="">
@@ -82,10 +78,10 @@
               Username
             </a>
             <ul class="dropdown-menu" >
-              <li><a class="dropdown-item" href="Order/All orders.html" th:href="@{Order/All orders.html}">
+              <li><a class="dropdown-item" href="javascript:void(0);">
                 <i class="bi bi-list">&nbsp&nbsp</i>
                 All Orders</a></li>
-              <li><a class="dropdown-item" href="user/Profile.html" th:herf="@{user/Profile.html}">
+              <li><a class="dropdown-item" href="user/profile" th:href="@{/user/profile}">
                 <i class="bi bi-person-lines-fill">&nbsp&nbsp</i>
                 Profile</a></li>
               <li><hr class="dropdown-divider"></li>
@@ -110,7 +106,7 @@
 <div class="Big">
   <p2 class="title"> <strong>All Orders
 <!--    <a class="btn  btn-warning" href="#" role="button" style="float: right;margin-top: 20px; font-size: 20px"></a>-->
-  </strong></p2>
+  </strong></p2><div class="spinner-border" role="status" id="order-loading"><span class="sr-only">Loading...</span></div>
   <hr class="dropdown-divider" style="border-top: 3px solid #FFBF3D; ">
 
 
@@ -118,8 +114,9 @@
   <div class="row" style="margin-top: 20px">
     <div class="col-4" style="flex: 0 0 20%; width: 20%;">
       <div class="list-group" id="list-tab" role="tablist">
-        <a class="list-group-item list-group-item-action active" id="list-AllOrders-list" data-toggle="list" href="#list-AllOrders" role="tab" aria-controls="home">All orders</a>
+        <a class="list-group-item list-group-item-action active" id="list-AllOrders-list" data-toggle="list" href="#list-AllOrders" role="tab" aria-controls="home">Historical orders</a>
         <a class="list-group-item list-group-item-action" id="list-InProgress-list" data-toggle="list" href="#list-InProgress" role="tab" aria-controls="profile">In progress</a>
+        <a class="list-group-item list-group-item-action" id="list-unPaid-list" data-toggle="list" href="#list-UnpaidOrders" role="tab" aria-controls="unpaid">Unpaid orders</a>
         </div>
     </div>
     <div class="col-8 contentsize">
@@ -127,7 +124,8 @@
         <div class="tab-pane fade show active" id="list-AllOrders" role="tabpanel" aria-labelledby="list-AllOrders-list">
           <div id="all"></div>
         </div>
-        <div class="tab-pane fade" id="list-InProgress" role="tabpanel" aria-labelledby="list-InProgress-list"> <div id="inProgress"></div></div>
+        <div class="tab-pane fade" id="list-InProgress" role="tabpanel" aria-labelledby="list-InProgress-list"><div id="inProgress"></div></div>
+        <div class="tab-pane fade" id="list-UnpaidOrders" role="tabpanel" aria-labelledby="list-unPaid-list"> <div id="unpaid"></div></div>
        </div>
     </div>
   </div>
@@ -199,19 +197,32 @@
           type: "get",
           url:"order/get",
           success:function (result){
+            $("#order-loading").remove();
             load1(result)
-          }
+          },
+        error:function (){
+            $("#order-loading").remove();
+            alertUtil.message("Get order failed",dangerType,document.getElementById("messageContainer"));
+        }
       })
   }
 
   function load1(result){
     let inProgress ="#inProgress";
     let all = "#all";
+    let unpaid = "#unpaid";
     for (let i=0;i<result.total;i++){
-      if (result.rows[i].state===1||result.rows[i].state==2) orders(result.rows[i],all);
+      if ((result.rows[i].type==0&&result.rows[i].state==1)||result.rows[i].state == 2) orders(result.rows[i],all);
+      else if (result.rows[i].paid===0) orders(result.rows[i],unpaid)
       else orders(result.rows[i],inProgress);
     }
-    alert("finish")
+    $(all).find("a.pay").attr("disabled","disabled");
+    let $inProgress = $(inProgress);
+    alert($inProgress.find("a.pay").length);
+    $inProgress.find("a.pay").css("display","none");
+    $inProgress.find("a.invoice").css("display","none");
+    let $unpaid = $("#unpaid");
+    $unpaid.find("a.invoice").css("display","none");
 
   }
   function orders(row,type){
@@ -222,15 +233,15 @@
     if ((row.imgs[0]===null||row.imgs[0]==="")&&(row.imgs[1]===null||row.imgs[1]==="")){
       $(`<div class="card order1" style="width: 90%;position: relative;margin-bottom: 20px">
                    <div class="dishPhoto card-img-top" style="width: 51%;padding: 10px 10px;height: 230px"></div>
-
                    <div class="card-body" style="position: absolute;left: 53%">
                    <h5 class="card-title">${row.id}</h5>
                    <p class="card-text"> Time: ${row.time}</p>
                    <p class="card-text"> Total Quantity: ${row.quantity}</p>
-                   <p class="card-text"> Total Price: ${row.totalPrice}</p>
+                   <p class="card-text"> Total Price: ${row.price}</p>
                    </div>
-                   <a class="btn  btn-warning finishbtn" href="order/info?orderId=${row.id}" role="button" style="position: absolute;left: 83%;bottom: 5%; font-size: 17px;width:15%">Order Detail</a>
-                   <a class="btn  btn-warning finishbtn" href="#" role="button" style="position: absolute;left: 83%;bottom: 5%; font-size: 17px;width:15%">Invoice</a>
+                   <a class="btn btn-warning finishbtn order-detail" href="order/info?orderId=${row.id}" role="button" style="position: absolute;left: 83%;bottom: 55%; font-size: 17px;width:15%">Order Detail</a>
+                   <a class="btn btn-warning finishbtn invoice-order invoice" href="order/invoice?orderId=${row.id}" role="button" style="position: absolute;left: 83%;bottom: 30%; font-size: 17px;width:15%">Invoice</a>
+                   <a class="btn btn-warning finishbtn invoice-order pay" href="pay/order?orderId=${row.id}" role="button" style="position: absolute;left: 83%;bottom: 5%; font-size: 17px;width:15%">Pay</a>
                    </div>`).insertBefore(type);
     }else if ((row.imgs[1]===null||row.imgs[1]==="")&&(row.imgs[0]!==null||row.imgs[0]!=="")) {
       img1 = row.imgs[0];
@@ -247,10 +258,11 @@
                    <h5 class="card-title">${row.id}</h5>
                    <p class="card-text"> Time: ${row.time}</p>
                    <p class="card-text"> Total Quantity: ${row.quantity}</p>
-                   <p class="card-text"> Total Price: ${row.totalPrice}</p>
+                   <p class="card-text"> Total Price: ${row.price}</p>
                    </div>
-                   <a class="btn  btn-warning finishbtn" href="order/info?orderId=${row.id}" role="button" style="position: absolute;left: 83%;bottom: 5%; font-size: 17px;width:15%">Order Detail</a>
-                   <a class="btn  btn-warning finishbtn" href="#" role="button" style="position: absolute;left: 83%;bottom: 5%; font-size: 17px;width:15%">Invoice</a>
+                   <a class="btn btn-warning finishbtn order-detail" href="order/info?orderId=${row.id}" role="button" style="position: absolute;left: 83%;bottom: 55%; font-size: 17px;width:15%">Order Detail</a>
+                   <a class="btn btn-warning finishbtn invoice-order invoice" href="order/invoice?orderId=${row.id}" role="button" style="position: absolute;left: 83%;bottom: 30%; font-size: 17px;width:15%">Invoice</a>
+                   <a class="btn btn-warning finishbtn invoice-order pay" href="pay/order?orderId=${row.id}" role="button" style="position: absolute;left: 83%;bottom: 5%; font-size: 17px;width:15%">Pay</a>
                    </div>`).insertBefore(type);
 
     }
@@ -269,10 +281,11 @@
                    <h5 class="card-title">${row.id}</h5>
                    <p class="card-text"> Time: ${row.time}</p>
                    <p class="card-text"> Total Quantity: ${row.quantity}</p>
-                   <p class="card-text"> Total Price: ${row.totalPrice}</p>
+                   <p class="card-text"> Total Price: ${row.price}</p>
                    </div>
-                   <a class="btn  btn-warning finishbtn" href="order/info?orderId=${row.id}" role="button" style="position: absolute;left: 83%;bottom: 5%; font-size: 17px;width:15%">Order Detail</a>
-                   <a class="btn  btn-warning finishbtn" href="#" role="button" style="position: absolute;left: 83%;bottom: 5%; font-size: 17px;width:15%">Invoice</a>
+                   <a class="btn btn-warning finishbtn order-detail" href="order/info?orderId=${row.id}" role="button" style="position: absolute;left: 83%;bottom: 55%; font-size: 17px;width:15%">Order Detail</a>
+                   <a class="btn btn-warning finishbtn invoice-order invoice" href="order/invoice?orderId=${row.id}" role="button" style="position: absolute;left: 83%;bottom: 30%; font-size: 17px;width:15%">Invoice</a>
+                   <a class="btn btn-warning finishbtn invoice-order pay" href="pay/order?orderId=${row.id}" role="button" style="position: absolute;left: 83%;bottom: 5%; font-size: 17px;width:15%">Pay</a>
                    </div>`).insertBefore(type);
     }else {
       img1 =row.imgs[0];
@@ -299,10 +312,11 @@
                    <h5 class="card-title">${row.id}</h5>
                    <p class="card-text"> Time: ${row.time}</p>
                    <p class="card-text"> Total Quantity: ${row.quantity}</p>
-                   <p class="card-text"> Total Price: ${row.totalPrice}</p>
+                   <p class="card-text"> Total Price: ${row.price}</p>
                    </div>
-                   <a class="btn  btn-warning finishbtn" href="order/info?orderId=${row.id}" role="button" style="position: absolute;left: 83%;bottom: 5%; font-size: 17px;width:15%">Order Detail</a>
-                   <a class="btn  btn-warning finishbtn" href="#" role="button" style="position: absolute;left: 83%;bottom: 5%; font-size: 17px;width:15%">Invoice</a>
+<a class="btn btn-warning finishbtn order-detail" href="order/info?orderId=${row.id}" role="button" style="position: absolute;left: 83%;bottom: 55%; font-size: 17px;width:15%">Order Detail</a>
+                   <a class="btn btn-warning finishbtn invoice-order invoice" href="order/invoice?orderId=${row.id}" role="button" style="position: absolute;left: 83%;bottom: 30%; font-size: 17px;width:15%">Invoice</a>
+                   <a class="btn btn-warning finishbtn invoice-order pay" href="pay/order?orderId=${row.id}" role="button" style="position: absolute;left: 83%;bottom: 5%; font-size: 17px;width:15%">Pay</a>
                    </div>`).insertBefore(type);
     }
 

@@ -182,7 +182,7 @@
             $("#btn").on("click",function (){
                 $.ajax({
                     type:"post",
-                    url:basePath+"/forget/username",
+                    url:"forget/username",
                     data:$("#form").serialize(),
                     beforeSend:function (){
                          let canSend = checkUsername($("#username").val(),/^[A-Za-z0-9]+$/);

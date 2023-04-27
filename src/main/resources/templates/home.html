@@ -1,12 +1,13 @@
 <!DOCTYPE html>
 
-<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns: xmlns:>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
   <base href="../static/" th:href="@{/}">
     <meta charset="UTF-8">
   <title>category</title>
   <script src="js/header.js"></script>
   <link href="plugins/bootstrap-table/bootstrap-table.min.css" rel="stylesheet"/>
+  <link href="font/fonts.css" rel="stylesheet"/>
   <script src="js/footer.js"></script>
   <script src="plugins/bootstrap-table/bootstrap-table.min.js"></script>
 </head>
@@ -21,9 +22,10 @@
   }
 
 </style>
-<body style="background-size: 100% 100%;background-image: url('../static/img/loginBack.jpg');background-repeat: no-repeat;background-position: center;background-attachment: fixed">
+<body style="background-size: 100% 100%;background-image: url('img/loginBack.jpg');background-repeat: no-repeat;background-position: center;background-attachment: fixed">
 
-
+<div id="messageContainer" style="width: 30%;margin-top: 1%;position: fixed;z-index: 1055;margin-left: 35%;top: 0">
+</div>
 
 
 <div id="header" class="fixed-top" >
@@ -40,11 +42,7 @@
           <a class="nav-link" href="javascript:void(0)">Home<span class="sr-only">(current)</span></a>
         </li>
       </ul>
-      <form class="d-flex">
-        <input class="form-control mr-2" type="search" placeholder="Search" aria-label="Search">
-        <button class="btn btn-outline-success" type="submit">Search</button>
-      </form>
-      <div style="">
+      <div>
         <ul class="navbar-nav mr-auto my-2 my-lg-0 navbar-nav-scroll" style="max-height: 100px;">
           <li class="nav-item dropdown" style="">
             <a class="nav-link dropdown-toggle" href="#" role="button" data-toggle="dropdown" aria-expanded="false">
@@ -66,7 +64,6 @@
           <div class="brand" href="#" style="width: 40px;height: 40px;overflow: hidden;border-radius: 50%;float:right;box-shadow: 0 4px 8px rgba(0,0,0,.05);z-index: 1;">
             <img src="img/defaultAvatar.png" alt="Default avatar" style="width: 40px;height: 40px;" >
           </div>
-
         </ul>
       </div>
 
@@ -84,25 +81,26 @@
             <div class="row flex-column g-0">
                 <div class="col-md-4">
                     <div style="margin-bottom: 10px;margin-top: 1%">
-                        <img src="../static/img/shop.jpg" class="img-fluid rounded-start" alt="...">
+                        <img src="img/shop.jpg" class="img-fluid rounded-start" alt="...">
                     </div>
 
                     <div class=""style="display: flex;-ms-flex-wrap: wrap; flex-wrap: wrap;margin: 26px -30px">
                     <div class="col-sm-6 mb-3 mb-sm-0">
                       <div class="card-container">
                       <div class="card" style="transform: scale(100%); position: absolute; height:80%;">
-                          <img src="../static/img/take_out.png" class="d-block w-100" alt="...">
+                          <img src="img/take_out.png" class="d-block w-100" alt="...">
                         <div class="card-body">
-                            <a href="#" class="btn btn-warning" style="margin-left: 30px">take_out</a>
+                            <input type="number" th:value="${addressCount}" hidden>
+                            <a onclick="if (parseInt($(this).siblings('input').val())<1){alertUtil.message('You should add a address in profile',warningType,document.getElementById('messageContainer'));return;}window.open('menu?deliveryType=1')" class="btn btn-warning" style="margin-left: 30px">take_out</a>
                         </div>
                       </div>
                     </div>
                     </div>
-                    <div class="col-sm-6"style="flex:1;">
-                      <div class="card"style="transform: scale(100%); position: absolute;height:80%;">
-                        <img src="../static/img/eat_in.png" class="d-block w-100" alt="...">
+                    <div class="col-sm-6" style="flex:1;">
+                      <div class="card" style="transform: scale(100%); position: absolute;height:80%;">
+                        <img src="img/eat_in.png" class="d-block w-100" alt="...">
                         <div class="card-body">
-                          <a href="#" class="btn btn-warning" style="margin-left: 50px">eat_in</a>
+                          <a target="_blank" href="menu?deliveryType=0" class="btn btn-warning" style="margin-left: 50px">eat_in</a>
                         </div>
                       </div>
                     </div>
@@ -147,7 +145,7 @@
                     </button>
                 </div>
                     <div>
-                    <ul class="list-group list-group-flush"style="margin-bottom: 10%">
+                    <ul class="list-group list-group-flush" style="margin-bottom: 10%">
                         <li class="list-group-item">Business hours: 24 hours</li>
                         <li class="list-group-item">Phone number: 12345678</li>
                     </ul>

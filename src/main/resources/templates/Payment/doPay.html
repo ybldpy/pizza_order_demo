@@ -113,7 +113,7 @@
                             <form id="pay-form" class="my-login-validation" novalidate="" style="margin-top: 20px">
                                 <input name="orderId" th:value="${orderId}" hidden/>
                                 <div class="form-group">
-                                    <span class="form-control" readonly>$ [${price}]</span>
+                                    <span class="form-control" readonly>$ [(${price})]</span>
                                 </div>
                                 <div class="form-group m-0">
                                     <button type="button" id="pay-btn" class="btn btn-primary btn-block submitBtn" style="background-color: #FFCB62">
