@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity5">
 <head>
     <base href="../../static/" th:href="@{/}">
     <meta charset="UTF-8">
-    <title>Meue</title>
+    <title>Menu</title>
     <script src="js/header.js"></script>
     <link rel="stylesheet" href="font/fonts.css">
     <script src="js/footer.js"></script>
@@ -47,14 +47,17 @@
         <div class="collapse navbar-collapse" id="navbarScroll">
             <ul class="navbar-nav mr-auto my-2 my-lg-0 navbar-nav-scroll" style="max-height: 100px;">
                 <li class="nav-item active">
-                    <a class="nav-link" href="#">Home <span class="sr-only">(current)</span></a>
+                    <a class="nav-link" href="home">Home <span class="sr-only">(current)</span></a>
+                </li>
+                <li class="nav-item active">
+                    <a class="nav-link" href="admin/index" sec:authorize="hasRole('admin')">Admin</a>
                 </li>
             </ul>
             <div>
                 <ul class="navbar-nav mr-auto my-2 my-lg-0 navbar-nav-scroll" style="max-height: 100px;">
                     <li class="nav-item dropdown" style="">
                         <a class="nav-link dropdown-toggle" href="#" role="button" data-toggle="dropdown" aria-expanded="false">
-                            Username
+                            [(${userName})]
                         </a>
                         <ul class="dropdown-menu" >
                             <li><a class="dropdown-item" href="order/all" th:href="@{/order/all}">
@@ -121,7 +124,7 @@
                 <h5 id="cur-price">$ 0</h5>
             </div>
             <div class="modal-footer" style="width: 100%">
-                <button type="button" class="btn btn-secondary addBtn">Close</button>
+                <button type="button" class="btn btn-secondary addBtn" onclick="$('#customizationContainer').modal('hide')">Close</button>
                 <button id="add-btn" type="button" class="btn btn-warning addBtn">Add to shopping car</button>
             </div>
         </div>
@@ -135,34 +138,13 @@
 <div class="row big">
     <div class="col-3">
         <div class="list-group" role="tablist" id="categoryList">
-            <a th:each="category:${categories}" data-toggle="list" href="#te" role="tab" th:href="'#c-'+${category.categoryName}" class="list-group-item list-group-item-action">[(${category.categoryName})]</a>
+            <a th:each="category:${categories}" data-toggle="list" href="#te" role="tab" th:href="'#c-'+${category.id}" class="list-group-item list-group-item-action">[(${category.categoryName})]</a>
         </div>
     </div>
     <div class="col-7">
         <div class="tab-content" id="nav-tabContent">
-            <div class="tab-pane fade" id="te" th:each="category:${categories}" th:id="'c-'+${category.categoryName}" role="tabpanel">
-<!--                <div class="card">-->
-<!--                        <div class="card-body">-->
-<!--                            <div class="row">-->
-<!--                                <div class="col-3">-->
-<!--                                    <img src="img/titlelogo1.png" class="img-fluid"/>-->
-<!--                                </div>-->
-<!--                                <div class="col-5">-->
-<!--                                    <h5 class = 'dishName'>-->
-<!--&lt;!&ndash;                                        名字&ndash;&gt;1111-->
-<!--                                    </h5>-->
-<!--                                    <h5 class="dishPrice">-->
-<!--&lt;!&ndash;                                        $ 333&ndash;&gt;111-->
-<!--                                    </h5>-->
-<!--                                    <h5>Description</h5>-->
-<!--                                    <div class="dishRemark" style="overflow-y: scroll;max-height: 35%">-->
-<!--                                    </div>-->
-<!--                                    <span style="cursor: pointer;"><a><i class="bi bi-plus-circle" style="background: #FFCB62;"></i></a></span>-->
-<!--                                </div>-->
-<!--                            </div>-->
+            <div class="tab-pane fade" id="te" th:each="category:${categories}" th:id="'c-'+${category.id}" role="tabpanel">
 
-<!--                        </div>-->
-<!--                </div>-->
             </div>
         </div>
     </div>
@@ -476,7 +458,7 @@
         toppingContainer.find("span.plus").click(function (){addTopping(foodItem,this)})
         // 跳出选项之后渲染价格
         updateFoodOptionPrice(foodItem);
-        $("#customizationContainer").modal("show");
+        $("#customizationContainer").modal({backdrop:false});
     }
     function addTopping(foodItem,toppingElement){
         let count = $(toppingElement).siblings("span.count");
@@ -492,7 +474,7 @@
         if (sizeChosen.length!=0){
             for(let i in foodItem["sizePrice"]){
                 let val = foodItem["sizePrice"][i]["size"];
-                if (sizeChosen[0].innerText==val){
+                if (sizeChosen[0].innerText===val){
                     price+=foodItem["sizePrice"][i]["price"];
                     break;
                 }
@@ -544,6 +526,7 @@
             toppings[toppingsAndPrice[i]["toppingName"]] = toppingsAndPrice[i]["price"];
         }
         for(let i=0;i<data.total;i++){
+            if (data.rows[i].state == 0) {continue;}
             data.rows[i]["sizePrice"] = JSON.parse(data.rows[i]["sizePrice"]);
             data.rows[i]["topping"] = JSON.parse(data.rows[i]["topping"]);
             food.push(data.rows[i]);
@@ -567,7 +550,7 @@
                 "                        </div>\n" +
                 "                </div>"
             let $html = $(html);
-            let container = $("#c-"+data.rows[i].categoryName);
+            let container = $("#c-"+data.rows[i].categoryId);
             container.append($html);
             $html.find("span.buy").click(function (){popFoodOption(data.rows[i]);})
         }

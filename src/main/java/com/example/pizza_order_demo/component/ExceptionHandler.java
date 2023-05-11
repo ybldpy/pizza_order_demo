@@ -7,18 +7,32 @@ import com.example.pizza_order_demo.exception.CURDException;
 import com.example.pizza_order_demo.model.Log;
 import com.example.pizza_order_demo.service.LogService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.web.access.AccessDeniedHandler;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ResponseBody;
+
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
 
 /**
  * class that is responsible for handling exception
  * managed by Spring IOC
  */
 @ControllerAdvice
-public class ExceptionHandler {
+public class ExceptionHandler{
 
     @Autowired
     private LogService logService;
+
+    @org.springframework.web.bind.annotation.ExceptionHandler(value = AccessDeniedException.class)
+    @ResponseBody
+    public Result handleDenied(AccessDeniedException e){
+        AccessDeniedException accessDeniedException = new AccessDeniedException("Access denied",e.getCause());
+        return handleInternalException(accessDeniedException);
+    }
 
 
     @org.springframework.web.bind.annotation.ExceptionHandler(value = Exception.class)

@@ -6,6 +6,9 @@ import com.example.pizza_order_demo.commons.constant.ResultConstant;
 import com.example.pizza_order_demo.model.Log;
 import com.example.pizza_order_demo.model.LogExample;
 import com.example.pizza_order_demo.service.LogService;
+import com.example.pizza_order_demo.utils.FileUploadUtil;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.tomcat.util.http.fileupload.FileUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
@@ -20,40 +23,53 @@ import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.Writer;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 
 @Controller
 public class FileController {
-    @Value("${file.upload-path}")
-    private String uploadDir;
-
     @Value("${file.temp-path}")
     private String tempDir;
+
+    @Value("${tengxun.accessKey}")
+    private String accessKey;
+    @Value("${tengxun.secretKey}")
+    private String secretKey;
+    @Value("${tengxun.bucket}")
+    private String bucket;
+    @Value("${tengxun.bucketName}")
+    private String bucketName;
+    @Value("${tengxun.path}")
+    private String basePath;
+    @Value("${tengxun.prefix}")
+    private String prefix;
+
 
     @Autowired
     private LogService logService;
 
     @PostMapping("/file/img/upload")
     @ResponseBody
-    public Object uploadFile(@RequestParam("img") MultipartFile multipartFile){
+    public Object uploadFile(@RequestParam("img") MultipartFile multipartFile) throws IOException {
         String originalName = multipartFile.getOriginalFilename();
         String name = originalName.substring(0,originalName.lastIndexOf("."));
         String postFix = originalName.substring(originalName.lastIndexOf(".")+1);
         String fileName = name+System.currentTimeMillis()+"."+postFix;
-        File parentPath = new File(uploadDir+"/img");
-        if (!parentPath.exists()){
-            parentPath.mkdir();
+        File pFile = new File(tempDir);
+        if (!pFile.exists()){
+            pFile.mkdirs();
         }
-        File file = new File(parentPath,fileName);
-        try {
-            boolean success = file.createNewFile();
-            if (!success){return new Result(ResultConstant.CODE_FAILED,ErrorConstant.FILE_UPLOAD_ERROR,null);}
-            multipartFile.transferTo(file);
+        File tempFile = new File(tempDir+"/"+fileName);
+        tempFile.createNewFile();
+        multipartFile.transferTo(tempFile);
+        String uploadedPath = FileUploadUtil.uploadFile(accessKey,secretKey,bucket,bucketName,basePath,prefix+"/"+ UUID.randomUUID()+"."+postFix,tempFile);
+        if (StringUtils.isBlank(uploadedPath)){
+            return new Result(ResultConstant.CODE_FAILED,"Upload failed",null);
         }
-        catch (IOException e){
-            return new Result(ResultConstant.CODE_FAILED, ErrorConstant.FILE_UPLOAD_ERROR,null);
-        }
+
+        return new Result(ResultConstant.CODE_SUCCESS,ResultConstant.MESSAGE_SUCCESS,uploadedPath);
 //        InputStream in = multipartFile.getInputStream();
 //        FileOutputStream out = null;
 //        out = new FileOutputStream(file);
@@ -63,7 +79,6 @@ public class FileController {
 //            out.write(data,0,read);
 //        }
 //        out.close();
-        return new Result(ResultConstant.CODE_SUCCESS,ResultConstant.MESSAGE_SUCCESS,"upload/img/"+fileName);
     }
 
 

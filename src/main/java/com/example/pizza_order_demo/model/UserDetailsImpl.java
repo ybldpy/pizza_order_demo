@@ -17,6 +17,7 @@ public class UserDetailsImpl implements UserDetails{
         if (ObjectUtils.isEmpty(user)){
             username = "";
             pwd = "";
+            this.auths = auths;
             return;
         }
         pwd = user.getPwd();

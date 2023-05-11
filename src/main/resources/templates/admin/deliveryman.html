@@ -80,6 +80,7 @@
     <div id="toolbar">
         <span><button class="btn btn-warning" id="addBtn" onclick="$('#add-container').modal({backdrop: false})"><i class="bi bi-plus"></i>Add delivery man</button></span>
         <span><button class="btn btn-danger" id="deleteBtn" onclick="doDelete($(this))"><i class="bi bi-trash"></i>Delete</button></span>
+        <span><button class="btn btn-dark" onclick="$('#deliveryman-table').bootstrapTable('refresh')"><i class="bi bi-arrow-clockwise"></i> Refresh</button></span>
     </div>
     <table id="deliveryman-table"></table>
 </div>

@@ -13,7 +13,9 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.poi.ss.formula.functions.T;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.transaction.annotation.Transactional;
@@ -24,10 +26,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Controller
 public class DishController {
@@ -45,7 +44,16 @@ public class DishController {
 
 
     @GetMapping("/dish/add")
-    public String addDish(){
+    @PreAuthorize("hasRole('admin')")
+    public String addDish(Model model){
+        CategoryExample categoryExample = new CategoryExample();
+        categoryExample.or().andDeletedEqualTo(0);
+        List<Category> categoryList = categoryService.selectByExample(categoryExample);
+        model.addAttribute("categories",categoryList);
+        ToppingExample toppingExample = new ToppingExample();
+        toppingExample.or().andDeletedEqualTo(0);
+        List<Topping> toppings = toppingService.selectByExample(toppingExample);
+        model.addAttribute("allToppings",toppings);
         return "admin/dishAdd";
     }
     @GetMapping("/dish/get")
@@ -54,16 +62,34 @@ public class DishController {
         Map<String,Object> resultMap = new HashMap<>();
         DishExample dishExample = new DishExample();
         dishExample.or().andDeletedEqualTo(0);
-        List<Dish> DishList = dishService.selectByExample(dishExample);
-        int count = DishList.size();
-        resultMap.put("total",count);
-        resultMap.put("rows",DishList);
+        List<Dish> dishList = dishService.selectByExample(dishExample);
+        if (ObjectUtils.isEmpty(dishList)){
+            resultMap.put("total",0);
+            resultMap.put("rows",new ArrayList<>());
+            return resultMap;
+        }
+        CategoryExample categoryExample = new CategoryExample();
+        categoryExample.or().andDeletedEqualTo(0);
+        List<Category> categoryList = categoryService.selectByExample(categoryExample);
+        Map<String,Integer> map = new HashMap<>(categoryList.size());
+        for(Category category:categoryList){
+            map.put(category.getCategoryName(),category.getId());
+        }
+        List<DishDTO> dishDTOList = new ArrayList<>(dishList.size()+1);
+        for(Dish dish:dishList){
+            DishDTO dishDTO = new DishDTO(dish);
+            dishDTO.setCategoryId(map.get(dishDTO.getCategoryName()));
+            dishDTOList.add(dishDTO);
+        }
+        resultMap.put("total",dishDTOList.size());
+        resultMap.put("rows",dishDTOList);
         return resultMap;
     }
 
 
 
     @GetMapping("/dish/management")
+    @PreAuthorize("hasRole('admin')")
     public String manageDish(){
         return "admin/dishTable";
     }
@@ -71,6 +97,7 @@ public class DishController {
     @PostMapping("/dish/add")
     @Transactional(rollbackFor = Exception.class)
     @ResponseBody
+    @PreAuthorize("hasRole('admin')")
     public Result addDish(@RequestBody Map<String,Object> map, Authentication authentication){
         if (ObjectUtils.anyNull(map,map.get("dishName"),map.get("categoryName"),map.get("state"),map.get("sizePrice"))){return new Result(ResultConstant.CODE_FAILED,ErrorConstant.PARAM_MISSING,null);}
         if ((ObjectUtils.isNotEmpty(map.get("toppings"))&&!(map.get("toppings") instanceof List)) || !(map.get("sizePrice") instanceof List)){
@@ -144,6 +171,7 @@ public class DishController {
 
     }
     @GetMapping("/dish/modify")
+    @PreAuthorize("hasRole('admin')")
     public String modifyDish(int dishId, Model model) throws JsonProcessingException {
         DishExample dishExample = new DishExample();
         dishExample.or().andIdEqualTo(dishId).andDeletedEqualTo(0);
@@ -171,6 +199,7 @@ public class DishController {
 
     @PostMapping("/dish/modify")
     @ResponseBody
+    @PreAuthorize("hasRole('admin')")
     public Result modifyDish(@RequestBody Map<String,Object> map,int dishId,Authentication authentication){
         if (ObjectUtils.anyNull(map,map.get("dishName"),map.get("categoryName"),map.get("state"),map.get("sizePrice"))){return new Result(ResultConstant.CODE_FAILED,ErrorConstant.PARAM_MISSING,null);}
         if ((ObjectUtils.isNotEmpty(map.get("toppings"))&&!(map.get("toppings") instanceof List)) || !(map.get("sizePrice") instanceof List)){
@@ -262,6 +291,7 @@ public class DishController {
     @PostMapping("/dish/delete")
     @Transactional(rollbackFor = Exception.class)
     @ResponseBody
+    @PreAuthorize("hasRole('admin')")
     public Result deleteDish(@RequestBody List<Integer> dishIds,Authentication authentication){
         if (ObjectUtils.isEmpty(dishIds)){
             return new Result(ResultConstant.CODE_FAILED,"Empty ids",null);
@@ -295,6 +325,7 @@ public class DishController {
     @PostMapping("/dish/changeState")
     @Transactional(rollbackFor = Exception.class)
     @ResponseBody
+    @PreAuthorize("hasRole('admin')")
     public Result changeDishState(@RequestBody Map<String,Object> map,Authentication authentication){
         if (ObjectUtils.isEmpty(map.get("ids"))||ObjectUtils.isEmpty(map.get("state"))||!(map.get("ids") instanceof List)||!((map.get("state")) instanceof Integer)){
             return new Result(ResultConstant.CODE_FAILED,ErrorConstant.PARAM_MISSING,null);

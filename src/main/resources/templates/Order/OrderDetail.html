@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity5">
 <head>
     <meta charset="UTF-8">
     <title>OrderDetail</title>
@@ -102,11 +102,11 @@
         display: none;
         background-color: white;
         border-radius: 25px;
-        width: 50%;
-        height: 80%;
-        position: absolute;
-        right: 25%;
-        top: 10%;
+        width: 32%;
+        height: 50%;
+        position: fixed;
+        left: 30%;
+        top: 25%;
         border: 2px solid #FFBF3D;
     }
 
@@ -138,52 +138,31 @@
         <div class="collapse navbar-collapse" id="navbarScroll">
             <ul class="navbar-nav mr-auto my-2 my-lg-0 navbar-nav-scroll" style="max-height: 100px;">
                 <li class="nav-item active">
-                    <a class="nav-link" href="#">Home <span class="sr-only">(current)</span></a>
+                    <a class="nav-link" href="home">Home <span class="sr-only">(current)</span></a>
                 </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="#">Link</a>
-                </li>
-                <li class="nav-item dropdown">
-                    <a class="nav-link dropdown-toggle" href="#" role="button" data-toggle="dropdown"
-                       aria-expanded="false">
-                        Link
-                    </a>
-                    <ul class="dropdown-menu">
-                        <li><a class="dropdown-item" href="#">Action</a></li>
-                        <li><a class="dropdown-item" href="#">Another action</a></li>
-                        <li>
-                            <hr class="dropdown-divider">
-                        </li>
-                        <li><a class="dropdown-item" href="#">Something else here</a></li>
-                    </ul>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link disabled">Link</a>
+                <li class="nav-item active">
+                    <a class="nav-link" href="admin/index" sec:authorize="hasRole('admin')">Admin</a>
                 </li>
             </ul>
-            <form class="d-flex">
-                <input class="form-control mr-2" type="search" placeholder="Search" aria-label="Search">
-                <button class="btn btn-outline-success" type="submit">Search</button>
-            </form>
             <div style="">
                 <ul class="navbar-nav mr-auto my-2 my-lg-0 navbar-nav-scroll" style="max-height: 100px;">
                     <li class="nav-item dropdown" style="">
                         <a class="nav-link dropdown-toggle" href="#" role="button" data-toggle="dropdown"
                            aria-expanded="false">
-                            Username
+                            [(${userName})]
                         </a>
                         <ul class="dropdown-menu">
-                            <li><a class="dropdown-item" href="OrderDetail/All orders.html"
-                                   th:href="@{/Order/All orders.html}">
+                            <li><a class="dropdown-item" href="order/all"
+                                   th:href="@{/order/all}">
                                 <i class="bi bi-list">&nbsp&nbsp</i>
                                 All Orders</a></li>
-                            <li><a class="dropdown-item" href="#">
+                            <li><a class="dropdown-item" href="user/profile">
                                 <i class="bi bi-person-lines-fill">&nbsp&nbsp</i>
                                 Profile</a></li>
                             <li>
                                 <hr class="dropdown-divider">
                             </li>
-                            <li><a class="dropdown-item" href="#">
+                            <li><a class="dropdown-item" href="logout">
                                 <i class="bi bi-box-arrow-right">&nbsp&nbsp</i>
                                 Log out</a></li>
                         </ul>
@@ -240,8 +219,8 @@
                 <div id="States" style="margin-left: 10%">
                     <span class="orderState1 " id="making">In the making</span>
                     <span class="orderState1" style="display: none" id="finished">The cooking is finished</span>
-                    <span class="orderState1" style="display: none" id="deliveryStateM">Under distribution</span>
-                    <span class="orderState1" style="display: none" id="deliveryStateC">Completed distribution</span>
+                    <span class="orderState1" style="display: none" id="deliveryStateM">Under Delivery</span>
+                    <span class="orderState1" style="display: none" id="deliveryStateC">Completed Delivery</span>
                 </div>
 
                 <div class="orderList" id="item-3">
@@ -325,6 +304,9 @@
 <div id="QRcodepagemu">
 </div>
 <div id="QRcodepage">
+    <div style="height: 80%;margin-top: 20px;width: 90%;margin-left: 5%">
+        <img id="qrcode" style="max-height: 100%;max-width: 100%"/>
+    </div>
     <button type="button" class="btn btn-warning" data-dismiss="modal" onclick="QRcodePageclose()"
             style="float: right; margin-top: 10px;margin-right: 10px">Back
     </button>
@@ -340,7 +322,7 @@
     }
 
     function doComment(){
-        window.location.href = "comment/postprandialEvaluation?orderId="+$("#orderId").val()
+        window.location.href = "comment/doComment?orderId="+$("#orderId").val()
     }
 
     function QRcodePageclose() {
@@ -355,7 +337,7 @@
         if (typeof topping!="object"){return ""}
         let strList = [];
         for(let key in topping){
-            strList.push(key+" X"+topping[key]);
+            strList.push(key+"X"+topping[key]);
         }
         return strList.join("");
     }
@@ -397,16 +379,20 @@
                 type: "get",
                 url: "deliveryman/get?delivertmanId="+deliverymanID,
                 success: function (deliveryman) {
-                    deliveryman = JSON.parse(deliveryman)
                     if (deliveryman === undefined || deliveryman === null) {
                         alertUtil.message("server error", "danger", $("#messageContainer"));
-                    } else if (deliveryman.code !== 1) {
-                        alertUtil.message(deliveryman.message, "warning", $("#messageContainer"));
-                    } else {
+                    }  else {
+                        let man = {};
+                        for(let i in deliveryman.rows){
+                            if (deliveryman.rows[i].id == deliverymanID){
+                                man = deliveryman.rows[i];
+                                break;
+                            }
+                        }
                         let deliverymanName = $("#deliverymanName")[0]
-                        deliverymanName.innerText = "Name : " + deliveryman.data.name
+                        deliverymanName.innerText = "Name : " + man.deliverymanName;
                         let deliverymanPhone = $("#deliverymanPhone")[0]
-                        deliverymanPhone.innerText = "Phone Number:  " + deliveryman.data.phone
+                        deliverymanPhone.innerText = "Phone Number:  " + man.phone;
                     }
                 }
             });
@@ -515,7 +501,7 @@
                         $(`<tr class="food-item">
                                        <th scope="row">${i}</th>
                                        <td>${orderDetail.data[i].dishName}</td>
-                                       <td>${getToppingStr(orderDetail.data[i].topping)}</td>
+                                       <td>${getToppingStr(JSON.parse(orderDetail.data[i].topping))}</td>
                                        <td>${orderDetail.data[i].size}</td>
                                        <td>${orderDetail.data[i].amount}</td>
                                        <td>${itemPrice}</td>
@@ -755,6 +741,10 @@
         iorderId = parseInt($("#orderId").val());
         // check();
         // setInterval(check,60000);
+        $("#qrcode").attr("src","order/qrcode?orderId="+iorderId);
+        setInterval(function (){
+            $("#qrcode").attr("src","order/qrcode?orderId="+iorderId);
+        },30000)
         check()
     })
 

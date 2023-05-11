@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 
-<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity5">
 <head>
   <base href="../static/" th:href="@{/}">
     <meta charset="UTF-8">
@@ -41,12 +41,15 @@
         <li class="nav-item active">
           <a class="nav-link" href="javascript:void(0)">Home<span class="sr-only">(current)</span></a>
         </li>
+          <li class="nav-item active">
+              <a class="nav-link" href="admin/index" sec:authorize="hasRole('admin')">Admin</a>
+          </li>
       </ul>
       <div>
         <ul class="navbar-nav mr-auto my-2 my-lg-0 navbar-nav-scroll" style="max-height: 100px;">
           <li class="nav-item dropdown" style="">
             <a class="nav-link dropdown-toggle" href="#" role="button" data-toggle="dropdown" aria-expanded="false">
-              Username
+              [(${userName})]
             </a>
             <ul class="dropdown-menu" >
               <li><a class="dropdown-item" href="order/all">
@@ -113,7 +116,6 @@
                         <p class="card-text">Pizza, originally from Pizza in Italy, is a mixture of spices, tomatoes and cheese baked. We provide different kinds of pizza for customers to choose, hoping to give users a service experience</p>
                     </div>
                     <div id="carouselExampleCaptions" class="carousel slide"  style="margin: 10px 5%;z-index: 999;width: 85%;max-width: none;height: 50%" data-ride="carousel">
-
                     <ol class="carousel-indicators">
                         <li data-target="#carouselExampleCaptions" data-slide-to="0" class="active"></li>
                         <li data-target="#carouselExampleCaptions" data-slide-to="1"></li>

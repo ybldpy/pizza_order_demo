@@ -11,6 +11,7 @@ import com.example.pizza_order_demo.service.WalletService;
 import org.apache.commons.lang3.ObjectUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Controller;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.ui.Model;
@@ -95,7 +96,7 @@ public class PaymentController {
     }
 
     @GetMapping("/pay/order")
-    public String payOrder(int orderId, Model model){
+    public String payOrder(int orderId, Model model,Authentication authentication){
         OrderDetailExample orderDetailExample = new OrderDetailExample();
         orderDetailExample.or().andOrderIdEqualTo(orderId);
         List<OrderDetail> orderDetailList = orderDetailService.selectByExample(orderDetailExample);
@@ -106,9 +107,14 @@ public class PaymentController {
         for(OrderDetail orderDetail:orderDetailList){
             count+=orderDetail.getTotalPrice();
         }
+        String curUser = "admin";
+        if (authentication!=null){
+            curUser = authentication.getName();
+        }
         model.addAttribute("orderId",orderId);
         model.addAttribute("price",count);
-        return "payment/doPay";
+        model.addAttribute("userName",curUser);
+        return "Payment/doPay";
 
     }
 

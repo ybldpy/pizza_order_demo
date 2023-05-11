@@ -48,11 +48,9 @@
 
 
 <div style="margin-top: 5%;width: 85%;margin-left: 7.5%">
-<!--    <div id="toolbar">-->
-<!--        <span>-->
-<!--            <button class="btn btn-danger" id="deleteBtn" onclick="window.open('log/download')"><i class="bi bi-trash"></i>Download master file</button>-->
-<!--        </span>-->
-<!--    </div>-->
+    <div id="toolbar">
+        <button class="btn btn-dark" onclick="$('#logTable').bootstrapTable('refresh')"><i class="bi bi-arrow-clockwise"></i> Refresh</button>
+    </div>
     <table id="logTable"></table>
 </div>
 
@@ -63,6 +61,7 @@
         $("#logTable").bootstrapTable({
             url:"log/get",
             showExport:true,
+            toolbar:"#toolbar",
             search:true,
             exportDataType: $(this).val(),
             exportTypes: ['json', 'xml', 'csv', 'txt', 'sql', 'excel', 'pdf'],

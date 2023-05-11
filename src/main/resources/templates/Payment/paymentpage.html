@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity5">
 <head>
   <base href="../../static/" th:href="@{/}">
     <meta charset="UTF-8">
@@ -131,14 +131,14 @@
 <div id="messageContainer" style="width: 30%;margin-top: 1%;position: fixed;z-index: 1055;margin-left: 35%;top: 0">
 </div>
 <div class="modal" id="addressContainer">
-    <input type="number" id="deliveryType" th:value="${deliveryType}" hidden>
-    <div class="modal-dialog modal-dialog-centered">
+    <input type="number" id="deliveryType" th:value="${deliveryType}" hidden/>
+    <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
         <div class="modal-content">
             <div class="modal-header">
                 <div class="modal-title">Choose address</div>
             </div>
             <div class="modal-body">
-                    <ul id="address-list" class="list-group" style="height: 90%;overflow-y: scroll;word-wrap: anywhere">
+                    <ul id="address-list" class="list-group" style="height: 90%;word-wrap: anywhere">
                         <li class="list-group-item list-group-item-action" th:each="address:${addressList}" >
                             <input class="address-id" type="number" th:value="${address.id}" hidden/>
                             <h5>Contact: [(${address.contact})]</h5>
@@ -194,24 +194,27 @@
         <div class="collapse navbar-collapse" id="navbarScroll">
             <ul class="navbar-nav mr-auto my-2 my-lg-0 navbar-nav-scroll" style="max-height: 100px;">
                 <li class="nav-item active">
-                    <a class="nav-link" href="#">Home <span class="sr-only">(current)</span></a>
+                    <a class="nav-link" href="home">Home <span class="sr-only">(current)</span></a>
+                </li>
+                <li class="nav-item active">
+                    <a class="nav-link" href="admin/index" sec:authorize="hasRole('admin')">Admin</a>
                 </li>
             </ul>
             <div style="">
                 <ul class="navbar-nav mr-auto my-2 my-lg-0 navbar-nav-scroll" style="max-height: 100px;">
                     <li class="nav-item dropdown" style="">
                         <a class="nav-link dropdown-toggle" href="#" role="button" data-toggle="dropdown" aria-expanded="false">
-                            Username
+                            [(${userName})]
                         </a>
                         <ul class="dropdown-menu" >
-                            <li><a class="dropdown-item" href="Order/All orders.html" th:href="@{/order/all}">
+                            <li><a class="dropdown-item" href="order/all" th:href="@{/order/all}">
                                 <i class="bi bi-list">&nbsp&nbsp</i>
                                 All Orders</a></li>
-                            <li><a class="dropdown-item" href="user/Profile.html" th:href="@{/user/profile}">
+                            <li><a class="dropdown-item" href="user/profile" th:href="@{/user/profile}">
                                 <i class="bi bi-person-lines-fill">&nbsp&nbsp</i>
                                 Profile</a></li>
                             <li><hr class="dropdown-divider"></li>
-                            <li><a class="dropdown-item" href="#">
+                            <li><a class="dropdown-item" href="logout">
                                 <i class="bi bi-box-arrow-right">&nbsp&nbsp</i>
                                 Log out</a></li>
                         </ul>
@@ -232,7 +235,7 @@
    <div id="recommendationText" style="margin-top:20px;margin-left: 30px;">
        <h5>Recommendations</h5>
    </div>
-    <button type="button" id="functionMore" class="btn btn-link" style="font-size:25px;">
+    <button type="button" id="functionMore" class="btn btn-link" style="font-size:25px;" disabled>
         More
     </button>
 </div>
@@ -241,28 +244,28 @@
     <div id="shopping-car-items" style="width: 100%;height: 85%;overflow-y: scroll">
         <ul id="shopping-car-item-list" class="list-group">
             <li class="list-group-item">
-                <div class="row">
-                    <div class="col-sm-4">
-                        <img style="max-width: 100%;max-height: 100%"/>
-                    </div>
-                    <div class="col-sm-4 item-info">
-                        <h5>1</h5>
-                        <div>size: </div>
-                        <div>111</div>
-                        <h5 class="item-price">$ </h5>
-                    </div>
-                    <div class="col-sm-4 operationContainer">
-                    <span style="top:40%;position: absolute;left: 35%">
-                        <a class="minus" style="cursor: pointer">
-                            <i class="bi bi-dash-circle"></i>
-                        </a>
-                        <span class="count">1</span>
-                        <a class="plus" style="cursor: pointer">
-                            <i class="bi bi-plus-circle"></i>
-                        </a>
-                    </span>
-                    </div>
-                </div>
+<!--                <div class="row">-->
+<!--                    <div class="col-sm-4">-->
+<!--                        <img style="max-width: 100%;max-height: 100%"/>-->
+<!--                    </div>-->
+<!--                    <div class="col-sm-4 item-info">-->
+<!--                        <h5>1</h5>-->
+<!--                        <div>size: </div>-->
+<!--                        <div>111</div>-->
+<!--                        <h5 class="item-price">$ </h5>-->
+<!--                    </div>-->
+<!--                    <div class="col-sm-4 operationContainer">-->
+<!--                    <span style="top:40%;position: absolute;left: 35%">-->
+<!--                        <a class="minus" style="cursor: pointer">-->
+<!--                            <i class="bi bi-dash-circle"></i>-->
+<!--                        </a>-->
+<!--                        <span class="count">1</span>-->
+<!--                        <a class="plus" style="cursor: pointer">-->
+<!--                            <i class="bi bi-plus-circle"></i>-->
+<!--                        </a>-->
+<!--                    </span>-->
+<!--                    </div>-->
+<!--                </div>-->
             </li>
         </ul>
     </div>

@@ -10,8 +10,10 @@ import com.example.pizza_order_demo.utils.TimeUtils;
 import javafx.util.Pair;
 import org.apache.commons.lang3.ObjectUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import javax.servlet.http.HttpServletResponse;
@@ -23,6 +25,7 @@ import java.text.SimpleDateFormat;
 import java.util.*;
 
 @Controller
+@PreAuthorize("hasRole('admin')")
 public class StatisticController {
 
 
@@ -124,10 +127,28 @@ public class StatisticController {
 
 
     @GetMapping("/statistic/dish/download")
-    public void downloadFood(HttpServletResponse response){
+    public void downloadFood(HttpServletResponse response) throws IOException {
+        OrderDetailExample orderDetailExample = new OrderDetailExample();
+        List<OrderDetail> orderDetailList = orderDetailService.selectByExample(orderDetailExample);
+        Map<String,Integer> foodCount = new HashMap<>();
+        for(OrderDetail orderDetail:orderDetailList){
+            if (foodCount.containsKey(orderDetail.getDishName())){
+                foodCount.put(orderDetail.getDishName(),foodCount.get(orderDetail.getDishName())+orderDetail.getAmount());
+            }
+            else {
+                foodCount.put(orderDetail.getDishName(),orderDetail.getAmount());
+            }
+        }
+        List<DishSale> dishSaleList = new ArrayList<>(foodCount.size()+1);
+        for(Map.Entry<String,Integer> entry:foodCount.entrySet()){
+            dishSaleList.add(new DishSale(entry.getKey(),entry.getValue()));
+        }
+        response.setContentType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
+        response.setCharacterEncoding("utf-8");
+        response.setHeader("Content-disposition", "attachment;filename=sales.xlsx");
+        EasyExcel.write(response.getOutputStream(), DishSale.class).sheet("sales").doWrite(dishSaleList);
 
-        DishExample dishExample = new DishExample();
-        List<Dish> list = null;
+
 
     }
 

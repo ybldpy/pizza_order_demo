@@ -75,7 +75,7 @@ public class UserAddressController {
     public Object queryUserAddress(Authentication authentication){
         String curUser = "admin";
         if (authentication!=null){
-            curUser = ((UserDetails)authentication.getPrincipal()).getUsername();
+            curUser = authentication.getName();
         }
         UserAddressExample userAddressExample = new UserAddressExample();
         userAddressExample.or().andDeletedEqualTo(0).andUserNameEqualTo(curUser);

@@ -30,6 +30,30 @@
     <!--        </div>-->
 </div>
 
+<div id="editContainer" class="modal" tabindex="-1">
+
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">New Category</h5>
+            </div>
+            <div class="modal-body">
+                <div>
+                    <form id="editForm">
+                        <input name="id" hidden/>
+                        <input id="editCategoryInput" class="form-control" type="text" name="categoryName" placeholder="Input new category" oninput="$(this).siblings('div').hide();"/>
+                        <div id="editFeedback" class="invalid-feedback">Category cannot be empty</div>
+                    </form>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary addBtn" onclick="$('#editContainer').modal('hide')">Close</button>
+                <button id="editBtn" type="button" class="btn btn-primary addBtn" onclick="doEdit($(this))">Edit</button>
+            </div>
+        </div>
+    </div>
+</div>
+
 <div id="addContainer" class="modal" tabindex="-1">
 
     <div class="modal-dialog modal-dialog-centered">
@@ -66,6 +90,7 @@
         <div class="btns">
             <a class="btn-warning btn"  id="addCategoryBtn"><i class="bi bi-plus"></i>Add Category</a>
             <a class="btn-danger btn"  id="deleteCategoryBtn"><i class="bi bi-trash"></i>Delete Category</a>
+            <button class="btn btn-dark" onclick="$('#table').bootstrapTable('refresh')"><i class="bi bi-arrow-clockwise"></i> Refresh</button>
         </div>
 <!--        <div class="col-3">-->
 <!--            <input class="form-control" type="text" id="searchText" placeholder="search here"/>-->
@@ -119,6 +144,10 @@
         $("#addContainer").on("hide.bs.modal",function (){
             document.getElementById("addCategoryInput").value = '';
         })
+        $("#editContainer").on("bs.modal.hide",function (){
+            $("#editForm").find("input").val("");
+        })
+
         $("#addCategoryBtn").on("click",function (){
             $("#addContainer").modal({keyboard:true,focus:true,show:true});
         })
@@ -149,7 +178,46 @@
 
 
     function operateFormatter(value,row,index,field){
-        return "<button class='btn btn-warning'><i class='bi bi-pencil-square'></i>Edit</button>"
+        return "<button class='btn btn-warning' onclick=\"showEditModal("+row.id+",'"+row.categoryName+"')\"><i class='bi bi-pencil-square'></i>Edit</button>"
+    }
+
+    function showEditModal(id,categoryName){
+        let $form = $("#editForm");
+        $form.find("input[name='id']").val(id);
+        $form.find("input[name='categoryName']").val(categoryName);
+        $("#editContainer").modal({backdrop:false});
+
+    }
+    function doEdit($btn){
+        let $form = $("#editForm");
+        let html = $btn.text();
+        $.ajax({
+            type:"post",
+            url:"category/edit",
+            data:$form.serialize(),
+            beforeSend:function (){
+                if (isBlank($form.find("input[name='id']").val())||isBlank($form.find("input[name='categoryName']"))){
+                    alertUtil.message("Illegal params",dangerType,document.getElementById("messageContainer"));
+                    return false;
+                }
+                enableLoadingVideo($btn);
+                return true;
+            },
+            success:function (result){
+                disableLoadingVideo($btn,html);
+                if (result.code!=1){
+                    alertUtil.message(isBlank(result.message)?"Edit failed":result.message,dangerType,document.getElementById("messageContainer"));
+                    return;
+                }
+                alertUtil.message("Success",successType,document.getElementById("messageContainer"));
+                $("#table").bootstrapTable("refresh");
+            },
+            error:function (){
+                disableLoadingVideo($btn,html);
+                alertUtil.message("Failed",dangerType,document.getElementById("messageContainer"));
+            }
+        })
+
     }
 
     function addNewCategory(btn){

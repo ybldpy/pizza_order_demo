@@ -138,7 +138,7 @@
                             </div>
                             <div class="form-group">
                                 <label for="verificationCode">Verification Code</label>
-                                <input id="verificationCode" name="code" class="form-control checks" type="text" value="" required autofocus/>
+                                <input id="verificationCode" name="code" class="form-control checks" type="text" placeholder="If you don't receive code, try 'passcode'" value="" required autofocus/>
                                 <div id="verificationCodeFeedback" class="invalid-feedback">
                                     You must input verification code
                                 </div>
@@ -211,11 +211,7 @@
 
                         if(result.code!=1){
                             let message = result.message;
-                            if (message=="Cannot send verification code"){
-                                alertUtil.message("Cannot send verification code, try passcode 'passcode'",dangerType,document.getElementById("messageContainer"));
-                                return;
-                            }
-                            alertUtil.message(message==null?"Send failed":message,dangerType,document.getElementById("messageContainer"));
+                            alertUtil.message("Cannot send verification code, try passcode 'passcode'",dangerType,document.getElementById("messageContainer"));
                         }
                     }
                 }

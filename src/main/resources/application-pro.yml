@@ -1,0 +1,75 @@
+file:
+  upload-path: D:/pizza_order_demo/upload
+  temp-path: C:/Program Files/cpt202/temp
+spring:
+  thymeleaf:
+    cache: false
+  servlet:
+    multipart:
+      max-file-size: 30MB
+  datasource:
+    driver-class-name: com.mysql.jdbc.Driver
+    url: jdbc:mysql://124.220.16.197:3306/pizza_shop
+    username: ztn
+    password: qwertyuiop
+
+
+
+
+
+  mail:
+    host: smtp.163.com
+    username: 18508782239@163.com
+    password: WXBZCJYSENDETJCR
+    properties:
+      mail:
+        smtp:
+          starttls:
+            enable: true
+            required: true
+
+
+
+
+
+#  spring.datasource.driver-class-name=com.mysql.jdbc.Driver
+#  spring.datasource.url=jdbc:mysql://localhost:3306/pizza_shop
+#  spring.datasource.username=root
+#  spring.datasource.password=root062400
+#
+#
+#
+#
+#
+#  spring.mail.host=smtp.163.com
+#  spring.mail.username=18508782239@163.com
+#  spring.mail.password=KGMTTQVMGTGLEIJN
+#  spring.mail.properties
+#
+#
+#  server.servlet.context-path=/pizza_shop
+#
+#  mybatis.mapper-locations=classpath:/mappers/*.xml
+#  mybatis.configuration.log-impl=org.apache.ibatis.logging.stdout.StdOutImpl
+server:
+  servlet:
+    context-path: /pizza_shop
+
+tengxun:
+  accessKey: AKIDi7rnndG71rU5iFZhcMsD9yU7r4nkkaHr
+  secretKey: Ws1xgVA6TfuhFg2EDzZzDtSq1gBmUC5r
+  bucket: ap-nanjing
+  bucketName: pizza-1311286354
+  path: https://pizza-1311286354.cos.ap-nanjing.myqcloud.com
+  prefix: /img
+
+mybatis:
+  configuration:
+    map-underscore-to-camel-case: true
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+  logging:
+    level:
+      com.example.pizza_order_demo.mapper: debug
+  type-aliases-package: com.example.pizza_order_demo.model
+  mapper-locations: classpath:/mappers/*Mapper.xml
+#  mybatis.configuration.map-underscore-to-camel-case=true

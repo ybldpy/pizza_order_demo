@@ -4,18 +4,23 @@ package com.example.pizza_order_demo.controller;
 import com.example.pizza_order_demo.commons.Result;
 import com.example.pizza_order_demo.commons.constant.ErrorConstant;
 import com.example.pizza_order_demo.commons.constant.ResultConstant;
+import com.example.pizza_order_demo.component.SystemControlComponent;
 import com.example.pizza_order_demo.exception.CURDException;
 import com.example.pizza_order_demo.model.*;
 import com.example.pizza_order_demo.service.*;
 import com.example.pizza_order_demo.utils.OrderUtil;
+import com.example.pizza_order_demo.utils.QRCodeUtil;
 import com.example.pizza_order_demo.utils.TimeUtils;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.lang3.ObjectUtils;
 import org.apache.ibatis.javassist.NotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Controller;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.ui.Model;
@@ -23,7 +28,13 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.thymeleaf.extras.springsecurity5.dialect.processor.AuthorizeUrlAttrProcessor;
 
+import javax.imageio.ImageIO;
+import javax.servlet.http.HttpServletResponse;
+import java.awt.image.BufferedImage;
+import java.io.IOException;
+import java.io.OutputStream;
 import java.security.Principal;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -43,6 +54,10 @@ public class OrderController {
     private DeliverymanService deliverymanService;
     @Autowired
     private UserAddressService userAddressService;
+    @Value("${server.servlet.context-path}")
+    private String contextPath;
+    @Autowired
+    private SystemControlComponent systemControlComponent;
 
     @Autowired
     private DishService dishService;
@@ -74,6 +89,7 @@ public class OrderController {
      */
     @GetMapping("/order/confirmDelivery")
     @ResponseBody
+    @PreAuthorize("hasRole('admin')")
     public Result ConfirmOrderDelivery(int orderId) throws NotFoundException {
         /**
          * check if order exist
@@ -111,24 +127,40 @@ public class OrderController {
     }
 
     @GetMapping("/order/todo")
+    @PreAuthorize("hasRole('admin')")
     public String orderTodo(){
         return "admin/orderTodo";
     }
     @GetMapping("/order/toDelivery")
+    @PreAuthorize("hasRole('admin')")
     public String orderToDelivery(){
         return "admin/orderToDelivery";
     }
     @GetMapping("/order/history")
+    @PreAuthorize("hasRole('admin')")
     public String orderHistory(){
         return "admin/orderHistory";
     }
     @GetMapping("/order/info")
-    public String orderInfo(int orderId,Model model){
+    public String orderInfo(int orderId,Model model,Authentication authentication){
         model.addAttribute("orderId",orderId);
+        String curUser = "admin";
+        if (authentication!=null){
+            curUser = authentication.getName();
+        }
+        model.addAttribute("userName",curUser);
         return "Order/OrderDetail";
     }
     @GetMapping("/order/all")
-    public String allOrder(){
+    public String allOrder(Model model,Authentication authentication){
+        String curUser = "admin";
+        if (authentication!=null){
+            curUser = ((UserDetails)authentication.getPrincipal()).getUsername();
+        }
+        model.addAttribute("userName",curUser);
+        if (systemControlComponent.closed()){
+            return "forward:/closed.html";
+        }
         return "Order/All orders";
     }
 
@@ -137,6 +169,7 @@ public class OrderController {
     @GetMapping("/order/detail/finish")
     @ResponseBody
     @Transactional(rollbackFor = Exception.class)
+    @PreAuthorize("hasRole('admin')")
     public Result finishDetail(int orderDetailId) throws NotFoundException {
         OrderDetail orderDetail = orderDetailService.selectByPrimaryKey(orderDetailId);
         if (ObjectUtils.isEmpty(orderDetail)){
@@ -183,6 +216,7 @@ public class OrderController {
 
     @GetMapping("/order/toDelivery/orders")
     @ResponseBody
+    @PreAuthorize("hasRole('admin')")
     public Object toDeliveryOrders(){
         OrderExample orderExample = new OrderExample();
         orderExample.or().andStateEqualTo(1).andTypeEqualTo(1);
@@ -227,6 +261,7 @@ public class OrderController {
 
     @GetMapping("/order/history/orders")
     @ResponseBody
+    @PreAuthorize("hasRole('admin')")
     public Object historyOrders(){
         OrderExample orderExample = new OrderExample();
         orderExample.or().andStateEqualTo(1).andTypeEqualTo(0);
@@ -271,10 +306,10 @@ public class OrderController {
 
     @GetMapping("/order/todo/orders")
     @ResponseBody
+    @PreAuthorize("hasRole('admin')")
     public Object todoOrders(){
         OrderExample orderExample = new OrderExample();
-        orderExample.or().andStateEqualTo(0);
-        orderExample.or().andPaidEqualTo(1);
+        orderExample.or().andStateEqualTo(0).andPaidEqualTo(1);
         Map<String,Object> resultMap = new HashMap<>();
         List<Order> orders = orderService.selectByExample(orderExample);
         List<Integer> orderIds = null;
@@ -442,11 +477,29 @@ public class OrderController {
         return result;
     }
 
+    @GetMapping("/order/qrcode")
+    public void createQrcode(int orderId, HttpServletResponse response) throws IOException {
+        Order order = orderService.selectByPrimaryKey(orderId);
+        String content = order!=null?("Order id: # "+order.getId()+" State: "+(order.getPaid()==0?"unpaid":order.getState()==0?"In cooking":order.getState()==1&&order.getType()==0?"Finished":order.getState()==1&&order.getType()==1?"Under delivery":"Completed delivery")):"order doesn't exist";
+        response.setContentType("image/png");
+        response.setHeader("Pragma","no-cache");
+        response.setHeader("Cache-Control","no-cache");
+        response.setDateHeader("Expires",0);
+        BufferedImage bufferedImage = QRCodeUtil.generateQRCode(content,500,500);
+        OutputStream outputStream = response.getOutputStream();
+        ImageIO.write(bufferedImage,"png",outputStream);
+    }
+    @GetMapping("/order/qrcode/scan")
+    public String scanQrCode(int orderId,Model model){
+        model.addAttribute("orderId",orderId);
+        return "Order/QRCode";
+    }
+
 
     @PostMapping("/order/create")
     @Transactional(rollbackFor = Exception.class)
     @ResponseBody
-    public Result createOrder(@RequestBody Map<String,Object> map) throws JsonProcessingException {
+    public Result createOrder(@RequestBody Map<String,Object> map,Authentication authentication) throws JsonProcessingException {
         if (ObjectUtils.isEmpty(map.get("pickupTime"))||ObjectUtils.isEmpty(map.get("shoppingCar"))||ObjectUtils.isEmpty(map.get("deliveryType"))||ObjectUtils.isEmpty(map.get("addressId"))){
             return new Result(ResultConstant.CODE_FAILED, ErrorConstant.PARAM_MISSING,null);
         }
@@ -468,6 +521,7 @@ public class OrderController {
                 return new Result(ResultConstant.CODE_FAILED,"params is wrong",null);
             }
             DeliverymanExample deliverymanExample = new DeliverymanExample();
+            deliverymanExample.or().andDeletedEqualTo(0);
             List<Deliveryman> deliverymanList = deliverymanService.selectByExample(deliverymanExample);
             if (!ObjectUtils.isEmpty(deliverymanList)&&!deliverymanList.isEmpty()){
 
@@ -478,7 +532,11 @@ public class OrderController {
             newOrder.setUserAddressId(addressId);
         }
         else {newOrder.setType(0);}
-        newOrder.setUserName((String) SecurityContextHolder.getContext().getAuthentication().getPrincipal());
+        String curUser = "admin";
+        if (authentication!=null){
+            curUser = ((UserDetails)authentication.getPrincipal()).getUsername();
+        }
+        newOrder.setUserName(curUser);
         newOrder.setState(0);
         newOrder.setPaid(0);
         int res = orderService.insert(newOrder);
@@ -503,17 +561,22 @@ public class OrderController {
     }
 
     @PostMapping("/order/payment")
-    public String paymentPage(String shoppingCar, int deliveryType, Model model){
+    public String paymentPage(String shoppingCar, int deliveryType, Model model, Authentication authentication){
+        if (systemControlComponent.closed()){
+            return "forward:/closed.html";
+        }
         if (deliveryType!=0&&deliveryType!=1){
             return "415";
         }
-        Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        String curUser = principal instanceof String?"anonymousUser":((UserDetailsImpl)principal).getUsername();
+        String curUser = "admin";
+        if (authentication!=null){
+            curUser = authentication.getName();
+        }
         model.addAttribute("shoppingCar",shoppingCar);
         model.addAttribute("deliveryType",deliveryType);
-
+        model.addAttribute("userName",curUser);
         UserAddressExample userAddressExample = new UserAddressExample();
-        userAddressExample.or().andUserNameEqualTo(curUser);
+        userAddressExample.or().andUserNameEqualTo(curUser).andDeletedEqualTo(0);
         model.addAttribute("addressList",userAddressService.selectByExample(userAddressExample));
         return "Payment/paymentpage";
     }

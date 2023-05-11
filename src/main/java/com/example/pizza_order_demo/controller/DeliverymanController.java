@@ -14,6 +14,7 @@ import com.example.pizza_order_demo.service.LogService;
 import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.transaction.annotation.Transactional;
@@ -41,6 +42,7 @@ public class DeliverymanController {
 
     @PostMapping("/deliveryman/add")
     @ResponseBody
+    @PreAuthorize("hasRole('admin')")
     public Result addDeliveryman(Deliveryman deliveryman,Authentication authentication){
         if (StringUtils.isAnyBlank(deliveryman.getDeliverymanName(),deliveryman.getPhone())){
             return new Result(ResultConstant.CODE_FAILED,ErrorConstant.PARAM_MISSING,null);
@@ -69,6 +71,7 @@ public class DeliverymanController {
 
     @PostMapping("/deliveryman/edit")
     @ResponseBody
+    @PreAuthorize("hasRole('admin')")
     public Result editDeliveryman(Deliveryman deliveryman,Authentication authentication){
 
         if (ObjectUtils.anyNull(deliveryman.getId(),deliveryman.getDeliverymanName(),deliveryman.getPhone())|| StringUtils.isAnyBlank(deliveryman.getPhone(),deliveryman.getDeliverymanName())){
@@ -79,6 +82,7 @@ public class DeliverymanController {
             return new Result(ResultConstant.CODE_FAILED,"Delivery man not find",null);
         }
         deliveryman.setId(old.getId());
+        deliveryman.setDeleted(0);
         int res = deliverymanService.updateByPrimaryKey(deliveryman);
         if (res<1){
             return new Result(ResultConstant.CODE_FAILED,ResultConstant.MESSAGE_FAILED,null);
@@ -120,6 +124,7 @@ public class DeliverymanController {
     @PostMapping("/deliveryman/delete")
     @ResponseBody
     @Transactional(rollbackFor = Exception.class)
+    @PreAuthorize("hasRole('admin')")
     public Result deleteDeliverymen(@RequestBody List<Integer> ids, Authentication authentication){
         if (ObjectUtils.isEmpty(ids)){
             return new Result(ResultConstant.CODE_FAILED, ErrorConstant.PARAM_MISSING,null);

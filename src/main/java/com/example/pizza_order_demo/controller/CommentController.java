@@ -2,6 +2,7 @@ package com.example.pizza_order_demo.controller;
 
 import com.example.pizza_order_demo.commons.Result;
 import com.example.pizza_order_demo.commons.constant.ResultConstant;
+import com.example.pizza_order_demo.component.SystemControlComponent;
 import com.example.pizza_order_demo.model.Comment;
 import com.example.pizza_order_demo.model.CommentExample;
 import com.example.pizza_order_demo.model.OrderExample;
@@ -11,6 +12,8 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.lang3.ObjectUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -28,10 +31,16 @@ public class CommentController {
     private CommentService commentService;
     @Autowired
     private OrderService orderService;
+    @Autowired
+    private SystemControlComponent systemControlComponent;
 
     @GetMapping("/comment/doComment")
-    public String comment(int orderId, Model model){
+    public String comment(int orderId, Model model, Authentication authentication){
+        if (systemControlComponent.closed()){
+            return "forward:/closed.html";
+        }
         model.addAttribute("orderId",orderId);
+        model.addAttribute("userName",((UserDetails)authentication.getPrincipal()).getUsername());
         return "Order/PostprandialEvaluation";
     }
 
@@ -42,7 +51,7 @@ public class CommentController {
         Comment comment = commentService.selectFirstByExample(commentExample);
         if (ObjectUtils.isEmpty(comment)){return "404";}
         model.addAttribute("commentData",comment.getRemark());
-        return "Order/Evalution";
+        return "Order/Evaluation";
     }
 
     @PostMapping("/comment/doComment")

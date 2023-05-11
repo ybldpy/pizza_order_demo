@@ -2,8 +2,8 @@
 <html>
 
 <head>
-    <base href="../">
-    <title>Bootstrap5 实例</title>
+    <base href="../../static/" th:href="@{/}">
+    <title>Admin</title>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <script src = "js/header.js"></script>
@@ -191,6 +191,9 @@
             <li>
                 <input id="system-state" th:value="${state}" hidden/>
                 <button class="btn btn-warning" id="control-btn">Close system</button>
+            </li>
+            <li>
+                <button class="btn btn-link"  type="button" onclick="window.open('home')">Client side</button>
             </li>
 <!--            <li class="mb-1">-->
 <!--                <button class="btn btn-toggle align-items-center rounded collapsed" data-bs-toggle="collapse"-->

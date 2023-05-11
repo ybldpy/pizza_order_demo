@@ -58,6 +58,7 @@
             <div class="form-group col-md-7">
                 <label for="categoryName">Choose category</label>
                 <select name="categoryName" class="form-control" id="categoryName" onclick="$(this).siblings('.invalid-feedback').hide();">
+                    <option th:each="category:${categories}" th:value="${category.categoryName}">[(${category.categoryName})]</option>
                 </select>
                 <div class="invalid-feedback" id="categoryNameFeedback">You must select a category</div>
             </div>
@@ -104,6 +105,7 @@
 <!--                <div id="topping-item-container" class="form-control"><span>&times;</span></div>-->
                 <label>Add topping</label>
                 <select class="form-control selectpicker" id="topping" multiple>
+                    <option th:each="topping:${allToppings}" th:value="${topping.toppingName}">[(${topping.toppingName})]</option>
                 </select>
             </div>
 
@@ -266,7 +268,7 @@
     function addGroupItem(container){
         let itemContent = "<div class=\"form-row group-item\">\n" +
             "                <div class=\"form-group col-md-4\">\n" +
-            "                    <input type=\"number\" name=\"size\" class=\"form-control\" placeholder=\"Input size\"/>\n" +
+            "                    <input type=\"text\" name=\"size\" class=\"form-control\" placeholder=\"Input size\"/>\n" +
             "                </div>\n" +
             "                <div class=\"form-group col-md-4\">\n" +
             "                    <input type=\"number\" name=\"price\" class=\"form-control\" placeholder=\"Input price\"/>\n" +
@@ -339,8 +341,6 @@
     }
 
     $(function (){
-        getCategory();
-        getTopping();
         $("#addDishBtn").on("click",addDish);
 
         $("#upload-image-btn").on("click",function (){
@@ -367,7 +367,6 @@
                     }
                     else {
                         alertUtil.message("Upload success","success",document.getElementById("messageContainer"));
-                        alert(result.data)
                         $("input[name='img']")[0].value = result.data
                     }
                 },

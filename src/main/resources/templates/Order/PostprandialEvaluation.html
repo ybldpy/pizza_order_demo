@@ -1,11 +1,11 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity5">
 <head>
     <meta charset="UTF-8">
     <title>Postprandial evaluation</title>
   <base href="../../static/" th:href="@{/}">
   <script src="js/header.js"></script>
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+
   <link href="plugins/bootstrap-table/bootstrap-table.min.css" rel="stylesheet"/>
     <link href="font/fonts.css" rel="stylesheet"/>
   <script src="js/footer.js"></script>
@@ -123,45 +123,27 @@
           <div class="collapse navbar-collapse" id="navbarScroll">
               <ul class="navbar-nav mr-auto my-2 my-lg-0 navbar-nav-scroll" style="max-height: 100px;">
                   <li class="nav-item active">
-                      <a class="nav-link" href="#">Home <span class="sr-only">(current)</span></a>
+                      <a class="nav-link" href="home">Home <span class="sr-only">(current)</span></a>
                   </li>
-                  <li class="nav-item">
-                      <a class="nav-link" href="#">Link</a>
-                  </li>
-                  <li class="nav-item dropdown">
-                      <a class="nav-link dropdown-toggle" href="#" role="button" data-toggle="dropdown" aria-expanded="false">
-                          Link
-                      </a>
-                      <ul class="dropdown-menu">
-                          <li><a class="dropdown-item" href="#">Action</a></li>
-                          <li><a class="dropdown-item" href="#">Another action</a></li>
-                          <li><hr class="dropdown-divider"></li>
-                          <li><a class="dropdown-item" href="#">Something else here</a></li>
-                      </ul>
-                  </li>
-                  <li class="nav-item">
-                      <a class="nav-link disabled">Link</a>
+                  <li class="nav-item active">
+                      <a class="nav-link" href="admin/index" sec:authorize="hasRole('admin')">Admin</a>
                   </li>
               </ul>
-              <form class="d-flex">
-                  <input class="form-control mr-2" type="search" placeholder="Search" aria-label="Search">
-                  <button class="btn btn-outline-success" type="submit">Search</button>
-              </form>
               <div style="">
                   <ul class="navbar-nav mr-auto my-2 my-lg-0 navbar-nav-scroll" style="max-height: 100px;">
                       <li class="nav-item dropdown" style="">
                           <a class="nav-link dropdown-toggle" href="#" role="button" data-toggle="dropdown" aria-expanded="false">
-                              Username
+                              [(${userName})]
                           </a>
                           <ul class="dropdown-menu" >
                               <li><a class="dropdown-item" href="order/all">
                                   <i class="bi bi-list">&nbsp&nbsp</i>
                                   All Orders</a></li>
-                              <li><a class="dropdown-item" href="#">
+                              <li><a class="dropdown-item" href="user/profile">
                                   <i class="bi bi-person-lines-fill">&nbsp&nbsp</i>
                                   Profile</a></li>
                               <li><hr class="dropdown-divider"></li>
-                              <li><a class="dropdown-item" href="#">
+                              <li><a class="dropdown-item" href="logout">
                                   <i class="bi bi-box-arrow-right">&nbsp&nbsp</i>
                                   Log out</a></li>
                           </ul>
@@ -502,7 +484,7 @@
         $.ajax(
             {
                 type: "post",
-                url:"comment/postprandialEvaluation",
+                url:"comment/doComment",
                 data: JSON.stringify(commentData),
                 contentType:"application/json",
                 beforeSend:function (){
@@ -524,14 +506,14 @@
                 },
                 success:function (result){
                     if (result === undefined||result===null){
-                        alertUtil.message("server error","danger",$("#messageContainer"));
+                        alertUtil.message("server error",dangerType,$("#messageContainer"));
                     }
                     else if (result.code!==1){
-                        alertUtil.message(result.message,"warning",$("#messageContainer"));
-                    }else window.location.href= "index";
+                        alertUtil.message(result.message,dangerType,$("#messageContainer"));
+                    }else window.location.href= "order/info?orderId="+parseInt($("#orderId").val());
                 },
                 error:function (){
-                    alertUtil.message("server error","danger",$("#messageContainer"));
+                    alertUtil.message("server error",dangerType,$("#messageContainer"));
                 }
             })
     }

@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity5">
 <head>
     <base href="../../static/" th:href="@{/}">
     <meta charset="UTF-8">
@@ -51,38 +51,27 @@
         <div class="collapse navbar-collapse" id="navbarScroll">
             <ul class="navbar-nav mr-auto my-2 my-lg-0 navbar-nav-scroll" style="max-height: 100px;">
                 <li class="nav-item active">
-                    <a class="nav-link" href="#">Home <span class="sr-only">(current)</span></a>
+                    <a class="nav-link" href="home">Home <span class="sr-only">(current)</span></a>
                 </li>
-                <!--        <li class="nav-item dropdown">-->
-                <!--          <a class="nav-link dropdown-toggle" href="#" role="button" data-toggle="dropdown" aria-expanded="false">-->
-                <!--            Link-->
-                <!--          </a>-->
-                <!--          <ul class="dropdown-menu">-->
-                <!--            <li><a class="dropdown-item" href="#">Action</a></li>-->
-                <!--            <li><a class="dropdown-item" href="#">Another action</a></li>-->
-                <!--            <li><hr class="dropdown-divider"></li>-->
-                <!--            <li><a class="dropdown-item" href="#">Something else here</a></li>-->
-                <!--          </ul>-->
-                <!--        </li>-->
-                <!--        <li class="nav-item">-->
-                <!--          <a class="nav-link disabled">Link</a>-->
-                <!--        </li>-->
+                <li class="nav-item active">
+                    <a class="nav-link" href="admin/index" sec:authorize="hasRole('admin')">Admin</a>
+                </li>
             </ul>
             <div style="">
                 <ul class="navbar-nav mr-auto my-2 my-lg-0 navbar-nav-scroll" style="max-height: 100px;">
                     <li class="nav-item dropdown" style="">
                         <a class="nav-link dropdown-toggle" href="#" role="button" data-toggle="dropdown" aria-expanded="false">
-                            Username
+                            [(${userName})]
                         </a>
                         <ul class="dropdown-menu" >
                             <li><a class="dropdown-item" href="order/all" th:href="@{/order/all}">
                                 <i class="bi bi-list">&nbsp&nbsp</i>
                                 All Orders</a></li>
-                            <li><a class="dropdown-item" href="#">
+                            <li><a class="dropdown-item" href="user/profile">
                                 <i class="bi bi-person-lines-fill">&nbsp&nbsp</i>
                                 Profile</a></li>
                             <li><hr class="dropdown-divider"></li>
-                            <li><a class="dropdown-item" href="#">
+                            <li><a class="dropdown-item" href="logout">
                                 <i class="bi bi-box-arrow-right">&nbsp&nbsp</i>
                                 Log out</a></li>
                         </ul>

@@ -7,7 +7,7 @@ function register(){
     let form = $("#registerForm");
     $.ajax({
         type:"post",
-        url:basePath+"/register",
+        url:"register",
         data:form.serialize(),
         beforeSend:function (){
             let canSend = true;
@@ -92,19 +92,20 @@ function sendVerificationCode(btn){
                 alertUtil.message("Send failed","danger",$("#messageContainer"));
             }
             else  if (result.code!=1){
-                alertUtil.message("Send failed, try passcode 'passcode'",'danger',$("#messageContainer"))
+                alertUtil.message("Send failed, try verification code 'passcode' ",'danger',$("#messageContainer"))
             }
             else {
                 alertUtil.message("Send Success","info",$("#messageContainer"));
                 btnJ[0].disabled = true;
                 let count = 60*1000;
                 let func = setInterval(function (){
-                    btnJ[0].innerText = "retry after "+count/1000+"seconds";
+                    btnJ[0].innerText = "retry after "+count/1000+" seconds";
                     count = count-1000;
                 },1000);
                 setTimeout(function(){
                     clearInterval(func);
                     btnJ[0].disabled = false;
+                    btnJ[0].innerText = "Send verification code";
                 },60*1000)
             }
         },

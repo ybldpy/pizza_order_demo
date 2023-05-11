@@ -159,7 +159,7 @@
         for(let i=0;i<items.length;i++){
             let inputs = $(items[i]).find("input");
             let jsonObj = {};
-            jsonObj["size"] = parseInt(inputs[0].value);
+            jsonObj["size"] = inputs[0].value;
             jsonObj["price"] = parseInt(inputs[1].value);
             if (isNaN(jsonObj["price"]||jsonObj["price"]<=0)){alertUtil.message("price is illegal",warningType,document.getElementById("messageContainer"));return;}
             size_price.push(jsonObj);
@@ -338,7 +338,7 @@
                         alertUtil.message("Upload failed","danger",document.getElementById("messageContainer"));
                     }
                     else if (result.code!=1){
-                        alertUtil.message(result.message,"warning",document.getElementById("messageContainer"));
+                        alertUtil.message(result.message==null?"Upload failed":result.message,"warning",document.getElementById("messageContainer"));
                     }
                     else {
                         alertUtil.message("Upload success","success",document.getElementById("messageContainer"));

@@ -14,6 +14,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.transaction.annotation.Transactional;
@@ -36,6 +37,7 @@ public class ToppingController {
     @PostMapping("/topping/add")
     @ResponseBody
     @Transactional(rollbackFor = Exception.class)
+    @PreAuthorize("hasRole('admin')")
     public Result addTopping(String toppingName, Integer price, Authentication authentication){
         if (StringUtils.isBlank(toppingName)){
             return new Result(ResultConstant.CODE_FAILED, ErrorConstant.PARAM_MISSING,null);
@@ -46,7 +48,6 @@ public class ToppingController {
 
         ToppingExample toppingExample = new ToppingExample();
         toppingExample.or().andDeletedEqualTo(0).andToppingNameEqualTo(toppingName);
-        toppingExample.or().andToppingNameEqualTo(toppingName);
         if (toppingService.selectFirstByExample(toppingExample)!=null){
             return new Result(ResultConstant.CODE_FAILED,ErrorConstant.EXIST,null);
         }
@@ -81,6 +82,7 @@ public class ToppingController {
         Map<String,Object> resultMap = new HashMap<>();
         if (ObjectUtils.isEmpty(toppings)){
             resultMap.put("total",0);
+            resultMap.put("rows",new ArrayList<>());
             return resultMap;
         }
         resultMap.put("total",toppings.size());
@@ -91,6 +93,7 @@ public class ToppingController {
     @PostMapping("/topping/delete")
     @ResponseBody
     @Transactional(rollbackFor = Exception.class)
+    @PreAuthorize("hasRole('admin')")
     public Result deleteTopping(@RequestBody List<Integer> ids,Authentication authentication) throws JsonProcessingException {
         if (ObjectUtils.isEmpty(ids)){
             return new Result(ResultConstant.CODE_FAILED,ErrorConstant.PARAM_MISSING,null);
@@ -99,12 +102,6 @@ public class ToppingController {
         toppingExample.or().andIdIn(ids);
         if (toppingService.countByExample(toppingExample)!= ids.size()){
             return new Result(ResultConstant.CODE_FAILED,"Some toppings don't find",null);
-        }
-        Topping updateTopping = new Topping();
-        updateTopping.setDeleted(1);
-        int res  =toppingService.updateByExampleSelective(updateTopping,toppingExample);
-        if (res!=ids.size()){
-            throw new CURDException();
         }
         List<Topping> toppingList = toppingService.selectByExample(toppingExample);
         Set<String> toppingNames = new HashSet<>();
@@ -119,6 +116,12 @@ public class ToppingController {
                     return new Result(ResultConstant.CODE_FAILED,"Topping is used by dishes, please modify topping of dish first!",null);
                 }
             }
+        }
+        Topping updateTopping = new Topping();
+        updateTopping.setDeleted(1);
+        int res  =toppingService.updateByExampleSelective(updateTopping,toppingExample);
+        if (res!=ids.size()){
+            throw new CURDException();
         }
         String curUser = "admin";
         if (!ObjectUtils.isEmpty(authentication)){
@@ -138,6 +141,7 @@ public class ToppingController {
 
     @PostMapping("/topping/modify")
     @ResponseBody
+    @PreAuthorize("hasRole('admin')")
     public Result modifyTopping(Topping topping,Authentication authentication){
         if (ObjectUtils.anyNull(topping.getPrice(),topping.getId())){
             return new Result(ResultConstant.CODE_FAILED,ErrorConstant.PARAM_MISSING,null);
@@ -173,6 +177,7 @@ public class ToppingController {
     }
 
     @GetMapping("/topping/management")
+    @PreAuthorize("hasRole('admin')")
     public String manageTopping(){
 
         return "admin/topping";

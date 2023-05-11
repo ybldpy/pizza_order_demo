@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity5">
 <head>
     <meta charset="UTF-8">
     <title>All orders</title>
@@ -56,36 +56,25 @@
         <li class="nav-item active">
           <a class="nav-link" href="home">Home <span class="sr-only">(current)</span></a>
         </li>
-        <!--        <li class="nav-item dropdown">-->
-        <!--          <a class="nav-link dropdown-toggle" href="#" role="button" data-toggle="dropdown" aria-expanded="false">-->
-        <!--            Link-->
-        <!--          </a>-->
-        <!--          <ul class="dropdown-menu">-->
-        <!--            <li><a class="dropdown-item" href="#">Action</a></li>-->
-        <!--            <li><a class="dropdown-item" href="#">Another action</a></li>-->
-        <!--            <li><hr class="dropdown-divider"></li>-->
-        <!--            <li><a class="dropdown-item" href="#">Something else here</a></li>-->
-        <!--          </ul>-->
-        <!--        </li>-->
-        <!--        <li class="nav-item">-->
-        <!--          <a class="nav-link disabled">Link</a>-->
-        <!--        </li>-->
+        <li class="nav-item active">
+          <a class="nav-link" href="admin/index" sec:authorize="hasRole('admin')">Admin</a>
+        </li>
       </ul>
       <div style="">
         <ul class="navbar-nav mr-auto my-2 my-lg-0 navbar-nav-scroll" style="max-height: 100px;">
           <li class="nav-item dropdown" style="">
             <a class="nav-link dropdown-toggle" href="#" role="button" data-toggle="dropdown" aria-expanded="false">
-              Username
+              [(${userName})]
             </a>
             <ul class="dropdown-menu" >
-              <li><a class="dropdown-item" href="javascript:void(0);">
+              <li><a class="dropdown-item" href="order/all">
                 <i class="bi bi-list">&nbsp&nbsp</i>
                 All Orders</a></li>
               <li><a class="dropdown-item" href="user/profile" th:href="@{/user/profile}">
                 <i class="bi bi-person-lines-fill">&nbsp&nbsp</i>
                 Profile</a></li>
               <li><hr class="dropdown-divider"></li>
-              <li><a class="dropdown-item" href="#">
+              <li><a class="dropdown-item" href="logout">
                 <i class="bi bi-box-arrow-right">&nbsp&nbsp</i>
                 Log out</a></li>
             </ul>
@@ -125,7 +114,7 @@
           <div id="all"></div>
         </div>
         <div class="tab-pane fade" id="list-InProgress" role="tabpanel" aria-labelledby="list-InProgress-list"><div id="inProgress"></div></div>
-        <div class="tab-pane fade" id="list-UnpaidOrders" role="tabpanel" aria-labelledby="list-unPaid-list"> <div id="unpaid"></div></div>
+        <div class="tab-pane fade" id="list-UnpaidOrders" role="tabpanel" aria-labelledby="list-unPaid-list"><div id="unpaid"></div></div>
        </div>
     </div>
   </div>
@@ -216,13 +205,14 @@
       else if (result.rows[i].paid===0) orders(result.rows[i],unpaid)
       else orders(result.rows[i],inProgress);
     }
-    $(all).find("a.pay").attr("disabled","disabled");
-    let $inProgress = $(inProgress);
-    alert($inProgress.find("a.pay").length);
+    let $inProgress = $("#list-InProgress");
     $inProgress.find("a.pay").css("display","none");
-    $inProgress.find("a.invoice").css("display","none");
-    let $unpaid = $("#unpaid");
-    $unpaid.find("a.invoice").css("display","none");
+    let $unpaid = $("#list-UnpaidOrders");
+    $("a.invoice").css("display","none");
+    // $unpaid.find("a.pay").css("display","none");
+    let $his = $("#list-AllOrders");
+    $his.find("a.pay").css("display","none");
+
 
   }
   function orders(row,type){
@@ -235,7 +225,7 @@
                    <div class="dishPhoto card-img-top" style="width: 51%;padding: 10px 10px;height: 230px"></div>
                    <div class="card-body" style="position: absolute;left: 53%">
                    <h5 class="card-title">${row.id}</h5>
-                   <p class="card-text"> Time: ${row.time}</p>
+                   <p class="card-text"> Time: ${row.createTimeStr}</p>
                    <p class="card-text"> Total Quantity: ${row.quantity}</p>
                    <p class="card-text"> Total Price: ${row.price}</p>
                    </div>
@@ -249,14 +239,14 @@
       $(`<div class="card order1" style="width: 90%;position: relative;margin-bottom: 20px">
                    <div class="dishPhoto card-img-top" style="width: 51%;padding: 10px 10px;height: 230px">
                    <div class="dishPhoto1 float-left img-thumbnail" style="width: 42%; margin-right: 2%;height: 95%">
-                       <img src=${img1} style="width: 90%;height: 80%" >
+                       <img src='${img1}' style="width: 90%;height: 80%" >
                        <p class="text-center" style="margin-top: 7px">${img1Name}</p>
                    </div>
                    </div>
 
                    <div class="card-body" style="position: absolute;left: 53%">
                    <h5 class="card-title">${row.id}</h5>
-                   <p class="card-text"> Time: ${row.time}</p>
+                   <p class="card-text"> Time: ${row.createTimeStr}</p>
                    <p class="card-text"> Total Quantity: ${row.quantity}</p>
                    <p class="card-text"> Total Price: ${row.price}</p>
                    </div>
@@ -272,14 +262,14 @@
         $(`<div class="card order1" style="width: 90%;position: relative;margin-bottom: 20px">
                    <div class="dishPhoto card-img-top" style="width: 51%;padding: 10px 10px;height: 230px">
                    <div class="dishPhoto1 float-left img-thumbnail" style="width: 42%; margin-right: 2%;height: 95%">
-                       <img src=${img1} style="width: 90%;height: 80%" >
+                       <img src='${img1}' style="width: 90%;height: 80%" >
                        <p class="text-center" style="margin-top: 7px">${img1Name}</p>
                    </div>
                    </div>
 
                    <div class="card-body" style="position: absolute;left: 53%">
                    <h5 class="card-title">${row.id}</h5>
-                   <p class="card-text"> Time: ${row.time}</p>
+                   <p class="card-text"> Time: ${row.createTimeStr}</p>
                    <p class="card-text"> Total Quantity: ${row.quantity}</p>
                    <p class="card-text"> Total Price: ${row.price}</p>
                    </div>
@@ -295,12 +285,12 @@
       $(`<div class="card order1" style="width: 90%;position: relative;margin-bottom: 20px">
                    <div class="dishPhoto card-img-top" style="width: 51%;padding: 10px 10px;height: 250px">
                    <div class="dishPhoto1 float-left img-thumbnail" style="width: 42%; margin-right: 2%;height: 90%">
-                       <img src=${img1} style="width: 90%;height: 80%" >
+                       <img src='${img1}' style="width: 90%;height: 80%" >
                        <p class="text-center" style="margin-top: 7px">${img1Name}</p>
                    </div>
 
                    <div class="dishPhoto2 float-left img-thumbnail" style="width: 42%;height: 90%">
-                   <img src=${img2} style="width: 90%;height: 80%" >
+                   <img src='${img2}' style="width: 90%;height: 80%" >
                    <p class="text-center" style="margin-top: 7px">${img2Name}</p>
                    </div>
                    <div class="float-right" style="margin-top: 20%;margin-left: 2%">
@@ -310,7 +300,7 @@
 
                    <div class="card-body" style="position: absolute;left: 53%">
                    <h5 class="card-title">${row.id}</h5>
-                   <p class="card-text"> Time: ${row.time}</p>
+                   <p class="card-text"> Time: ${row.createTimeStr}</p>
                    <p class="card-text"> Total Quantity: ${row.quantity}</p>
                    <p class="card-text"> Total Price: ${row.price}</p>
                    </div>
