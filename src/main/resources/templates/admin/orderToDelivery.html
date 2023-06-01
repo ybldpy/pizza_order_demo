@@ -89,7 +89,6 @@
     }
 
     function checkOrderDetail(orderId){
-        if (detailList[orderId]!=undefined){renderOrderDetail(detailList[orderId]);return}
 
         $.ajax(
             {
@@ -102,9 +101,6 @@
                     }
                     if (result.code!=1){
                         alertUtil.message(result.message==null||result.message==undefined?"Load detail failed":result.message,dangerType,document.getElementById("messageContainer"));
-                    }
-                    for(let i in result.data){
-                        detailList[result.data[i].id] = result.data[i];
                     }
                     renderOrderDetail(result.data);
                 },
